@@ -362,12 +362,21 @@ class SimbaRoleAccess
         $commonMaster = [
             '/admin*',
             '/workshops*',
-            '/locations*',
-            '/storage-locations*',
             '/item-categories*',
             '/categories*',
             '/units*',
             '/audit-logs*',
+        ];
+
+        $locationManage = [
+            '/locations/create',
+            '/locations/*/edit',
+            '/locations/*/toggle*',
+            '/locations/*/destroy',
+            '/storage-locations/create',
+            '/storage-locations/*/edit',
+            '/storage-locations/*/toggle*',
+            '/storage-locations/*/destroy',
         ];
 
         if (
@@ -404,6 +413,7 @@ class SimbaRoleAccess
         if ($role === self::ROLE_HEAD) {
             return array_merge(
                 $commonMaster,
+                $locationManage,
                 [
                     '/items/create',
                     '/items/bulk*',
@@ -429,10 +439,16 @@ class SimbaRoleAccess
         }
 
         if ($role === self::ROLE_TOOLMAN) {
-            return $commonMaster;
+            return array_merge(
+                $commonMaster,
+                $locationManage
+            );
         }
 
-        return $commonMaster;
+        return array_merge(
+            $commonMaster,
+            $locationManage
+        );
     }
 
     public function roleLabel(?User $user): string
