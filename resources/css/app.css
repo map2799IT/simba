@@ -1,0 +1,43 @@
+@source "../../**/*.blade.php";
+@source "../../**/*.js";
+@import "tailwindcss";
+@import "simba.css";
+
+/* =========================================================================
+   SIMBA - Bootstrap Overrides & Utilities
+   ========================================================================= */
+
+.page-container {
+    width: 100%;
+    max-width: 1500px;
+    margin: 0 auto;
+}
+
+[x-cloak] { display: none !important; }
+
+/* =========================================================================
+   RESPONSIVE SAFEGUARD
+   Kelas ini wajib ada di semua viewport - Tailwind scan backup
+   ========================================================================= */
+
+/* Tabel desktop: hanya tampil di lg+ */
+.table-desktop {
+    display: none;
+}
+
+@media (min-width: 1024px) {
+    .table-desktop {
+        display: block;
+    }
+}
+
+/* Card mobile: hanya tampil di bawah lg */
+.card-mobile {
+    display: block;
+}
+
+@media (min-width: 1024px) {
+    .card-mobile {
+        display: none;
+    }
+}
