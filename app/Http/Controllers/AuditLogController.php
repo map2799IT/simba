@@ -7,15 +7,20 @@ use App\Models\User;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
+use App\Traits\SortsIndex;
 
 class AuditLogController extends Controller
 {
+    use SortsIndex;
+
     public function index(
         Request $request
     ): View {
         $search = trim(
             (string) $request->input('search')
         );
+
+        [$sort, $direction, $perPage] = $this->indexSortParams(['created_at', 'event']);
 
         $logs = AuditLog::query()
             ->with('user')
@@ -112,11 +117,18 @@ class AuditLogController extends Controller
             )
             ->orderByDesc('created_at')
             ->orderByDesc('id')
-            ->paginate(30)
+            ->when($sort !== null, fn ($q) => $q->orderBy($sort, $direction))
+            ->paginate($perPage)
             ->withQueryString();
 
         return view('audit-logs.index', [
             'logs' => $logs,
+
+            'sort' => $sort,
+
+            'direction' => $direction,
+
+            'perPage' => $perPage,
 
             'events' =>
                 AuditLog::eventOptions(),

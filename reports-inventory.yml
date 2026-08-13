@@ -1,0 +1,303 @@
+- generic [ref=f5e2]:
+  - complementary "Navigasi utama" [ref=f5e3]:
+    - link "SIMBA Dashboard" [ref=f5e5] [cursor=pointer]:
+      - /url: http://localhost/simba/public/dashboard
+      - generic [ref=f5e6]: 
+      - generic [ref=f5e8]:
+        - generic [ref=f5e9]: SIMBA
+        - generic [ref=f5e10]: Sistem Inventaris Bengkel
+    - generic [ref=f5e12]:
+      - generic [ref=f5e13]: A
+      - generic [ref=f5e14]:
+        - generic [ref=f5e15]: Administrator SIMBA
+        - generic [ref=f5e16]:
+          - generic [ref=f5e17]: Administrator
+          - generic [ref=f5e18]: · Semua Jurusan
+    - navigation [ref=f5e19]:
+      - list [ref=f5e21]:
+        - listitem [ref=f5e22]:
+          - link " Dashboard" [ref=f5e23] [cursor=pointer]:
+            - /url: http://localhost/simba/public/dashboard
+            - generic [ref=f5e24]: 
+            - generic [ref=f5e25]: Dashboard
+      - generic [ref=f5e26]:
+        - generic [ref=f5e27]: Inventaris
+        - list [ref=f5e28]:
+          - listitem [ref=f5e29]:
+            - link " Data Alat & Bahan" [ref=f5e30] [cursor=pointer]:
+              - /url: http://localhost/simba/public/items
+              - generic [ref=f5e31]: 
+              - generic [ref=f5e32]: Data Alat & Bahan
+          - listitem [ref=f5e33]:
+            - link " Unit Alat & QR" [ref=f5e34] [cursor=pointer]:
+              - /url: http://localhost/simba/public/item-assets
+              - generic [ref=f5e35]: 
+              - generic [ref=f5e36]: Unit Alat & QR
+          - listitem [ref=f5e37]:
+            - link " Cetak QR Massal QR" [ref=f5e38] [cursor=pointer]:
+              - /url: http://localhost/simba/public/item-assets/qr-bulk
+              - generic [ref=f5e39]: 
+              - generic [ref=f5e40]: Cetak QR Massal
+              - generic [ref=f5e41]: QR
+      - generic [ref=f5e42]:
+        - generic [ref=f5e43]: Data Jurusan
+        - list [ref=f5e44]:
+          - listitem [ref=f5e45]:
+            - link " Lokasi Penyimpanan Kelola" [ref=f5e46] [cursor=pointer]:
+              - /url: http://localhost/simba/public/locations
+              - generic [ref=f5e47]: 
+              - generic [ref=f5e48]: Lokasi Penyimpanan
+              - generic [ref=f5e49]: Kelola
+      - generic [ref=f5e50]:
+        - generic [ref=f5e51]: Data Sekolah
+        - list [ref=f5e52]:
+          - listitem [ref=f5e53]:
+            - link " Data Siswa Kelola" [ref=f5e54] [cursor=pointer]:
+              - /url: http://localhost/simba/public/students
+              - generic [ref=f5e55]: 
+              - generic [ref=f5e56]: Data Siswa
+              - generic [ref=f5e57]: Kelola
+      - generic [ref=f5e58]:
+        - generic [ref=f5e59]: Transaksi Stok
+        - list [ref=f5e60]:
+          - listitem [ref=f5e61]:
+            - link " Barang Masuk Proses" [ref=f5e62] [cursor=pointer]:
+              - /url: http://localhost/simba/public/stock-receipts
+              - generic [ref=f5e63]: 
+              - generic [ref=f5e64]: Barang Masuk
+              - generic [ref=f5e65]: Proses
+          - listitem [ref=f5e66]:
+            - link " Barang Keluar Proses" [ref=f5e67] [cursor=pointer]:
+              - /url: http://localhost/simba/public/stock-issues
+              - generic [ref=f5e68]: 
+              - generic [ref=f5e69]: Barang Keluar
+              - generic [ref=f5e70]: Proses
+          - listitem [ref=f5e71]:
+            - link " Import Barang Masuk Import" [ref=f5e72] [cursor=pointer]:
+              - /url: http://localhost/simba/public/stock-import
+              - generic [ref=f5e73]: 
+              - generic [ref=f5e74]: Import Barang Masuk
+              - generic [ref=f5e75]: Import
+          - listitem [ref=f5e76]:
+            - link " Pergerakan Stok" [ref=f5e77] [cursor=pointer]:
+              - /url: http://localhost/simba/public/stock-movements
+              - generic [ref=f5e78]: 
+              - generic [ref=f5e79]: Pergerakan Stok
+      - generic [ref=f5e80]:
+        - generic [ref=f5e81]: Peminjaman
+        - list [ref=f5e82]:
+          - listitem [ref=f5e83]:
+            - link " Ajukan Peminjaman" [ref=f5e84] [cursor=pointer]:
+              - /url: http://localhost/simba/public/loans/create
+              - generic [ref=f5e85]: 
+              - generic [ref=f5e86]: Ajukan Peminjaman
+          - listitem [ref=f5e87]:
+            - link " Kelola Peminjaman" [ref=f5e88] [cursor=pointer]:
+              - /url: http://localhost/simba/public/loans
+              - generic [ref=f5e89]: 
+              - generic [ref=f5e90]: Kelola Peminjaman
+          - listitem [ref=f5e91]:
+            - link " Pengembalian" [ref=f5e92] [cursor=pointer]:
+              - /url: http://localhost/simba/public/loan-returns
+              - generic [ref=f5e93]: 
+              - generic [ref=f5e94]: Pengembalian
+          - listitem [ref=f5e95]:
+            - link " Penggantian Alat Ganti" [ref=f5e96] [cursor=pointer]:
+              - /url: http://localhost/simba/public/loans/replacement-requests
+              - generic [ref=f5e97]: 
+              - generic [ref=f5e98]: Penggantian Alat
+              - generic [ref=f5e99]: Ganti
+      - generic [ref=f5e100]:
+        - generic [ref=f5e101]: Kerusakan
+        - list [ref=f5e102]:
+          - listitem [ref=f5e103]:
+            - link " Laporkan Kerusakan" [ref=f5e104] [cursor=pointer]:
+              - /url: http://localhost/simba/public/damage-reports/create
+              - generic [ref=f5e105]: 
+              - generic [ref=f5e106]: Laporkan Kerusakan
+          - listitem [ref=f5e107]:
+            - link " Kelola Kerusakan" [ref=f5e108] [cursor=pointer]:
+              - /url: http://localhost/simba/public/damage-reports
+              - generic [ref=f5e109]: 
+              - generic [ref=f5e110]: Kelola Kerusakan
+      - generic [ref=f5e111]:
+        - generic [ref=f5e112]: Laporan
+        - list [ref=f5e113]:
+          - listitem [ref=f5e114]:
+            - link " Laporan Inventaris" [ref=f5e115] [cursor=pointer]:
+              - /url: http://localhost/simba/public/reports/inventory
+              - generic [ref=f5e117]: 
+              - generic [ref=f5e118]: Laporan Inventaris
+          - listitem [ref=f5e119]:
+            - link " Laporan Stok" [ref=f5e120] [cursor=pointer]:
+              - /url: http://localhost/simba/public/reports/stock
+              - generic [ref=f5e121]: 
+              - generic [ref=f5e122]: Laporan Stok
+          - listitem [ref=f5e123]:
+            - link " Laporan Peminjaman" [ref=f5e124] [cursor=pointer]:
+              - /url: http://localhost/simba/public/reports/loans
+              - generic [ref=f5e125]: 
+              - generic [ref=f5e126]: Laporan Peminjaman
+          - listitem [ref=f5e127]:
+            - link " Laporan Kerusakan" [ref=f5e128] [cursor=pointer]:
+              - /url: http://localhost/simba/public/reports/damages
+              - generic [ref=f5e129]: 
+              - generic [ref=f5e130]: Laporan Kerusakan
+          - listitem [ref=f5e131]:
+            - link " Laporan Pergerakan" [ref=f5e132] [cursor=pointer]:
+              - /url: http://localhost/simba/public/reports/stock-movements
+              - generic [ref=f5e133]: 
+              - generic [ref=f5e134]: Laporan Pergerakan
+      - generic [ref=f5e135]:
+        - generic [ref=f5e136]: Master Sistem
+        - list [ref=f5e137]:
+          - listitem [ref=f5e138]:
+            - link " Bengkel / Jurusan" [ref=f5e139] [cursor=pointer]:
+              - /url: http://localhost/simba/public/workshops
+              - generic [ref=f5e140]: 
+              - generic [ref=f5e141]: Bengkel / Jurusan
+          - listitem [ref=f5e142]:
+            - link " Kategori Barang" [ref=f5e143] [cursor=pointer]:
+              - /url: http://localhost/simba/public/item-categories
+              - generic [ref=f5e144]: 
+              - generic [ref=f5e145]: Kategori Barang
+          - listitem [ref=f5e146]:
+            - link " Satuan" [ref=f5e147] [cursor=pointer]:
+              - /url: http://localhost/simba/public/units
+              - generic [ref=f5e148]: 
+              - generic [ref=f5e149]: Satuan
+      - generic [ref=f5e150]:
+        - generic [ref=f5e151]: Administrasi
+        - list [ref=f5e152]:
+          - listitem [ref=f5e153]:
+            - link " Pengguna" [ref=f5e154] [cursor=pointer]:
+              - /url: http://localhost/simba/public/admin/users
+              - generic [ref=f5e155]: 
+              - generic [ref=f5e156]: Pengguna
+          - listitem [ref=f5e157]:
+            - link " Hak Akses" [ref=f5e158] [cursor=pointer]:
+              - /url: http://localhost/simba/public/admin/access
+              - generic [ref=f5e159]: 
+              - generic [ref=f5e160]: Hak Akses
+          - listitem [ref=f5e161]:
+            - link " Audit Aktivitas" [ref=f5e162] [cursor=pointer]:
+              - /url: http://localhost/simba/public/admin/audit-logs
+              - generic [ref=f5e163]: 
+              - generic [ref=f5e164]: Audit Aktivitas
+          - listitem [ref=f5e165]:
+            - link " Audit Sistem Error" [ref=f5e166] [cursor=pointer]:
+              - /url: http://localhost/simba/public/admin/error-logs
+              - generic [ref=f5e167]: 
+              - generic [ref=f5e168]: Audit Sistem
+              - generic [ref=f5e169]: Error
+    - generic [ref=f5e171]:
+      - link " Profil Saya" [ref=f5e172] [cursor=pointer]:
+        - /url: http://localhost/simba/public/profile
+        - generic [ref=f5e173]: 
+        - generic [ref=f5e174]: Profil Saya
+      - button " Keluar" [ref=f5e176] [cursor=pointer]:
+        - generic [ref=f5e177]: 
+        - generic [ref=f5e178]: Keluar
+  - generic [ref=f5e179]:
+    - banner [ref=f5e180]:
+      - generic [ref=f5e181]: SIMBA
+      - generic [ref=f5e184]:
+        - button "Ganti tema" [ref=f5e185] [cursor=pointer]:
+          - text: 
+          - generic [ref=f5e186]: 
+        - generic [ref=f5e187]:
+          - button "Menu pengguna" [ref=f5e188] [cursor=pointer]:
+            - generic [ref=f5e189]: A
+          - text:  
+    - main [ref=f5e192]:
+      - generic [ref=f5e193]:
+        - generic [ref=f5e194]:
+          - generic [ref=f5e195]:
+            - heading "Laporan Inventaris" [level=1] [ref=f5e196]
+            - paragraph [ref=f5e197]: Jurusan dan lokasi diambil dari unit alat serta transaksi Barang Masuk.
+          - generic [ref=f5e198]:
+            - link " Excel" [ref=f5e199] [cursor=pointer]:
+              - /url: http://localhost/simba/public/reports/export/excel
+              - generic [ref=f5e200]: 
+              - text: Excel
+            - link " PDF" [ref=f5e201] [cursor=pointer]:
+              - /url: http://localhost/simba/public/reports/export/pdf
+              - generic [ref=f5e202]: 
+              - text: PDF
+        - generic [ref=f5e203]:
+          - generic [ref=f5e204]:
+            - paragraph [ref=f5e205]: Total Data
+            - paragraph [ref=f5e206]: "28"
+          - generic [ref=f5e207]:
+            - paragraph [ref=f5e208]: Data Alat
+            - paragraph [ref=f5e209]: "20"
+          - generic [ref=f5e210]:
+            - paragraph [ref=f5e211]: Data Bahan
+            - paragraph [ref=f5e212]: "8"
+          - generic [ref=f5e213]:
+            - paragraph [ref=f5e214]: Total Nilai
+            - paragraph [ref=f5e215]: Rp 0
+        - generic [ref=f5e218]:
+          - generic [ref=f5e219]:
+            - generic [ref=f5e220]: Pencarian
+            - searchbox "Pencarian" [ref=f5e222]
+          - generic [ref=f5e223]:
+            - generic [ref=f5e224]: Jurusan
+            - combobox "Jurusan" [ref=f5e225]:
+              - option "Semua jurusan" [selected]
+              - option "DPIB — Desain Pemodelan dan Informasi Bangunan"
+              - option "RPL — Rekayasa Perangkat Lunak"
+              - option "TAV — Teknik Audio Video"
+              - option "TKJ — Teknik Komputer dan Jaringan"
+              - option "TKR — Teknik Kendaraan Ringan"
+              - option "TP — Teknik Pemesinan"
+              - option "TSM — Teknik Sepeda Motor"
+              - option "TTIL — Teknik Tenaga Instalasi Listrik"
+          - generic [ref=f5e226]:
+            - generic [ref=f5e227]: Kategori
+            - combobox "Kategori" [ref=f5e228]:
+              - option "Semua" [selected]
+              - option "ATK"
+              - option "Bahan Manajemen & Instalasi Kelistrikan"
+              - option "Kabel & Konektor"
+              - option "Media Penyimpanan"
+              - option "Perangkat Jaringan"
+              - option "Perangkat Keras/Elektronik"
+              - option "Perangkat Server"
+              - option "Toolkit"
+          - generic [ref=f5e229]:
+            - generic [ref=f5e230]: Jenis
+            - combobox "Jenis" [ref=f5e231]:
+              - option "Semua" [selected]
+              - option "Alat"
+              - option "Bahan"
+          - generic [ref=f5e232]:
+            - button " Filter" [ref=f5e233] [cursor=pointer]:
+              - generic [ref=f5e234]: 
+              - text: Filter
+            - link "Reset" [ref=f5e235] [cursor=pointer]:
+              - /url: http://localhost/simba/public/reports
+        - generic [ref=f5e236]:
+          - generic [ref=f5e237]:
+            - generic [ref=f5e238]:
+              - heading "Daftar Inventaris" [level=2] [ref=f5e239]
+              - paragraph [ref=f5e240]: Ditemukan 28 data barang.
+            - generic [ref=f5e241]: "Total nilai: Rp 0"
+          - generic [ref=f5e243]:
+            - paragraph [ref=f5e244]: Menampilkan 1–25 dari 28
+            - navigation "Navigasi halaman" [ref=f5e245]:
+              - generic [ref=f5e246]: Menampilkan 1 sampai 25 dari 28 data
+              - navigation "Halaman data" [ref=f5e247]:
+                - list [ref=f5e248]:
+                  - listitem [ref=f5e249]:
+                    - generic: ‹ Sebelumnya
+                  - listitem [ref=f5e250]:
+                    - generic [ref=f5e251]: "1"
+                  - listitem [ref=f5e252]:
+                    - link "Buka halaman 2" [ref=f5e253] [cursor=pointer]:
+                      - /url: http://localhost/simba/public/reports/inventory?page=2
+                      - text: "2"
+                  - listitem [ref=f5e254]:
+                    - link "Halaman berikutnya" [ref=f5e255] [cursor=pointer]:
+                      - /url: http://localhost/simba/public/reports/inventory?page=2
+                      - text: Berikutnya ›

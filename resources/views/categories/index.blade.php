@@ -4,6 +4,12 @@
 @section('page-title', 'Kategori Barang')
 
 @section('content')
+    @php
+        $sort = $sort ?? null;
+        $direction = $direction ?? 'asc';
+        $perPage = $perPage ?? 25;
+    @endphp
+
     @php $canManage = auth()->user()->hasRole('admin', 'toolman'); @endphp
 
     <x-page-header title="Kategori Barang" description="Kelola kategori untuk alat dan bahan bengkel." :breadcrumb="['Master Sistem', 'Kategori']">
@@ -48,14 +54,30 @@
         </form>
     </div>
 
+    @if ($canManage)
+        <form id="bulk-categories-form" method="POST" action="{{ route('categories.bulk.toggle-status') }}" class="mb-4">
+            @csrf
+            <input type="hidden" name="ids" id="bulk-categories-ids">
+            <div class="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3 shadow-sm">
+                <span class="text-sm text-slate-600"><span id="bulk-count" class="font-semibold text-blue-600">0</span> dipilih</span>
+                <button id="bulk-toggle-btn" type="submit" disabled class="inline-flex min-h-10 items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-600 transition hover:border-blue-300 hover:text-blue-600 disabled:cursor-not-allowed disabled:opacity-40">
+                    <i class="bi bi-toggle-off"></i> Ubah Status Terpilih
+                </button>
+            </div>
+        </form>
+    @endif
+
     {{-- Desktop table --}}
     <div class="table-desktop overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
         <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-slate-200">
                 <thead class="bg-slate-50/80">
                     <tr>
-                        <th class="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Kode</th>
-                        <th class="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Nama Kategori</th>
+                        @if ($canManage)
+                            <th class="w-10 px-4 py-3.5"><input type="checkbox" id="bulk-check-all" class="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"></th>
+                        @endif
+                        <x-sortable-header :label="'Kode'" :sort-key="'code'" :sort="$sort" :direction="$direction" />
+                        <x-sortable-header :label="'Nama Kategori'" :sort-key="'name'" :sort="$sort" :direction="$direction" />
                         <th class="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Digunakan Untuk</th>
                         <th class="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Keterangan</th>
                         <th class="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Status</th>
@@ -65,6 +87,9 @@
                 <tbody class="divide-y divide-slate-100">
                     @forelse ($categories as $category)
                         <tr class="transition-colors hover:bg-blue-50/40">
+                            @if ($canManage)
+                                <td class="px-4 py-3.5"><input type="checkbox" class="item-check h-4 w-4 rounded border-slate-300 text-blue-600" value="{{ $category->id }}"></td>
+                            @endif
                             <td class="whitespace-nowrap px-5 py-4"><x-badge variant="neutral">{{ $category->code }}</x-badge></td>
                             <td class="px-5 py-4 text-sm font-semibold text-slate-900">{{ $category->name }}</td>
                             <td class="whitespace-nowrap px-5 py-4">
@@ -98,7 +123,7 @@
                             @endif
                         </tr>
                     @empty
-                        <tr><td colspan="{{ $canManage ? 6 : 5 }}" class="px-5 py-8">
+                        <tr><td colspan="{{ $canManage ? 7 : 6 }}" class="px-5 py-8">
                             <x-empty-state icon="bi-tags" title="Belum ada kategori barang" description="Tambahkan kategori pertama untuk mengelompokkan alat dan bahan.">
                                 @if ($canManage)<x-button href="{{ route('categories.create') }}" variant="primary"><i class="bi bi-plus-circle"></i> Tambah Kategori</x-button>@endif
                             </x-empty-state>
@@ -154,8 +179,42 @@
 
     @if ($categories->hasPages())
         <div class="mt-5 flex flex-col items-center justify-between gap-3 sm:flex-row">
-            <p class="text-sm text-slate-500">Menampilkan {{ $categories->firstItem() ?? 0 }}–{{ $categories->lastItem() ?? 0 }} dari {{ $categories->total() }}</p>
+            <x-per-page-selector :per-page="$perPage" />
+            <p class="text-sm text-slate-500">Menampilkan {{ $categories->firstItem() ?? 0 }}â€“{{ $categories->lastItem() ?? 0 }} dari {{ $categories->total() }}</p>
             {{ $categories->links() }}
         </div>
+    @endif
+
+    @if ($canManage)
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                var checkAll = document.getElementById('bulk-check-all');
+                var checks = document.querySelectorAll('.item-check');
+                var count = document.getElementById('bulk-count');
+                var btn = document.getElementById('bulk-toggle-btn');
+                var ids = document.getElementById('bulk-categories-ids');
+                var form = document.getElementById('bulk-categories-form');
+                if (!checkAll || !form) return;
+
+                function refresh() {
+                    var selected = Array.from(checks).filter(function (c) { return c.checked; });
+                    if (count) count.textContent = String(selected.length);
+                    if (btn) {
+                        btn.disabled = selected.length === 0;
+                        btn.classList.toggle('disabled', selected.length === 0);
+                    }
+                }
+                checkAll.addEventListener('change', function () {
+                    checks.forEach(function (c) { c.checked = checkAll.checked; });
+                    refresh();
+                });
+                checks.forEach(function (c) { c.addEventListener('change', refresh); });
+                form.addEventListener('submit', function (e) {
+                    var selected = Array.from(checks).filter(function (c) { return c.checked; }).map(function (c) { return c.value; });
+                    if (selected.length === 0) { e.preventDefault(); return; }
+                    ids.value = selected.join(',');
+                });
+            });
+        </script>
     @endif
 @endsection

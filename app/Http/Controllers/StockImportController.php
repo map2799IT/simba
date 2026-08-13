@@ -139,8 +139,20 @@ class StockImportController extends Controller
         $errors = [];
         $created = 0;
         $details = 0;
+        $existingRefs = \App\Models\ItemStockMovement::query()
+            ->withoutGlobalScopes()
+            ->where('workshop_id', $ws->id)
+            ->whereNotNull('reference_number')
+            ->whereIn('reference_number', array_column($docs, 'document_number'))
+            ->pluck('reference_number')
+            ->all();
+
         foreach ($docs as $doc) {
             try {
+                if (in_array($doc['document_number'], $existingRefs, true)) {
+                    $errors[] = 'Dokumen ' . ($doc['document_number'] ?? '-') . ': sudah diimport sebelumnya, dilewati.';
+                    continue;
+                }
                 $payload = $this->buildPayload($doc, (int) $ws->id, $defaultLoc, (string) $ws->code);
                 $this->submitViaManualFlow($payload, $user, $r);
                 $created++;
@@ -184,10 +196,15 @@ class StockImportController extends Controller
             if ($itemId === null) {
                 throw new \RuntimeException('Master barang tidak ditemukan: ' . ($row['kode_barang'] ?? $row['nama_barang_penerimaan'] ?? '-'));
             }
-            $qty = (float) ($row['jumlah'] ?? 0);
+            $rawQty = trim((string) ($row['jumlah'] ?? ''));
+            $rawPrice = trim((string) ($row['harga_unit'] ?? ''));
+            $qty = (float) str_replace(',', '.', $rawQty);
             if ($qty <= 0) {
                 throw new \RuntimeException('Jumlah harus > 0.');
             }
+            $unitPrice = $rawPrice !== ''
+                ? (string) str_replace(',', '.', $rawPrice)
+                : null;
             $loc = $this->resolveLocation($row, $wid) ?? $defaultLoc;
             if ($loc === null) {
                 throw new \RuntimeException("Tidak ada lokasi untuk jurusan $wcode.");
@@ -214,7 +231,7 @@ class StockImportController extends Controller
                 'brand' => $row['merek'] ?? null,
                 'model' => $row['model'] ?? null,
                 'specification' => $row['spesifikasi'] ?? null,
-                'unit_price' => $row['harga_unit'] ?? null,
+                'unit_price' => $unitPrice,
                 'condition' => $condition,
                 'notes' => null,
             ];
@@ -263,7 +280,11 @@ class StockImportController extends Controller
         if (empty($rows)) {
             return [];
         }
-        $header = array_map('strtolower', array_map('trim', array_values($rows[0] ?? [])));
+        $first = array_values($rows[0] ?? []);
+        if (isset($first[0]) && is_string($first[0]) && str_starts_with($first[0], "\xEF\xBB\xBF")) {
+            $first[0] = substr($first[0], 3);
+        }
+        $header = array_map('strtolower', array_map('trim', $first));
         $map = array_flip($header);
         $data = [];
         foreach (array_slice($rows, 2) as $idx => $row) {
@@ -296,16 +317,35 @@ class StockImportController extends Controller
     private function resolveLocation(array $row, int $wid): ?int
     {
         $name = trim((string) ($row['lokasi'] ?? ''));
+
+        if ($name === '') {
+            return null;
+        }
+
+        /*
+         * Bersihkan dekorator dari sheet REFERENSI:
+         * "[Induk] Nama" -> Nama
+         * "[Turunan] Induk (KODE) > Nama" -> Nama turunan
+         */
+        $clean = preg_replace('/^\[.*?\]\s*/', '', $name);
+        $clean = preg_replace('/^.*>\s*/', '', $clean);
+        $clean = trim((string) $clean);
+
         $q = StorageLocation::query()->withoutGlobalScopes()->where('workshop_id', $wid)->where('is_active', true);
-        if ($name !== '') {
-            if ($loc = (clone $q)->where('name', $name)->first()) {
+
+        foreach (array_unique([$name, $clean]) as $candidate) {
+            if ($candidate === '') {
+                continue;
+            }
+            if ($loc = (clone $q)->where('name', $candidate)->first()) {
                 return (int) $loc->id;
             }
-            if ($loc = (clone $q)->where('code', $name)->first()) {
+            if ($loc = (clone $q)->where('code', $candidate)->first()) {
                 return (int) $loc->id;
             }
         }
-        return null;
+
+        throw new \RuntimeException("Lokasi tidak ditemukan: {$name}");
     }
 
     public function reference(Request $r): View

@@ -1,0 +1,196 @@
+/*
+ * SIMBA dark mode override.
+ * Diaktifkan lewat atribut data-theme="dark" pada <html>.
+ *
+ * Palet gelap (slate):
+ *   bg-page    #0f172a   (body, panel paling luar)
+ *   bg-card    #1e293b   (kartu, tabel, form)
+ *   bg-elevated#273449   (thead, hover, dropdown, input focus)
+ *   border     #334155 / #475569
+ *   text-main  #e2e8f0   (teks utama)
+ *   text-sub   #94a3b8   (teks sekunder)
+ *   text-faint #64748b   (label samar)
+ *
+ * Prioritas: semua teks di atas permukaan gelap harus TERBACA.
+ * Tombol/status berwarna tidak diubah.
+ */
+
+/* ---------- Permukaan halaman ---------- */
+html[data-theme='dark'] body,
+html[data-theme='dark'] main,
+html[data-theme='dark'] .min-h-full {
+    background-color: #0f172a !important;
+    color: #e2e8f0 !important;
+}
+
+/* Kartu & panel isi */
+html[data-theme='dark'] .bg-white,
+html[data-theme='dark'] .bg-slate-50,
+html[data-theme='dark'] .bg-slate-100,
+html[data-theme='dark'] .content-card,
+html[data-theme='dark'] .table-desktop,
+html[data-theme='dark'] .card-mobile > div {
+    background-color: #1e293b !important;
+    border-color: #334155 !important;
+}
+
+/* thead / header tabel */
+html[data-theme='dark'] thead,
+html[data-theme='dark'] thead.bg-slate-50,
+html[data-theme='dark'] .bg-slate-50 {
+    background-color: #273449 !important;
+}
+
+/* hover baris */
+html[data-theme='dark'] tbody tr:hover,
+html[data-theme='dark'] .hover\:bg-slate-50:hover,
+html[data-theme='dark'] tr:hover {
+    background-color: #273449 !important;
+}
+
+/* Sidebar */
+html[data-theme='dark'] .bg-slate-800,
+html[data-theme='dark'] .bg-slate-950,
+html[data-theme='dark'] aside,
+html[data-theme='dark'] .bg-slate-900 {
+    background-color: #0b1220 !important;
+    border-color: #1e293b !important;
+}
+
+/* ---------- Teks utama (harus terbaca) ---------- */
+html[data-theme='dark'] body,
+html[data-theme='dark'] .text-slate-900,
+html[data-theme='dark'] .text-slate-800,
+html[data-theme='dark'] .text-slate-700,
+html[data-theme='dark'] .text-slate-600,
+html[data-theme='dark'] .fw-bold,
+html[data-theme='dark'] .fw-semibold,
+html[data-theme='dark'] .page-title,
+html[data-theme='dark'] h1,
+html[data-theme='dark'] h2,
+html[data-theme='dark'] h3,
+html[data-theme='dark'] h4,
+html[data-theme='dark'] h5,
+html[data-theme='dark'] h6,
+html[data-theme='dark'] td,
+html[data-theme='dark'] th,
+html[data-theme='dark'] .table td,
+html[data-theme='dark'] .table th {
+    color: #e2e8f0 !important;
+}
+
+/* Teks yang tadinya putih di atas kartu gelap -> jadikan terang kontras */
+html[data-theme='dark'] .text-white,
+html[data-theme='dark'] .text-slate-50,
+html[data-theme='dark'] .text-slate-100 {
+    color: #f8fafc !important;
+}
+
+/* Teks sekunder */
+html[data-theme='dark'] .text-slate-500,
+html[data-theme='dark'] .text-slate-400,
+html[data-theme='dark'] .text-slate-300,
+html[data-theme='dark'] .text-secondary,
+html[data-theme='dark'] .small,
+html[data-theme='dark'] .page-description {
+    color: #94a3b8 !important;
+}
+
+/* Teks samar (label, hint) */
+html[data-theme='dark'] .text-xs.text-slate-400,
+html[data-theme='dark'] .form-text,
+html[data-theme='dark'] .text-slate-300.text-[10px] {
+    color: #94a3b8 !important;
+}
+
+/* ---------- Tabel ---------- */
+html[data-theme='dark'] td,
+html[data-theme='dark'] th,
+html[data-theme='dark'] .table td,
+html[data-theme='dark'] .table th,
+html[data-theme='dark'] .divide-y > *,
+html[data-theme='dark'] .divide-slate-200 > *,
+html[data-theme='dark'] .divide-slate-100 > * {
+    border-color: #334155 !important;
+    color: #e2e8f0 !important;
+}
+
+html[data-theme='dark'] table,
+html[data-theme='dark'] .table {
+    color: #e2e8f0 !important;
+}
+
+/* Kode / mono */
+html[data-theme='dark'] .font-mono,
+html[data-theme='dark'] code,
+html[data-theme='dark'] .text-slate-700.font-mono {
+    color: #93c5fd !important;
+}
+
+/* ---------- Border umum ---------- */
+html[data-theme='dark'] .border-slate-200,
+html[data-theme='dark'] .border-slate-300,
+html[data-theme='dark'] .border-slate-100,
+html[data-theme='dark'] .border-slate-800,
+html[data-theme='dark'] .border,
+html[data-theme='dark'] .rounded-xl,
+html[data-theme='dark'] .rounded-2xl {
+    border-color: #334155 !important;
+}
+
+/* ---------- Form ---------- */
+html[data-theme='dark'] input,
+html[data-theme='dark'] select,
+html[data-theme='dark'] textarea,
+html[data-theme='dark'] .form-control,
+html[data-theme='dark'] .form-select {
+    background-color: #0f172a !important;
+    color: #e2e8f0 !important;
+    border-color: #475569 !important;
+}
+
+html[data-theme='dark'] input::placeholder,
+html[data-theme='dark'] textarea::placeholder {
+    color: #64748b !important;
+}
+
+html[data-theme='dark'] input:focus,
+html[data-theme='dark'] select:focus,
+html[data-theme='dark'] textarea:focus,
+html[data-theme='dark'] .form-control:focus,
+html[data-theme='dark'] .form-select:focus {
+    background-color: #0f172a !important;
+    color: #e2e8f0 !important;
+}
+
+/* ---------- Dropdown / Popover ---------- */
+html[data-theme='dark'] .dropdown-menu,
+html[data-theme='dark'] .dropdown-menu .dropdown-item {
+    background-color: #1e293b !important;
+    color: #e2e8f0 !important;
+    border-color: #334155 !important;
+}
+
+html[data-theme='dark'] .dropdown-item:hover {
+    background-color: #273449 !important;
+    color: #f8fafc !important;
+}
+
+/* ---------- Badge netral ---------- */
+html[data-theme='dark'] .badge,
+html[data-theme='dark'] .rounded-lg.bg-slate-100,
+html[data-theme='dark'] .inline-flex.rounded.bg-slate-100 {
+    background-color: #273449 !important;
+    color: #cbd5e1 !important;
+}
+
+/* ---------- Shadow ---------- */
+html[data-theme='dark'] .shadow-sm,
+html[data-theme='dark'] .shadow {
+    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.5) !important;
+}
+
+/* ---------- Link sekunder (belum diklik) ---------- */
+html[data-theme='dark'] a:not(.btn):not([class*='text-blue-']) {
+    color: #93c5fd !important;
+}

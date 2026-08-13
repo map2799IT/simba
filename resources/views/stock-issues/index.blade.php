@@ -4,6 +4,11 @@
 @section('page-title', 'Barang Keluar')
 
 @section('content')
+    @php
+        $sort = $sort ?? null;
+        $direction = $direction ?? 'asc';
+        $perPage = $perPage ?? 25;
+    @endphp
     <div
         class="d-flex flex-column flex-xl-row
             justify-content-between align-items-xl-center
@@ -217,12 +222,12 @@
             >
                 <thead>
                     <tr>
-                        <th>Tanggal</th>
-                        <th>Referensi</th>
+                        <x-sortable-header :label="'Tanggal'" :sort-key="'transaction_date'" :sort="$sort" :direction="$direction" />
+                        <x-sortable-header :label="'Referensi'" :sort-key="'reference_number'" :sort="$sort" :direction="$direction" />
                         <th>Barang</th>
                         <th>Jenis</th>
                         <th>Jurusan</th>
-                        <th class="text-end">Jumlah</th>
+                        <x-sortable-header :label="'Jumlah'" :sort-key="'quantity'" :sort="$sort" :direction="$direction" :class="'text-right'" />
                         <th class="text-end">Perubahan Stok</th>
                         <th>Tujuan/Keperluan</th>
                         <th>Petugas</th>
@@ -353,8 +358,9 @@
         </div>
 
         @if ($movements->hasPages())
-            <div class="content-card-body border-top">
+            <div class="content-card-body border-top d-flex flex-wrap align-items-center justify-content-between gap-2">
                 {{ $movements->links() }}
+                <x-per-page-selector :per-page="$perPage" />
             </div>
         @endif
     </section>

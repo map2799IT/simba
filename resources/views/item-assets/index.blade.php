@@ -4,6 +4,12 @@
 
 @section('content')
     @php
+        $sort = $sort ?? null;
+        $direction = $direction ?? 'asc';
+        $perPage = $perPage ?? 25;
+    @endphp
+
+    @php
         $conditionVariant = fn (string $c) => match ($c) {
             'good' => 'success', 'minor_damage' => 'warning', 'major_damage' => 'danger', default => 'neutral',
         };
@@ -29,7 +35,7 @@
 
     @if ($selectedItem)
         <div class="mb-5 flex flex-col gap-3 rounded-2xl border border-blue-200 bg-blue-50 p-4 sm:flex-row sm:items-center sm:justify-between">
-            <p class="text-sm text-blue-800">Menampilkan unit untuk: <strong>{{ $selectedItem->code }} — {{ $selectedItem->name }}</strong></p>
+            <p class="text-sm text-blue-800">Menampilkan unit untuk: <strong>{{ $selectedItem->code }} â€” {{ $selectedItem->name }}</strong></p>
             <x-button href="{{ route('item-assets.index') }}" variant="secondary" size="sm">Tampilkan Semua Unit</x-button>
         </div>
     @endif
@@ -52,7 +58,7 @@
                     <select id="workshop_id" name="workshop_id" class="w-full rounded-xl border-slate-300 bg-white py-2.5 text-sm shadow-sm focus:border-blue-500 focus:ring-blue-500">
                         <option value="">Semua bengkel</option>
                         @foreach ($workshops as $workshop)
-                            <option value="{{ $workshop->id }}" @selected((string) request('workshop_id') === (string) $workshop->id)>{{ $workshop->code }} — {{ $workshop->name }}</option>
+                            <option value="{{ $workshop->id }}" @selected((string) request('workshop_id') === (string) $workshop->id)>{{ $workshop->code }} â€” {{ $workshop->name }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -88,9 +94,9 @@
             <table class="min-w-full divide-y divide-slate-200">
                 <thead class="bg-slate-50">
                     <tr>
-                        <th class="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Nomor Inventaris</th>
+                        <x-sortable-header label="Nomor Inventaris" sort-key="asset_number" :sort="$sort" :direction="$direction" />
                         <th class="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Data Alat</th>
-                        <th class="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Nomor Seri</th>
+                        <x-sortable-header label="Nomor Seri" sort-key="serial_number" :sort="$sort" :direction="$direction" />
                         <th class="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Bengkel / Lokasi</th>
                         <th class="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Kondisi</th>
                         <th class="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Status</th>
@@ -103,10 +109,11 @@
                             <td class="px-5 py-3.5">
                                 <div class="font-mono text-sm font-semibold text-slate-900">{{ $asset->asset_number }}</div>
                                 <div class="text-xs text-slate-500">ID unit #{{ $asset->id }}</div>
+                                <div class="mt-0.5 inline-flex items-center gap-1 rounded bg-slate-100 px-1.5 py-0.5 text-[10px] font-medium text-slate-500"><i class="bi bi-clock-history"></i>{{ $asset->updated_at?->format('d-m-Y H:i') ?? '-' }}</div>
                             </td>
                             <td class="px-5 py-3.5">
                                 <div class="text-sm font-semibold text-slate-900">{{ collect([$asset->brand, $asset->model])->filter()->implode(' / ') ?: ($asset->item?->name ?? '-') }}</div>
-                                <div class="text-xs text-slate-500">{{ $asset->item?->name ?? '-' }} · {{ $asset->item?->code ?? '-' }}</div>
+                                <div class="text-xs text-slate-500">{{ $asset->item?->name ?? '-' }} Â· {{ $asset->item?->code ?? '-' }}</div>
                             </td>
                             <td class="px-5 py-3.5 text-sm text-slate-600">{{ $asset->serial_number ?: '-' }}</td>
                             <td class="px-5 py-3.5">
@@ -136,7 +143,8 @@
         @if ($assets->hasPages())
             <div class="border-t border-slate-100 px-5 py-4">
                 <div class="flex flex-col items-center justify-between gap-2 sm:flex-row">
-                    <p class="text-sm text-slate-500">Menampilkan {{ $assets->firstItem() ?? 0 }}–{{ $assets->lastItem() ?? 0 }} dari {{ $assets->total() }}</p>
+                    <p class="text-sm text-slate-500">Menampilkan {{ $assets->firstItem() ?? 0 }}â€“{{ $assets->lastItem() ?? 0 }} dari {{ $assets->total() }}</p>
+                    <x-per-page-selector :per-page="$perPage" />
                     {{ $assets->links() }}
                 </div>
             </div>
@@ -151,6 +159,7 @@
                     <div class="min-w-0">
                         <p class="font-mono text-sm font-semibold text-slate-900">{{ $asset->asset_number }}</p>
                         <p class="mt-0.5 text-sm font-semibold text-slate-700">{{ collect([$asset->brand, $asset->model])->filter()->implode(' / ') ?: ($asset->item?->name ?? '-') }}</p>
+                        <p class="mt-1 inline-flex items-center gap-1 rounded bg-slate-100 px-1.5 py-0.5 text-[10px] font-medium text-slate-500"><i class="bi bi-clock-history"></i>{{ $asset->updated_at?->format('d-m-Y H:i') ?? '-' }}</p>
                     </div>
                     <x-badge variant="{{ $statusVariant($asset->status) }}">{{ $asset->statusLabel() }}</x-badge>
                 </div>

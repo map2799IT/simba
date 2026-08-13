@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\Workshop;
+use App\Traits\SortsIndex;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
@@ -15,6 +16,8 @@ use Illuminate\Validation\Rule;
 
 class UserController extends Controller
 {
+    use SortsIndex;
+
     private const ROLE_WAKIL_SARPRAS =
         'wakil_sarpras';
 
@@ -23,6 +26,8 @@ class UserController extends Controller
         $search = trim(
             (string) $request->input('search')
         );
+
+        [$sort, $direction, $perPage] = $this->indexSortParams(['name', 'role', 'username', 'created_at']);
 
         $selectedRole = $this->normalizeRole(
             $request->input('role')
@@ -82,12 +87,16 @@ class UserController extends Controller
                 }
             )
             ->orderBy('name')
-            ->paginate(20)
+            ->when($sort !== null, fn ($q) => $q->orderBy($sort, $direction))
+            ->paginate($perPage)
             ->withQueryString();
 
         return view('admin.users.index', [
             'users' => $users,
             'roles' => $this->roleOptions(),
+            'sort' => $sort,
+            'direction' => $direction,
+            'perPage' => $perPage,
         ]);
     }
 

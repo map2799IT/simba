@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Student;
 use App\Services\StudentAccessService;
 use App\Services\StudentSpreadsheetService;
+use App\Traits\SortsIndex;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
@@ -20,6 +21,8 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class StudentController extends Controller
 {
+    use SortsIndex;
+
     public function __construct(
         private readonly StudentAccessService $access,
         private readonly StudentSpreadsheetService $spreadsheets
@@ -30,15 +33,21 @@ class StudentController extends Controller
     {
         $this->access->authorizeManager($request->user());
 
+        [$sort, $direction, $perPage] = $this->indexSortParams(['name', 'nisn', 'class_name']);
+
         $query = $this->filteredQuery($request)
             ->with(['workshop', 'user'])
             ->orderBy('name')
-            ->orderBy('nisn');
+            ->orderBy('nisn')
+            ->when($sort !== null, fn ($q) => $q->orderBy($sort, $direction));
 
         return view('students.index', [
             'students' => $query
-                ->paginate(20)
+                ->paginate($perPage)
                 ->withQueryString(),
+            'sort' => $sort,
+            'direction' => $direction,
+            'perPage' => $perPage,
             'workshops' => $this->access
                 ->visibleWorkshops($request->user()),
             'isAdmin' => $this->access

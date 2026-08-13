@@ -141,6 +141,39 @@
         </div>
     </div>
 
+    {{-- Visual Widget: Pergerakan Bulan Ini --}}
+    <div class="mb-5 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <div class="border-b border-slate-100 px-5 py-4">
+            <h2 class="text-base font-semibold text-slate-900">Pergerakan Stok Bulan Ini</h2>
+            <p class="mt-0.5 text-sm text-slate-500">Visual cepat untuk barang masuk vs keluar.</p>
+        </div>
+        @php
+            $incoming = (float) $stats['incoming_this_month'];
+            $outgoing = (float) $stats['outgoing_this_month'];
+            $maxMovement = max($incoming, $outgoing, 1);
+        @endphp
+        <div class="grid gap-4 p-5 md:grid-cols-2">
+            <div>
+                <div class="mb-2 flex items-center justify-between text-sm">
+                    <span class="font-medium text-emerald-700">Barang Masuk</span>
+                    <span class="font-semibold text-slate-800">{{ $number($incoming, 3) }}</span>
+                </div>
+                <div class="h-4 rounded-full bg-slate-100">
+                    <div class="h-4 rounded-full bg-emerald-500" style="width: {{ min(100, ($incoming / $maxMovement) * 100) }}%"></div>
+                </div>
+            </div>
+            <div>
+                <div class="mb-2 flex items-center justify-between text-sm">
+                    <span class="font-medium text-red-700">Barang Keluar</span>
+                    <span class="font-semibold text-slate-800">{{ $number($outgoing, 3) }}</span>
+                </div>
+                <div class="h-4 rounded-full bg-slate-100">
+                    <div class="h-4 rounded-full bg-red-500" style="width: {{ min(100, ($outgoing / $maxMovement) * 100) }}%"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     {{-- Quick Access --}}
     <div class="mb-5 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
         <div class="border-b border-slate-100 px-5 py-4">

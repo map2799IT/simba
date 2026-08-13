@@ -3,6 +3,12 @@
 @section('title', 'Peminjaman')
 
 @section('content')
+    @php
+        $sort = $sort ?? null;
+        $direction = $direction ?? 'asc';
+        $perPage = $perPage ?? 25;
+    @endphp
+
     <div class="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
             <h1 class="text-2xl font-bold tracking-tight text-slate-900 md:text-3xl">Peminjaman</h1>
@@ -49,7 +55,7 @@
                             <option value="">Semua jurusan</option>
                             @foreach ($workshops as $workshop)
                                 <option value="{{ $workshop->id }}" @selected((string) request('workshop_id') === (string) $workshop->id)>
-                                    {{ $workshop->code }} — {{ $workshop->name }}
+                                    {{ $workshop->code }} â€” {{ $workshop->name }}
                                 </option>
                             @endforeach
                         </select>
@@ -78,10 +84,10 @@
             <table class="min-w-full divide-y divide-slate-200">
                 <thead class="bg-slate-50">
                     <tr>
-                        <th class="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Kode / Peminjam</th>
+                        <x-sortable-header label="Kode / Peminjam" sort-key="code" :sort="$sort" :direction="$direction" />
                         <th class="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Jurusan</th>
-                        <th class="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Jatuh Tempo</th>
-                        <th class="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Keperluan</th>
+                        <x-sortable-header label="Jatuh Tempo" sort-key="due_at" :sort="$sort" :direction="$direction" />
+                        <x-sortable-header label="Keperluan" sort-key="purpose" :sort="$sort" :direction="$direction" />
                         <th class="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Status</th>
                         <th class="px-5 py-3.5 text-right text-xs font-semibold uppercase tracking-wide text-slate-500">Aksi</th>
                     </tr>
@@ -145,7 +151,8 @@
         @if ($loans->hasPages())
             <div class="border-t border-slate-100 px-5 py-4">
                 <div class="flex flex-col items-center justify-between gap-2 sm:flex-row">
-                    <p class="text-sm text-slate-500">Menampilkan {{ $loans->firstItem() ?? 0 }}–{{ $loans->lastItem() ?? 0 }} dari {{ $loans->total() }}</p>
+                    <p class="text-sm text-slate-500">Menampilkan {{ $loans->firstItem() ?? 0 }}â€“{{ $loans->lastItem() ?? 0 }} dari {{ $loans->total() }}</p>
+                    <x-per-page-selector :per-page="$perPage" />
                     {{ $loans->links() }}
                 </div>
             </div>
@@ -167,7 +174,7 @@
                 <div class="flex items-start justify-between gap-3">
                     <div class="min-w-0">
                         <p class="font-mono text-sm font-semibold text-slate-900">{{ $loan->code }}</p>
-                        <p class="mt-0.5 text-xs text-slate-500">{{ $loan->borrower?->name ?? '-' }} · {{ $loan->workshop?->code ?? '-' }}</p>
+                        <p class="mt-0.5 text-xs text-slate-500">{{ $loan->borrower?->name ?? '-' }} Â· {{ $loan->workshop?->code ?? '-' }}</p>
                     </div>
                     <x-badge variant="{{ $statusVariant }}">{{ $loan->statusLabel() }}</x-badge>
                 </div>

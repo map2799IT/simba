@@ -50,7 +50,6 @@ class ItemAssetBulkQrController extends Controller
             )
             ->where('item_assets.is_active', true)
             ->where('items.type', 'tool')
-            ->where('items.is_active', true)
             ->when(
                 $workshopId !== null,
                 fn ($builder) => $builder->where(

@@ -18,13 +18,20 @@
         <form method="GET" action="{{ route('stock-movements.index') }}" class="p-4 sm:p-5">
             <div class="flex flex-col gap-3 sm:flex-row sm:items-end">
                 <div class="flex-1">
-                    <label for="type" class="mb-1.5 block text-sm font-semibold text-slate-700">Jenis Pergerakan</label>
-                    <select id="type" name="type" class="w-full rounded-xl border-slate-300 bg-white py-2.5 text-sm shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                        <option value="">Semua jenis</option>
+                    <label for="type" class="mb-1.5 block text-sm font-semibold text-slate-700">Jenis Pergerakan (banyak)</label>
+                    <select id="type" name="type[]" multiple size="4" class="w-full rounded-xl border-slate-300 bg-white py-2.5 text-sm shadow-sm focus:border-blue-500 focus:ring-blue-500">
                         @foreach ($typeOptions as $value => $label)
-                            <option value="{{ $value }}" @selected(request('type') === $value)>{{ $label }}</option>
+                            <option value="{{ $value }}" @selected(in_array($value, (array) request('type'), true))>{{ $label }}</option>
                         @endforeach
                     </select>
+                </div>
+                <div>
+                    <label for="date_from" class="mb-1.5 block text-sm font-semibold text-slate-700">Dari Tanggal</label>
+                    <input id="date_from" type="date" name="date_from" value="{{ request('date_from') }}" class="w-full rounded-xl border-slate-300 bg-white py-2.5 text-sm shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label for="date_to" class="mb-1.5 block text-sm font-semibold text-slate-700">Sampai Tanggal</label>
+                    <input id="date_to" type="date" name="date_to" value="{{ request('date_to') }}" class="w-full rounded-xl border-slate-300 bg-white py-2.5 text-sm shadow-sm focus:border-blue-500 focus:ring-blue-500">
                 </div>
                 <div class="flex gap-2">
                     <x-button type="submit" variant="primary"><i class="bi bi-funnel"></i> Terapkan</x-button>
@@ -40,12 +47,12 @@
             <table class="min-w-full divide-y divide-slate-200">
                 <thead class="bg-slate-50/80">
                     <tr>
-                        <th class="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Tanggal</th>
-                        <th class="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Jenis</th>
+                        <x-sortable-header :label="'Tanggal'" :sort-key="'transaction_date'" :sort="$sort ?? null" :direction="$direction ?? 'asc'" />
+                        <x-sortable-header :label="'Jenis'" :sort-key="'type'" :sort="$sort ?? null" :direction="$direction ?? 'asc'" />
                         <th class="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Barang</th>
-                        <th class="px-5 py-3.5 text-right text-xs font-semibold uppercase tracking-wide text-slate-500">Jumlah</th>
+                        <x-sortable-header :label="'Jumlah'" :sort-key="'quantity'" :sort="$sort ?? null" :direction="$direction ?? 'asc'" :class="'text-right'" />
                         <th class="px-5 py-3.5 text-right text-xs font-semibold uppercase tracking-wide text-slate-500">Stok</th>
-                        <th class="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Referensi</th>
+                        <x-sortable-header :label="'Referensi'" :sort-key="'reference_number'" :sort="$sort ?? null" :direction="$direction ?? 'asc'" />
                         <th class="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Petugas</th>
                     </tr>
                 </thead>
@@ -118,6 +125,7 @@
         <div class="mt-5 flex flex-col items-center justify-between gap-3 sm:flex-row">
             <p class="text-sm text-slate-500">Menampilkan {{ $movements->firstItem() ?? 0 }}–{{ $movements->lastItem() ?? 0 }} dari {{ $movements->total() }}</p>
             {{ $movements->links() }}
+            <x-per-page-selector :per-page="$perPage ?? 25" />
         </div>
     @endif
 @endsection

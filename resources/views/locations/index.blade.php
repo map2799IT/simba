@@ -3,6 +3,12 @@
 @section('title', 'Lokasi Penyimpanan')
 
 @section('content')
+    @php
+        $sort = $sort ?? null;
+        $direction = $direction ?? 'asc';
+        $perPage = $perPage ?? 25;
+    @endphp
+
     @include('locations._inventory-menu-link')
     <div class="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
@@ -33,7 +39,7 @@
                         <select id="workshop_id" name="workshop_id" class="w-full rounded-xl border-slate-300 bg-white py-2.5 text-sm shadow-sm focus:border-blue-500 focus:ring-blue-500">
                             <option value="">Semua jurusan</option>
                             @foreach ($workshops as $workshop)
-                                <option value="{{ $workshop->id }}" @selected((int) $selectedWorkshopId === (int) $workshop->id)>{{ $workshop->code }} — {{ $workshop->name }}</option>
+                                <option value="{{ $workshop->id }}" @selected((int) $selectedWorkshopId === (int) $workshop->id)>{{ $workshop->code }} â€” {{ $workshop->name }}</option>
                             @endforeach
                         </select>
                     </div>
@@ -55,14 +61,30 @@
         </form>
     </div>
 
+    @if ($canManage)
+        <form id="bulk-locations-form" method="POST" action="{{ route('locations.bulk.toggle-status') }}" class="mb-4">
+            @csrf
+            <input type="hidden" name="ids" id="bulk-locations-ids">
+            <div class="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3 shadow-sm">
+                <span class="text-sm text-slate-600"><span id="bulk-count" class="font-semibold text-blue-600">0</span> dipilih</span>
+                <button id="bulk-toggle-btn" type="submit" disabled class="inline-flex min-h-10 items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-600 transition hover:border-blue-300 hover:text-blue-600 disabled:cursor-not-allowed disabled:opacity-40">
+                    <i class="bi bi-toggle-off"></i> Ubah Status Terpilih
+                </button>
+            </div>
+        </form>
+    @endif
+
     {{-- Desktop Table --}}
     <div class="table-desktop overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
         <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-slate-200">
                 <thead class="bg-slate-50">
                     <tr>
-                        <th class="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Kode</th>
-                        <th class="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Lokasi</th>
+                        @if ($canManage)
+                            <th class="w-10 px-4 py-3.5"><input type="checkbox" id="bulk-check-all" class="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"></th>
+                        @endif
+                        <x-sortable-header label="Kode" :sort-key="'code'" :sort="$sort" :direction="$direction" />
+                        <x-sortable-header label="Lokasi" :sort-key="'name'" :sort="$sort" :direction="$direction" />
                         <th class="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Jurusan</th>
                         <th class="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Induk</th>
                         <th class="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Isi Langsung</th>
@@ -73,15 +95,18 @@
                 <tbody class="divide-y divide-slate-100">
                     @forelse ($locations as $location)
                         <tr class="transition-colors hover:bg-slate-50">
+                            @if ($canManage)
+                                <td class="px-4 py-3.5"><input type="checkbox" class="item-check h-4 w-4 rounded border-slate-300 text-blue-600" value="{{ $location->id }}"></td>
+                            @endif
                             <td class="px-5 py-3.5 font-mono text-sm font-semibold text-slate-700">{{ $location->code }}</td>
                             <td class="px-5 py-3.5">
                                 <div class="text-sm font-semibold text-slate-900">{{ $location->name }}</div>
-                                <div class="text-xs text-slate-500">{{ $location->typeLabel() }} · {{ $location->children_count }} turunan</div>
+                                <div class="text-xs text-slate-500">{{ $location->typeLabel() }} Â· {{ $location->children_count }} turunan</div>
                             </td>
                             <td class="px-5 py-3.5 text-sm text-slate-600">{{ $location->workshop?->code ?? '-' }}</td>
                             <td class="px-5 py-3.5">
                                 @if ($location->parent)
-                                    <a href="{{ route('locations.show', $location->parent) }}" class="text-sm text-blue-600 hover:underline">{{ $location->parent->code }} — {{ $location->parent->name }}</a>
+                                    <a href="{{ route('locations.show', $location->parent) }}" class="text-sm text-blue-600 hover:underline">{{ $location->parent->code }} â€” {{ $location->parent->name }}</a>
                                 @else
                                     <x-badge variant="neutral">Lokasi Induk</x-badge>
                                 @endif
@@ -109,7 +134,7 @@
                             </td>
                         </tr>
                     @empty
-                        <tr><td colspan="7" class="px-5 py-10">
+                        <tr><td colspan="8" class="px-5 py-10">
                             <x-empty-state icon="bi-geo-alt" title="Belum ada lokasi penyimpanan" description="Buat lokasi induk pertama untuk mulai mencatat penyimpanan.">
                                 @if ($canManage)<x-button href="{{ route('locations.create', ['mode' => 'root']) }}" variant="primary"><i class="bi bi-plus-lg"></i> Buat Lokasi Induk Pertama</x-button>@endif
                             </x-empty-state>
@@ -121,8 +146,11 @@
         @if ($locations->hasPages())
             <div class="border-t border-slate-100 px-5 py-4">
                 <div class="flex flex-col items-center justify-between gap-2 sm:flex-row">
-                    <p class="text-sm text-slate-500">Menampilkan {{ $locations->firstItem() ?? 0 }}–{{ $locations->lastItem() ?? 0 }} dari {{ $locations->total() }}</p>
-                    {{ $locations->links() }}
+                    <p class="text-sm text-slate-500">Menampilkan {{ $locations->firstItem() ?? 0 }}â€“{{ $locations->lastItem() ?? 0 }} dari {{ $locations->total() }}</p>
+                    <div class="flex items-center gap-3">
+                        <x-per-page-selector :per-page="$perPage" />
+                        {{ $locations->links() }}
+                    </div>
                 </div>
             </div>
         @endif
@@ -135,7 +163,7 @@
                 <div class="flex items-start justify-between gap-3">
                     <div class="min-w-0">
                         <p class="truncate font-semibold text-slate-900">{{ $location->name }}</p>
-                        <p class="mt-0.5 font-mono text-xs text-slate-500">{{ $location->code }} · {{ $location->workshop?->code ?? '-' }}</p>
+                        <p class="mt-0.5 font-mono text-xs text-slate-500">{{ $location->code }} Â· {{ $location->workshop?->code ?? '-' }}</p>
                     </div>
                     @if ($location->is_active)<x-badge variant="success" dot>Aktif</x-badge>@else<x-badge variant="neutral" dot>Nonaktif</x-badge>@endif
                 </div>
@@ -159,4 +187,37 @@
             <div class="pt-2">{{ $locations->links() }}</div>
         @endif
     </div>
+
+    @if ($canManage)
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                var checkAll = document.getElementById('bulk-check-all');
+                var checks = document.querySelectorAll('.item-check');
+                var count = document.getElementById('bulk-count');
+                var btn = document.getElementById('bulk-toggle-btn');
+                var ids = document.getElementById('bulk-locations-ids');
+                var form = document.getElementById('bulk-locations-form');
+                if (!checkAll || !form) return;
+
+                function refresh() {
+                    var selected = Array.from(checks).filter(function (c) { return c.checked; });
+                    if (count) count.textContent = String(selected.length);
+                    if (btn) {
+                        btn.disabled = selected.length === 0;
+                        btn.classList.toggle('disabled', selected.length === 0);
+                    }
+                }
+                checkAll.addEventListener('change', function () {
+                    checks.forEach(function (c) { c.checked = checkAll.checked; });
+                    refresh();
+                });
+                checks.forEach(function (c) { c.addEventListener('change', refresh); });
+                form.addEventListener('submit', function (e) {
+                    var selected = Array.from(checks).filter(function (c) { return c.checked; }).map(function (c) { return c.value; });
+                    if (selected.length === 0) { e.preventDefault(); return; }
+                    ids.value = selected.join(',');
+                });
+            });
+        </script>
+    @endif
 @endsection

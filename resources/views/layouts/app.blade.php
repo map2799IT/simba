@@ -10,6 +10,15 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     <link rel="stylesheet" href="{{ asset('css/simba-brand.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/simba-dark.css') }}" id="theme-stylesheet">
+    <script>
+        (function () {
+            var saved = localStorage.getItem('simba-theme');
+            var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+            var theme = saved || (prefersDark ? 'dark' : 'light');
+            document.documentElement.setAttribute('data-theme', theme);
+        })();
+    </script>
     @stack('styles')
 </head>
 
@@ -66,6 +75,18 @@
                 </div>
 
                 <div class="flex items-center gap-2 sm:gap-3">
+                    {{-- Theme toggle --}}
+                    <button
+                        type="button"
+                        id="theme-toggle"
+                        title="Ganti tema terang/gelap"
+                        class="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 transition hover:bg-slate-50"
+                        aria-label="Ganti tema"
+                    >
+                        <i class="bi bi-moon-stars text-base leading-none dark-icon"></i>
+                        <i class="bi bi-sun text-base leading-none light-icon" style="display:none"></i>
+                    </button>
+
                     {{-- User menu --}}
                     <div class="dropdown">
                         <button
@@ -127,6 +148,31 @@
     <x-flash-toast />
 
     @stack('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var toggle = document.getElementById('theme-toggle');
+            if (!toggle) return;
+
+            var root = document.documentElement;
+            var darkIcon = toggle.querySelector('.dark-icon');
+            var lightIcon = toggle.querySelector('.light-icon');
+
+            function applyIcon(theme) {
+                var dark = theme === 'dark';
+                if (darkIcon) darkIcon.style.display = dark ? '' : 'none';
+                if (lightIcon) lightIcon.style.display = dark ? 'none' : '';
+            }
+
+            applyIcon(root.getAttribute('data-theme'));
+
+            toggle.addEventListener('click', function () {
+                var next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+                root.setAttribute('data-theme', next);
+                localStorage.setItem('simba-theme', next);
+                applyIcon(next);
+            });
+        });
+    </script>
     @include('layouts.role-menu-guard')
     @include('layouts.user-jurusan-guard')
     @include('layouts.loan-jurusan-guard')

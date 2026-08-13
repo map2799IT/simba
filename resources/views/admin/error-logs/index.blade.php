@@ -3,6 +3,12 @@
 @section('title', 'Audit Sistem')
 
 @section('content')
+    @php
+        $sort = $sort ?? null;
+        $direction = $direction ?? 'asc';
+        $perPage = $perPage ?? 25;
+    @endphp
+
     <div class="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
             <h1 class="text-2xl font-bold tracking-tight text-slate-900 md:text-3xl">Audit Sistem</h1>
@@ -52,7 +58,7 @@
                 @foreach ($topErrors as $error)
                     <div class="flex items-center justify-between px-5 py-3">
                         <p class="text-sm font-mono text-slate-700 truncate">{{ class_basename($error->exception_class) }}</p>
-                        <x-badge variant="danger">{{ $error->count }}×</x-badge>
+                        <x-badge variant="danger">{{ $error->count }}Ã—</x-badge>
                     </div>
                 @endforeach
             </div>
@@ -97,11 +103,11 @@
             <table class="min-w-full divide-y divide-slate-200">
                 <thead class="bg-slate-50">
                     <tr>
-                        <th class="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Waktu</th>
+                        <x-sortable-header label="Waktu" :sort-key="'created_at'" :sort="$sort" :direction="$direction" />
                         <th class="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">User / Role</th>
                         <th class="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">URL</th>
-                        <th class="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Error</th>
-                        <th class="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Status</th>
+                        <x-sortable-header label="Error" :sort-key="'message'" :sort="$sort" :direction="$direction" />
+                        <x-sortable-header label="Status" :sort-key="'is_resolved'" :sort="$sort" :direction="$direction" />
                         <th class="px-5 py-3.5 text-right text-xs font-semibold uppercase tracking-wide text-slate-500">Aksi</th>
                     </tr>
                 </thead>
@@ -111,7 +117,7 @@
                             <td class="whitespace-nowrap px-5 py-3.5 text-sm text-slate-600">{{ $log->created_at?->format('d-m-Y H:i:s') }}</td>
                             <td class="px-5 py-3.5">
                                 <div class="text-sm font-semibold text-slate-900">{{ $log->user?->name ?? 'Guest' }}</div>
-                                <div class="text-xs text-slate-500">{{ $log->user?->role ?? '-' }} · {{ $log->ip_address }}</div>
+                                <div class="text-xs text-slate-500">{{ $log->user?->role ?? '-' }} Â· {{ $log->ip_address }}</div>
                             </td>
                             <td class="px-5 py-3.5 max-w-[200px]">
                                 <div class="text-sm text-slate-700 truncate">{{ $log->url }}</div>
@@ -148,8 +154,11 @@
         @if ($logs->hasPages())
             <div class="border-t border-slate-100 px-5 py-4">
                 <div class="flex flex-col items-center justify-between gap-2 sm:flex-row">
-                    <p class="text-sm text-slate-500">Menampilkan {{ $logs->firstItem() ?? 0 }}–{{ $logs->lastItem() ?? 0 }} dari {{ $logs->total() }}</p>
-                    {{ $logs->links() }}
+                    <p class="text-sm text-slate-500">Menampilkan {{ $logs->firstItem() ?? 0 }}â€“{{ $logs->lastItem() ?? 0 }} dari {{ $logs->total() }}</p>
+                    <div class="flex items-center gap-3">
+                        <x-per-page-selector :per-page="$perPage" />
+                        {{ $logs->links() }}
+                    </div>
                 </div>
             </div>
         @endif

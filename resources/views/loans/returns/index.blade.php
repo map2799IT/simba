@@ -4,6 +4,12 @@
 @section('page-title', 'Pengembalian Alat')
 
 @section('content')
+    @php
+        $sort = $sort ?? null;
+        $direction = $direction ?? 'asc';
+        $perPage = $perPage ?? 25;
+    @endphp
+
 <div class="d-flex justify-content-between align-items-center gap-3 page-heading">
     <div>
         <h1 class="page-title">Pengembalian Alat</h1>
@@ -19,7 +25,7 @@
         <table class="table table-hover align-middle mb-0">
             <thead>
                 <tr>
-                    <th>Kode</th>
+                    <x-sortable-header label="Kode" sort-key="code" :sort="$sort" :direction="$direction" />
                     <th>Peminjam</th>
                     <th>Jurusan</th>
                     <th>Jatuh Tempo</th>
@@ -57,7 +63,10 @@
     </div>
 
     @if ($loans->hasPages())
-        <div class="border-top">{{ $loans->links() }}</div>
+        <div class="border-top d-flex justify-content-between align-items-center gap-2">
+            <x-per-page-selector :per-page="$perPage" />
+            {{ $loans->links() }}
+        </div>
     @endif
 </section>
 @endsection

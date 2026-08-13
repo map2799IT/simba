@@ -4,6 +4,12 @@
 @section('page-title', 'Audit Aktivitas')
 
 @section('content')
+    @php
+        $sort = $sort ?? null;
+        $direction = $direction ?? 'asc';
+        $perPage = $perPage ?? 25;
+    @endphp
+
     <div class="page-heading">
         <h1 class="page-title">
             Audit Aktivitas Sistem
@@ -128,7 +134,7 @@
                                     {{ $user->name }}
 
                                     @if ($user->username)
-                                        — {{ $user->username }}
+                                        â€” {{ $user->username }}
                                     @endif
                                 </option>
                             @endforeach
@@ -196,9 +202,9 @@
             <table class="table table-hover align-middle mb-0">
                 <thead>
                     <tr>
-                        <th>Waktu</th>
+                        <x-sortable-header label="Waktu" :sort-key="'created_at'" :sort="$sort" :direction="$direction" />
                         <th>Pengguna</th>
-                        <th>Aktivitas</th>
+                        <x-sortable-header label="Aktivitas" :sort-key="'event'" :sort="$sort" :direction="$direction" />
                         <th>Modul</th>
                         <th>Objek</th>
                         <th>Route</th>
@@ -315,7 +321,8 @@
         </div>
 
         @if ($logs->hasPages())
-            <div class="content-card-body border-top">
+            <div class="content-card-body border-top d-flex justify-content-between align-items-center flex-wrap gap-2">
+                <x-per-page-selector :per-page="$perPage" />
                 {{ $logs->links() }}
             </div>
         @endif

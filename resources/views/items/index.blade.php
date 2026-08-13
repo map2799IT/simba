@@ -3,6 +3,12 @@
 @section('title', 'Data Alat & Bahan')
 
 @section('content')
+    @php
+        $sort = $sort ?? null;
+        $direction = $direction ?? 'asc';
+        $perPage = $perPage ?? 25;
+    @endphp
+
     @php $canManage = auth()->user()->hasRole('admin', 'toolman'); @endphp
 
     {{-- Page Header --}}
@@ -19,7 +25,7 @@
         @endif
     </div>
 
-    {{-- Search & Filter — compact, single row --}}
+    {{-- Search & Filter â€” compact, single row --}}
     <div class="mb-3 overflow-hidden rounded-2xl border border-slate-200 bg-white p-3 shadow-sm">
         <form method="GET" action="{{ route('items.index') }}">
             <div class="flex flex-col gap-2 sm:flex-row sm:items-center">
@@ -69,17 +75,33 @@
         </form>
     </div>
 
+    @if ($canManage ?? false)
+        <form id="bulk-items-form" method="POST" action="{{ route('items.bulk.toggle-status') }}" class="mb-4">
+            @csrf
+            <input type="hidden" name="ids" id="bulk-items-ids">
+            <div class="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3 shadow-sm">
+                <span class="text-sm text-slate-600"><span id="bulk-count" class="font-semibold text-blue-600">0</span> dipilih</span>
+                <button id="bulk-toggle-btn" type="submit" disabled class="inline-flex min-h-10 items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-600 transition hover:border-blue-300 hover:text-blue-600 disabled:cursor-not-allowed disabled:opacity-40">
+                    <i class="bi bi-toggle-off"></i> Ubah Status Terpilih
+                </button>
+            </div>
+        </form>
+    @endif
+
     {{-- Desktop Table --}}
     <div class="table-desktop overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
         <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-slate-200">
                 <thead class="bg-slate-50">
                     <tr>
-                        <th class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Nama</th>
-                        <th class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Jenis</th>
+                        @if ($canManage ?? false)
+                            <th class="w-10 px-4 py-3.5"><input type="checkbox" id="bulk-check-all" class="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"></th>
+                        @endif
+                        <x-sortable-header :label="'Nama'" :sort-key="'name'" :sort="$sort" :direction="$direction" />
+                        <x-sortable-header :label="'Jenis'" :sort-key="'type'" :sort="$sort" :direction="$direction" />
                         <th class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Kategori</th>
                         <th class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Satuan</th>
-                        <th class="px-5 py-3 text-right text-xs font-semibold uppercase tracking-wide text-slate-500">Stok</th>
+                        <x-sortable-header :label="'Stok'" :sort-key="'stock'" :sort="$sort" :direction="$direction" />
                         <th class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Status</th>
                         <th class="px-5 py-3 text-right text-xs font-semibold uppercase tracking-wide text-slate-500">Aksi</th>
                     </tr>
@@ -87,9 +109,13 @@
                 <tbody class="divide-y divide-slate-100">
                     @forelse ($items as $item)
                         <tr class="transition-colors hover:bg-slate-50">
+                            @if ($canManage ?? false)
+                                <td class="px-4 py-3.5"><input type="checkbox" class="item-check h-4 w-4 rounded border-slate-300 text-blue-600" value="{{ $item->id }}"></td>
+                            @endif
                             <td class="px-5 py-3.5">
                                 <div class="text-sm font-semibold text-slate-900">{{ $item->name }}</div>
                                 <div class="font-mono text-xs text-slate-500">{{ $item->code }}</div>
+                                <div class="mt-0.5 inline-flex items-center gap-1 rounded bg-slate-100 px-1.5 py-0.5 text-[10px] font-medium text-slate-500"><i class="bi bi-clock-history"></i>{{ $item->updated_at?->format('d-m-Y H:i') ?? '-' }}</div>
                             </td>
                             <td class="whitespace-nowrap px-5 py-3.5">
                                 @if ($item->isTool())
@@ -148,7 +174,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7" class="px-5 py-10">
+                            <td colspan="{{ ($canManage ?? false) ? 8 : 7 }}" class="px-5 py-10">
                                 <div class="flex flex-col items-center justify-center text-center">
                                     <div class="flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-100 text-slate-400">
                                         <i class="bi bi-box-seam text-2xl"></i>
@@ -179,6 +205,7 @@
                     <div class="min-w-0">
                         <p class="truncate font-semibold text-slate-900">{{ $item->name }}</p>
                         <p class="mt-0.5 font-mono text-xs text-slate-500">{{ $item->code }}</p>
+                        <p class="mt-1 inline-flex items-center gap-1 rounded bg-slate-100 px-1.5 py-0.5 text-[10px] font-medium text-slate-500"><i class="bi bi-clock-history"></i>{{ $item->updated_at?->format('d-m-Y H:i') ?? '-' }}</p>
                     </div>
                     @if ($item->isTool())
                         <x-badge variant="info">Alat</x-badge>
@@ -253,10 +280,44 @@
     {{-- Pagination --}}
     @if ($items->hasPages())
         <div class="mt-4 flex flex-col items-center justify-between gap-2 sm:flex-row">
+            <x-per-page-selector :per-page="$perPage" />
             <p class="text-xs text-slate-500 sm:text-sm">
-                {{ $items->firstItem() ?? 0 }}–{{ $items->lastItem() ?? 0 }} dari {{ $items->total() }}
+                {{ $items->firstItem() ?? 0 }}â€“{{ $items->lastItem() ?? 0 }} dari {{ $items->total() }}
             </p>
             {{ $items->links() }}
         </div>
+    @endif
+
+    @if ($canManage ?? false)
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                var checkAll = document.getElementById('bulk-check-all');
+                var checks = document.querySelectorAll('.item-check');
+                var count = document.getElementById('bulk-count');
+                var btn = document.getElementById('bulk-toggle-btn');
+                var ids = document.getElementById('bulk-items-ids');
+                var form = document.getElementById('bulk-items-form');
+                if (!checkAll || !form) return;
+
+                function refresh() {
+                    var selected = Array.from(checks).filter(function (c) { return c.checked; });
+                    if (count) count.textContent = String(selected.length);
+                    if (btn) {
+                        btn.disabled = selected.length === 0;
+                        btn.classList.toggle('disabled', selected.length === 0);
+                    }
+                }
+                checkAll.addEventListener('change', function () {
+                    checks.forEach(function (c) { c.checked = checkAll.checked; });
+                    refresh();
+                });
+                checks.forEach(function (c) { c.addEventListener('change', refresh); });
+                form.addEventListener('submit', function (e) {
+                    var selected = Array.from(checks).filter(function (c) { return c.checked; }).map(function (c) { return c.value; });
+                    if (selected.length === 0) { e.preventDefault(); return; }
+                    ids.value = selected.join(',');
+                });
+            });
+        </script>
     @endif
 @endsection

@@ -1,6 +1,13 @@
 @extends('layouts.app')
 @section('title', 'Jurusan')
 @section('content')
+    @php
+        $sort = $sort ?? null;
+        $direction = $direction ?? 'asc';
+        $perPage = $perPage ?? 25;
+    @endphp
+
+    @php $canManage = auth()->user()->role === 'admin'; @endphp
     <div class="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div><h1 class="text-2xl font-bold tracking-tight text-slate-900">Data Jurusan</h1><p class="mt-1 text-sm text-slate-500">Kelola jurusan bengkel.</p></div>
         @if (\Illuminate\Support\Facades\Route::has('workshops.create'))
@@ -21,24 +28,37 @@
             </div>
         </form>
     </div>
+    @if ($canManage)
+        <form id="bulk-workshops-form" method="POST" action="{{ route('workshops.bulk.toggle-status') }}" class="mb-4">
+            @csrf
+            <input type="hidden" name="ids" id="bulk-workshops-ids">
+            <div class="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3 shadow-sm">
+                <span class="text-sm text-slate-600"><span id="bulk-count" class="font-semibold text-blue-600">0</span> dipilih</span>
+                <button id="bulk-toggle-btn" type="submit" disabled class="inline-flex min-h-10 items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-600 transition hover:border-blue-300 hover:text-blue-600 disabled:cursor-not-allowed disabled:opacity-40">
+                    <i class="bi bi-toggle-off"></i> Ubah Status Terpilih
+                </button>
+            </div>
+        </form>
+    @endif
     <div class="table-desktop overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
         <div class="overflow-x-auto"><table class="min-w-full divide-y divide-slate-200">
-            <thead class="bg-slate-50"><tr><th class="px-5 py-3.5 text-left text-xs font-semibold uppercase text-slate-500">Kode</th><th class="px-5 py-3.5 text-left text-xs font-semibold uppercase text-slate-500">Nama Jurusan</th><th class="px-5 py-3.5 text-left text-xs font-semibold uppercase text-slate-500">Status</th><th class="px-5 py-3.5 text-right text-xs font-semibold uppercase text-slate-500">Aksi</th></tr></thead>
+            <thead class="bg-slate-50"><tr>@if ($canManage)<th class="w-10 px-4 py-3.5"><input type="checkbox" id="bulk-check-all" class="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"></th>@endif<x-sortable-header :label="'Kode'" :sort-key="'code'" :sort="$sort" :direction="$direction" /><x-sortable-header :label="'Nama Jurusan'" :sort-key="'name'" :sort="$sort" :direction="$direction" /><x-sortable-header :label="'Status'" :sort-key="'is_active'" :sort="$sort" :direction="$direction" /><th class="px-5 py-3.5 text-right text-xs font-semibold uppercase text-slate-500">Aksi</th></tr></thead>
             <tbody class="divide-y divide-slate-100">
             @forelse ($workshops as $workshop)
                 <tr class="transition-colors hover:bg-slate-50">
+                    @if ($canManage)<td class="px-4 py-3.5"><input type="checkbox" class="item-check h-4 w-4 rounded border-slate-300 text-blue-600" value="{{ $workshop->id }}"></td>@endif
                     <td class="px-5 py-3.5"><x-badge variant="neutral" class="font-mono">{{ $workshop->code }}</x-badge></td>
                     <td class="px-5 py-3.5"><div class="text-sm font-semibold text-slate-900">{{ $workshop->name }}</div><div class="text-xs text-slate-500">{{ $workshop->code }}</div></td>
                     <td class="whitespace-nowrap px-5 py-3.5">{{ $workshop->is_active ? 'Aktif' : 'Nonaktif' }}</td>
                     <td class="whitespace-nowrap px-5 py-3.5 text-right"><a href="{{ route('workshops.edit', ['workshop' => $workshop->getRouteKey()]) }}" class="inline-flex min-h-9 items-center rounded-lg border border-slate-200 px-2.5 py-1.5 text-xs text-slate-600 hover:bg-slate-50" title="Edit"><i class="bi bi-pencil"></i></a></td>
                 </tr>
             @empty
-                <tr><td colspan="4" class="px-5 py-10"><x-empty-state icon="bi-building" title="Belum ada data jurusan" description="Tambahkan jurusan pertama." /></td></tr>
+                <tr><td colspan="{{ $canManage ? 5 : 4 }}" class="px-5 py-10"><x-empty-state icon="bi-building" title="Belum ada data jurusan" description="Tambahkan jurusan pertama." /></td></tr>
             @endforelse
             </tbody>
         </table></div>
         @if (method_exists($workshops, 'hasPages') && $workshops->hasPages())
-            <div class="border-t border-slate-100 px-5 py-4">{{ $workshops->links() }}</div>
+            <div class="flex flex-col items-center justify-between gap-2 border-t border-slate-100 px-5 py-4 sm:flex-row"><x-per-page-selector :per-page="$perPage" />{{ $workshops->links() }}</div>
         @endif
     </div>
     <div class="card-mobile space-y-3">
@@ -51,4 +71,37 @@
             <div class="rounded-2xl border border-slate-200 bg-white p-6"><x-empty-state icon="bi-building" title="Belum ada data jurusan" description="Tambahkan jurusan pertama." /></div>
         @endforelse
     </div>
+
+    @if ($canManage)
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                var checkAll = document.getElementById('bulk-check-all');
+                var checks = document.querySelectorAll('.item-check');
+                var count = document.getElementById('bulk-count');
+                var btn = document.getElementById('bulk-toggle-btn');
+                var ids = document.getElementById('bulk-workshops-ids');
+                var form = document.getElementById('bulk-workshops-form');
+                if (!checkAll || !form) return;
+
+                function refresh() {
+                    var selected = Array.from(checks).filter(function (c) { return c.checked; });
+                    if (count) count.textContent = String(selected.length);
+                    if (btn) {
+                        btn.disabled = selected.length === 0;
+                        btn.classList.toggle('disabled', selected.length === 0);
+                    }
+                }
+                checkAll.addEventListener('change', function () {
+                    checks.forEach(function (c) { c.checked = checkAll.checked; });
+                    refresh();
+                });
+                checks.forEach(function (c) { c.addEventListener('change', refresh); });
+                form.addEventListener('submit', function (e) {
+                    var selected = Array.from(checks).filter(function (c) { return c.checked; }).map(function (c) { return c.value; });
+                    if (selected.length === 0) { e.preventDefault(); return; }
+                    ids.value = selected.join(',');
+                });
+            });
+        </script>
+    @endif
 @endsection

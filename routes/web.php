@@ -460,6 +460,15 @@ Route::middleware('auth')->group(
         );
 
         $safeRoute(
+            'post',
+            '/items/bulk/toggle-status',
+            'items.bulk.toggle-status',
+            $controllers['items'],
+            'bulkToggleStatus',
+            'items.index'
+        );
+
+        $safeRoute(
             'get',
             '/items/{item}',
             'items.show',
@@ -587,6 +596,15 @@ Route::middleware('auth')->group(
             ['itemCategory']
         );
 
+        $safeRoute(
+            'post',
+            '/categories/bulk/toggle-status',
+            'categories.bulk.toggle-status',
+            $controllers['itemCategories'],
+            'bulkToggleStatus',
+            'item-categories.index'
+        );
+
         /*
         |--------------------------------------------------------------------------
         | Master Satuan
@@ -650,6 +668,15 @@ Route::middleware('auth')->group(
             ['unit']
         );
 
+        $safeRoute(
+            'post',
+            '/units/bulk/toggle-status',
+            'units.bulk.toggle-status',
+            $controllers['units'],
+            'bulkToggleStatus',
+            'units.index'
+        );
+
         /*
         |--------------------------------------------------------------------------
         | Bengkel
@@ -711,6 +738,15 @@ Route::middleware('auth')->group(
             'destroy',
             'workshops.index',
             ['workshop']
+        );
+
+        $safeRoute(
+            'post',
+            '/workshops/bulk/toggle-status',
+            'workshops.bulk.toggle-status',
+            $controllers['workshops'],
+            'bulkToggleStatus',
+            'workshops.index'
         );
 
         /*
@@ -783,6 +819,15 @@ Route::middleware('auth')->group(
             'destroy',
             'locations.index',
             ['location']
+        );
+
+        $safeRoute(
+            'post',
+            '/locations/bulk/toggle-status',
+            'locations.bulk.toggle-status',
+            $controllers['locations'],
+            'bulkToggleStatus',
+            'locations.index'
         );
 
         $safeRoute(
@@ -868,6 +913,16 @@ Route::middleware('auth')->group(
             'stock-receipts.cancel',
             $controllers['stockReceipts'],
             'cancel',
+            'stock-receipts.index',
+            ['stockReceipt']
+        );
+
+        $safeRoute(
+            'get',
+            '/stock-receipts/{stockReceipt}/print',
+            'stock-receipts.print',
+            $controllers['stockReceipts'],
+            'printPdf',
             'stock-receipts.index',
             ['stockReceipt']
         );

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\StorageLocation;
 use App\Models\Workshop;
 use App\Services\WorkshopDirectoryService;
+use App\Traits\SortsIndex;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
@@ -16,6 +17,8 @@ use Illuminate\Validation\ValidationException;
 
 class WorkshopController extends Controller
 {
+    use SortsIndex;
+
     public function __construct(
         private readonly
             WorkshopDirectoryService
@@ -29,6 +32,8 @@ class WorkshopController extends Controller
         $this->authorizeAdmin(
             $request
         );
+
+        [$sort, $direction, $perPage] = $this->indexSortParams(['code', 'name', 'is_active']);
 
         $query = Workshop::query()
             ->withoutGlobalScopes();
@@ -92,7 +97,8 @@ class WorkshopController extends Controller
         $workshops = $query
             ->orderByDesc('is_active')
             ->orderBy('code')
-            ->paginate(20)
+            ->when($sort !== null, fn ($q) => $q->orderBy($sort, $direction))
+            ->paginate($perPage)
             ->withQueryString();
 
         $summary = [
@@ -134,7 +140,10 @@ class WorkshopController extends Controller
             'workshops.index',
             compact(
                 'workshops',
-                'summary'
+                'summary',
+                'sort',
+                'direction',
+                'perPage'
             )
         );
     }
@@ -803,6 +812,63 @@ class WorkshopController extends Controller
         }
 
         return $code;
+    }
+
+    public function bulkToggleStatus(
+        Request $request
+    ): RedirectResponse {
+        $this->authorizeAdmin(
+            $request
+        );
+
+        $ids = $request->input(
+            'ids',
+            []
+        );
+
+        if (is_string($ids)) {
+            $ids = array_filter(
+                array_map(
+                    'intval',
+                    array_map(
+                        'trim',
+                        explode(',', $ids)
+                    )
+                )
+            );
+        } else {
+            $ids = array_map(
+                'intval',
+                (array) $ids
+            );
+        }
+
+        $ids = array_values($ids);
+
+        if (empty($ids)) {
+            return back()->with(
+                'warning',
+                'Tidak ada data yang dipilih.'
+            );
+        }
+
+        $count = Workshop::query()
+            ->withoutGlobalScopes()
+            ->whereIn('id', $ids)
+            ->get()
+            ->each(
+                function (Workshop $workshop): void {
+                    $workshop->fill([
+                        'is_active' => ! $workshop->is_active,
+                    ])->save();
+                }
+            )
+            ->count();
+
+        return back()->with(
+            'success',
+            "Status {$count} jurusan berhasil diubah."
+        );
     }
 
     private function authorizeAdmin(

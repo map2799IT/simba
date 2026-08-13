@@ -9,6 +9,7 @@ use App\Models\ItemCategory;
 use App\Models\ItemStockMovement;
 use App\Models\Unit;
 use App\Services\ItemCodeService;
+use App\Traits\SortsIndex;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
@@ -17,8 +18,12 @@ use Illuminate\Support\Facades\DB;
 
 class ItemController extends Controller
 {
+    use SortsIndex;
+
     public function index(Request $request): View
     {
+        [$sort, $direction, $perPage] = $this->indexSortParams(['code', 'name', 'type', 'stock']);
+
         $search = trim((string) $request->input('search'));
 
         $items = Item::query()
@@ -67,11 +72,15 @@ class ItemController extends Controller
             ->orderBy('type')
             ->orderBy('name')
             ->orderBy('code')
-            ->paginate(20)
+            ->when($sort !== null, fn ($q) => $q->orderBy($sort, $direction))
+            ->paginate($perPage)
             ->withQueryString();
 
         return view('items.index', [
             'items' => $items,
+            'sort' => $sort,
+            'direction' => $direction,
+            'perPage' => $perPage,
             'types' => Item::typeOptions(),
             'categories' => ItemCategory::query()
                 ->where('is_active', true)
@@ -270,6 +279,61 @@ class ItemController extends Controller
             $item->is_active
                 ? "Master {$item->code} berhasil diaktifkan."
                 : "Master {$item->code} berhasil dinonaktifkan."
+        );
+    }
+
+    public function bulkToggleStatus(
+        Request $request
+    ): RedirectResponse {
+        $this->authorizeInventoryManager();
+
+        $ids = $request->input(
+            'ids',
+            []
+        );
+
+        if (is_string($ids)) {
+            $ids = array_filter(
+                array_map(
+                    'intval',
+                    array_map(
+                        'trim',
+                        explode(',', $ids)
+                    )
+                )
+            );
+        } else {
+            $ids = array_map(
+                'intval',
+                (array) $ids
+            );
+        }
+
+        $ids = array_values($ids);
+
+        if (empty($ids)) {
+            return back()->with(
+                'warning',
+                'Tidak ada master barang yang dipilih.'
+            );
+        }
+
+        $count = Item::query()
+            ->withoutGlobalScopes()
+            ->whereIn('id', $ids)
+            ->get()
+            ->each(
+                function (Item $item): void {
+                    $item->fill([
+                        'is_active' => ! $item->is_active,
+                    ])->save();
+                }
+            )
+            ->count();
+
+        return back()->with(
+            'success',
+            "Status {$count} master barang berhasil diubah."
         );
     }
 

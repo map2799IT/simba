@@ -6,6 +6,7 @@ use App\Models\Item;
 use App\Models\ItemAsset;
 use App\Models\StorageLocation;
 use App\Models\Workshop;
+use App\Traits\SortsIndex;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
@@ -18,12 +19,16 @@ use Illuminate\Validation\ValidationException;
 
 class StorageLocationController extends Controller
 {
+    use SortsIndex;
+
     public function index(
         Request $request
     ): View {
         $this->authorizeViewRole(
             $request
         );
+
+        [$sort, $direction, $perPage] = $this->indexSortParams(['code', 'name', 'type']);
 
         $user = $request->user();
         $workshopId =
@@ -110,7 +115,8 @@ class StorageLocationController extends Controller
                 'CASE WHEN parent_id IS NULL THEN 0 ELSE 1 END'
             )
             ->orderBy('code')
-            ->paginate(25)
+            ->when($sort !== null, fn ($q) => $q->orderBy($sort, $direction))
+            ->paginate($perPage)
             ->withQueryString();
 
         return view(
@@ -139,6 +145,15 @@ class StorageLocationController extends Controller
                     $this->canPrint(
                         $user
                     ),
+
+                'sort' =>
+                    $sort,
+
+                'direction' =>
+                    $direction,
+
+                'perPage' =>
+                    $perPage,
             ]
         );
     }
@@ -1052,6 +1067,63 @@ class StorageLocationController extends Controller
             ),
             403,
             'Anda tidak memiliki hak akses lokasi penyimpanan.'
+        );
+    }
+
+    public function bulkToggleStatus(
+        Request $request
+    ): RedirectResponse {
+        $this->authorizeManage(
+            $request
+        );
+
+        $ids = $request->input(
+            'ids',
+            []
+        );
+
+        if (is_string($ids)) {
+            $ids = array_filter(
+                array_map(
+                    'intval',
+                    array_map(
+                        'trim',
+                        explode(',', $ids)
+                    )
+                )
+            );
+        } else {
+            $ids = array_map(
+                'intval',
+                (array) $ids
+            );
+        }
+
+        $ids = array_values($ids);
+
+        if (empty($ids)) {
+            return back()->with(
+                'warning',
+                'Tidak ada data yang dipilih.'
+            );
+        }
+
+        $count = StorageLocation::query()
+            ->withoutGlobalScopes()
+            ->whereIn('id', $ids)
+            ->get()
+            ->each(
+                function (StorageLocation $location): void {
+                    $location->fill([
+                        'is_active' => ! $location->is_active,
+                    ])->save();
+                }
+            )
+            ->count();
+
+        return back()->with(
+            'success',
+            "Status {$count} lokasi berhasil diubah."
         );
     }
 

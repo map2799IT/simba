@@ -6,6 +6,7 @@ use App\Models\Item;
 use App\Models\ItemAsset;
 use App\Models\ItemStockMovement;
 use App\Models\Workshop;
+use App\Traits\SortsIndex;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
@@ -16,9 +17,15 @@ use Illuminate\Validation\ValidationException;
 
 class StockIssueController extends Controller
 {
+    use SortsIndex;
+
     public function index(
         Request $request
     ): View {
+        [$sort, $direction, $perPage] = $this->indexSortParams([
+            'transaction_date', 'reference_number', 'quantity', 'destination', 'purpose',
+        ]);
+
         $search = trim(
             (string) $request->input(
                 'search'
@@ -147,7 +154,8 @@ class StockIssueController extends Controller
                     'transaction_date'
                 )
                 ->orderByDesc('id')
-                ->paginate(20)
+                ->when($sort !== null, fn ($query) => $query->orderBy($sort, $direction))
+                ->paginate($perPage)
                 ->withQueryString();
 
         return view(
@@ -155,6 +163,10 @@ class StockIssueController extends Controller
             [
                 'movements' =>
                     $movements,
+
+                'sort' => $sort,
+                'direction' => $direction,
+                'perPage' => $perPage,
 
                 'workshops' =>
                     Workshop::query()

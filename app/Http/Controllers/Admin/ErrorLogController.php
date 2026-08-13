@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\UserErrorLog;
+use App\Traits\SortsIndex;
 use Barryvdh\DomPDF\Facade\Pdf;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
@@ -16,11 +17,15 @@ use Illuminate\Support\Facades\DB;
 
 class ErrorLogController extends Controller
 {
+    use SortsIndex;
+
     public function index(Request $request): View
     {
         $search = trim((string) $request->input('search'));
         $status = $request->input('status', 'unresolved');
         $userId = $request->input('user_id');
+
+        [$sort, $direction, $perPage] = $this->indexSortParams(['created_at', 'message', 'is_resolved']);
 
         $query = UserErrorLog::query()
             ->with('user')
@@ -35,7 +40,8 @@ class ErrorLogController extends Controller
             ->when($status === 'unresolved', fn (Builder $q) => $q->where('is_resolved', false))
             ->when($status === 'resolved', fn (Builder $q) => $q->where('is_resolved', true))
             ->when($userId, fn (Builder $q) => $q->where('user_id', $userId))
-            ->orderByDesc('created_at');
+            ->orderByDesc('created_at')
+            ->when($sort !== null, fn ($q) => $q->orderBy($sort, $direction));
 
         $stats = [
             'total' => UserErrorLog::count(),
@@ -66,13 +72,16 @@ class ErrorLogController extends Controller
             ->get();
 
         return view('admin.error-logs.index', [
-            'logs' => $query->paginate(25)->withQueryString(),
+            'logs' => $query->paginate($perPage)->withQueryString(),
             'stats' => $stats,
             'topErrors' => $topErrors,
             'affectedUsers' => $affectedUsers,
             'search' => $search,
             'status' => $status,
             'userId' => $userId,
+            'sort' => $sort,
+            'direction' => $direction,
+            'perPage' => $perPage,
         ]);
     }
 

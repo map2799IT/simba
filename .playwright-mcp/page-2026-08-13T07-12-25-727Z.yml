@@ -1,0 +1,8 @@
+- generic [ref=e2]:
+  - generic [ref=e3]: 
+  - heading "Terjadi Kendala" [level=1] [ref=e5]
+  - paragraph [ref=e6]: Terjadi kesalahan saat memproses data. Silakan coba kembali beberapa saat lagi. Jika masalah berlanjut, hubungi administrator.
+  - link " Kembali ke Beranda" [ref=e8] [cursor=pointer]:
+    - /url: http://localhost/simba/public
+    - generic [ref=e9]: 
+    - text: Kembali ke Beranda

@@ -5,14 +5,19 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreItemCategoryRequest;
 use App\Http\Requests\UpdateItemCategoryRequest;
 use App\Models\ItemCategory;
+use App\Traits\SortsIndex;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
 class ItemCategoryController extends Controller
 {
+    use SortsIndex;
+
     public function index(Request $request): View
     {
+        [$sort, $direction, $perPage] = $this->indexSortParams(['code', 'name']);
+
         $search = trim(
             (string) $request->input('search')
         );
@@ -68,11 +73,15 @@ class ItemCategoryController extends Controller
                 )
             )
             ->orderBy('name')
-            ->paginate(15)
+            ->when($sort !== null, fn ($q) => $q->orderBy($sort, $direction))
+            ->paginate($perPage)
             ->withQueryString();
 
         return view('categories.index', [
             'categories' => $categories,
+            'sort' => $sort,
+            'direction' => $direction,
+            'perPage' => $perPage,
             'appliesToOptions' =>
                 ItemCategory::appliesToOptions(),
         ]);
@@ -140,5 +149,65 @@ class ItemCategoryController extends Controller
             : 'Kategori berhasil dinonaktifkan.';
 
         return back()->with('success', $message);
+    }
+
+    public function bulkToggleStatus(
+        Request $request
+    ): RedirectResponse {
+        abort_unless(
+            auth()->user()?->hasRole(
+                'admin',
+                'toolman'
+            ),
+            403
+        );
+
+        $ids = $request->input(
+            'ids',
+            []
+        );
+
+        if (is_string($ids)) {
+            $ids = array_filter(
+                array_map(
+                    'intval',
+                    array_map(
+                        'trim',
+                        explode(',', $ids)
+                    )
+                )
+            );
+        } else {
+            $ids = array_map(
+                'intval',
+                (array) $ids
+            );
+        }
+
+        $ids = array_values($ids);
+
+        if (empty($ids)) {
+            return back()->with(
+                'warning',
+                'Tidak ada data yang dipilih.'
+            );
+        }
+
+        $count = ItemCategory::query()
+            ->whereIn('id', $ids)
+            ->get()
+            ->each(
+                function (ItemCategory $itemCategory): void {
+                    $itemCategory->fill([
+                        'is_active' => ! $itemCategory->is_active,
+                    ])->save();
+                }
+            )
+            ->count();
+
+        return back()->with(
+            'success',
+            "Status {$count} kategori berhasil diubah."
+        );
     }
 }

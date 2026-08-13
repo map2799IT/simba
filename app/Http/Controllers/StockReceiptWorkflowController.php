@@ -9,6 +9,7 @@ use App\Models\StockReceiptChangeRequest;
 use App\Models\StorageLocation;
 use App\Models\Workshop;
 use App\Services\StockReceiptMutationService;
+use App\Traits\SortsIndex;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
@@ -20,6 +21,8 @@ use Throwable;
 
 class StockReceiptWorkflowController extends StockReceiptController
 {
+    use SortsIndex;
+
     public function index(Request $request): View
     {
         $this->authorizeRead($request);
@@ -27,11 +30,9 @@ class StockReceiptWorkflowController extends StockReceiptController
         $user = $request->user();
         $search = trim((string) $request->input('search'));
 
-        // Sorting: kode / tanggal / nama (ASC / DESC), kompatibel pagination.
-        $sort = $request->input('sort', 'tanggal');
-        $dir = strtolower((string) $request->input('dir', 'desc')) === 'asc'
-            ? 'asc'
-            : 'desc';
+        [$sort, $direction, $perPage] = $this->indexSortParams([
+            'receipt_code', 'transaction_date', 'quantity',
+        ]);
 
         $movements = ItemStockMovement::query()
             ->withoutGlobalScopes()
@@ -81,17 +82,10 @@ class StockReceiptWorkflowController extends StockReceiptController
                         $request->integer('workshop_id')
                     )
             )
-            ->when($sort === 'kode', function (Builder $query) use ($dir): void {
-                $query->orderBy('receipt_code', $dir)->orderBy('id', $dir);
-            })
-            ->when($sort === 'nama', function (Builder $query) use ($dir): void {
-                // Nama dari input Barang Masuk = brand/model.
-                $query->orderBy('brand', $dir)->orderBy('model', $dir)->orderBy('id', $dir);
-            })
-            ->when(! in_array($sort, ['kode', 'nama'], true), function (Builder $query) use ($dir): void {
-                $query->orderBy('transaction_date', $dir)->orderBy('id', $dir);
-            })
-            ->paginate(20)
+            ->when($sort !== null, fn ($query) => $query->orderBy($sort, $direction))
+            ->orderByDesc('transaction_date')
+            ->orderByDesc('id')
+            ->paginate($perPage)
             ->withQueryString();
 
         return view('stock-receipts.index', [
@@ -109,7 +103,8 @@ class StockReceiptWorkflowController extends StockReceiptController
             ),
             'isAdmin' => (string) $user?->role === 'admin',
             'sort' => $sort,
-            'dir' => $dir,
+            'direction' => $direction,
+            'perPage' => $perPage,
         ]);
     }
 

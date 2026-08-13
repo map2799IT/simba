@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+use App\Traits\SortsIndex;
 use App\Models\DamageReport;
 use App\Http\Requests\RejectLoanRequest;
 use App\Http\Requests\ReturnLoanItemRequest;
@@ -23,6 +24,8 @@ use Illuminate\Validation\ValidationException;
  */
 class LoanController extends Controller
 {
+    use SortsIndex;
+
     public function __construct()
     {
         abort(403, 'LoanController tidak aktif. Gunakan WorkshopLoanController.');
@@ -31,6 +34,8 @@ class LoanController extends Controller
         Request $request
     ): View {
         $user = $request->user();
+
+        [$sort, $direction, $perPage] = $this->indexSortParams(['code', 'purpose', 'request_date', 'due_at']);
 
         $canViewAll = $user->hasRole(
             'admin',
@@ -139,7 +144,8 @@ class LoanController extends Controller
             )
             ->orderByDesc('request_date')
             ->orderByDesc('id')
-            ->paginate(20)
+            ->when($sort !== null, fn ($q) => $q->orderBy($sort, $direction))
+            ->paginate($perPage)
             ->withQueryString();
 
         return view('loans.index', [
@@ -152,6 +158,9 @@ class LoanController extends Controller
                 'admin',
                 'toolman'
             ),
+            'sort' => $sort,
+            'direction' => $direction,
+            'perPage' => $perPage,
         ]);
     }
 

@@ -12,7 +12,7 @@ class StoreStockReceiptRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->user()?->hasRole('admin', 'toolman') ?? false;
+        return $this->user()?->hasRole('admin', 'toolman', 'kepala_bengkel') ?? false;
     }
 
     protected function prepareForValidation(): void

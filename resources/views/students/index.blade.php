@@ -3,6 +3,12 @@
 @section('title', 'Data Siswa')
 
 @section('content')
+    @php
+        $sort = $sort ?? null;
+        $direction = $direction ?? 'asc';
+        $perPage = $perPage ?? 25;
+    @endphp
+
     <div class="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
             <h1 class="text-2xl font-bold tracking-tight text-slate-900 md:text-3xl">Data Siswa</h1>
@@ -32,7 +38,7 @@
                         <select id="workshop_id" name="workshop_id" class="w-full rounded-xl border-slate-300 bg-white py-2.5 text-sm shadow-sm focus:border-blue-500 focus:ring-blue-500">
                             <option value="">Semua jurusan</option>
                             @foreach ($workshops as $workshop)
-                                <option value="{{ $workshop->id }}" @selected((string) request('workshop_id') === (string) $workshop->id)>{{ $workshop->code }} — {{ $workshop->name }}</option>
+                                <option value="{{ $workshop->id }}" @selected((string) request('workshop_id') === (string) $workshop->id)>{{ $workshop->code }} â€” {{ $workshop->name }}</option>
                             @endforeach
                         </select>
                     </div>
@@ -69,9 +75,9 @@
             <table class="min-w-full divide-y divide-slate-200">
                 <thead class="bg-slate-50">
                     <tr>
-                        <th class="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">NISN / NIS</th>
-                        <th class="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Siswa</th>
-                        <th class="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Jurusan / Kelas</th>
+                        <x-sortable-header :label="'NISN / NIS'" :sort-key="'nisn'" :sort="$sort" :direction="$direction" />
+                        <x-sortable-header :label="'Siswa'" :sort-key="'name'" :sort="$sort" :direction="$direction" />
+                        <x-sortable-header :label="'Jurusan / Kelas'" :sort-key="'class_name'" :sort="$sort" :direction="$direction" />
                         <th class="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Tgl Lahir</th>
                         <th class="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Status</th>
                         <th class="px-5 py-3.5 text-right text-xs font-semibold uppercase tracking-wide text-slate-500">Aksi</th>
@@ -86,7 +92,7 @@
                             </td>
                             <td class="px-5 py-3.5">
                                 <div class="text-sm font-semibold text-slate-900">{{ $student->name }}</div>
-                                <div class="text-xs text-slate-500">{{ $student->genderLabel() }} · {{ $student->email ?: 'Email belum diisi' }}</div>
+                                <div class="text-xs text-slate-500">{{ $student->genderLabel() }} Â· {{ $student->email ?: 'Email belum diisi' }}</div>
                             </td>
                             <td class="px-5 py-3.5">
                                 <div class="text-sm font-semibold text-slate-800">{{ $student->workshop?->code ?? '-' }}</div>
@@ -139,7 +145,8 @@
         @if ($students->hasPages())
             <div class="border-t border-slate-100 px-5 py-4">
                 <div class="flex flex-col items-center justify-between gap-2 sm:flex-row">
-                    <p class="text-sm text-slate-500">Menampilkan {{ $students->firstItem() ?? 0 }}–{{ $students->lastItem() ?? 0 }} dari {{ $students->total() }}</p>
+                    <x-per-page-selector :per-page="$perPage" />
+                    <p class="text-sm text-slate-500">Menampilkan {{ $students->firstItem() ?? 0 }}â€“{{ $students->lastItem() ?? 0 }} dari {{ $students->total() }}</p>
                     {{ $students->links() }}
                 </div>
             </div>
@@ -153,7 +160,7 @@
                 <div class="flex items-start justify-between gap-3">
                     <div class="min-w-0">
                         <p class="truncate font-semibold text-slate-900">{{ $student->name }}</p>
-                        <p class="mt-0.5 font-mono text-xs text-slate-500">{{ $student->nisn }} · {{ $student->nis ?: '-' }}</p>
+                        <p class="mt-0.5 font-mono text-xs text-slate-500">{{ $student->nisn }} Â· {{ $student->nis ?: '-' }}</p>
                     </div>
                     @if ($student->is_active)<x-badge variant="success" dot>Aktif</x-badge>@else<x-badge variant="neutral" dot>Nonaktif</x-badge>@endif
                 </div>

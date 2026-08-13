@@ -7,6 +7,7 @@ use App\Http\Requests\StoreDamageReportRequest;
 use App\Models\DamageReport;
 use App\Models\Item;
 use App\Models\Workshop;
+use App\Traits\SortsIndex;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
@@ -16,10 +17,14 @@ use Illuminate\Validation\ValidationException;
 
 class DamageReportController extends Controller
 {
+    use SortsIndex;
+
     public function index(
         Request $request
     ): View {
         $user = $request->user();
+
+        [$sort, $direction, $perPage] = $this->indexSortParams(['code', 'reported_at', 'status']);
 
         $canViewAll = $user->hasRole(
             'admin',
@@ -150,7 +155,8 @@ class DamageReportController extends Controller
             )
             ->orderByDesc('reported_at')
             ->orderByDesc('id')
-            ->paginate(20)
+            ->when($sort !== null, fn ($q) => $q->orderBy($sort, $direction))
+            ->paginate($perPage)
             ->withQueryString();
 
         return view(
@@ -172,6 +178,9 @@ class DamageReportController extends Controller
                         )
                         ->orderBy('code')
                         ->get(),
+            'sort' => $sort,
+            'direction' => $direction,
+            'perPage' => $perPage,
             ]
         );
     }

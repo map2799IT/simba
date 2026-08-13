@@ -4,6 +4,12 @@
 
 @section('content')
     @php
+        $sort = $sort ?? null;
+        $direction = $direction ?? 'asc';
+        $perPage = $perPage ?? 25;
+    @endphp
+
+    @php
         $severityVariant = fn (string $s) => match ($s) {
             'minor' => 'info', 'moderate' => 'warning', 'major' => 'danger', 'critical' => 'danger', default => 'neutral',
         };
@@ -73,12 +79,12 @@
             <table class="min-w-full divide-y divide-slate-200">
                 <thead class="bg-slate-50">
                     <tr>
-                        <th class="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Kode</th>
+                        <x-sortable-header label="Kode" sort-key="code" :sort="$sort" :direction="$direction" />
                         <th class="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Alat</th>
-                        <th class="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Waktu Laporan</th>
+                        <x-sortable-header label="Waktu Laporan" sort-key="reported_at" :sort="$sort" :direction="$direction" />
                         <th class="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Pelapor</th>
                         <th class="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Tingkat</th>
-                        <th class="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Status</th>
+                        <x-sortable-header label="Status" sort-key="status" :sort="$sort" :direction="$direction" />
                         <th class="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Petugas</th>
                         <th class="px-5 py-3.5 text-right text-xs font-semibold uppercase tracking-wide text-slate-500">Aksi</th>
                     </tr>
@@ -89,7 +95,7 @@
                             <td class="px-5 py-3.5"><x-badge variant="neutral">{{ $report->code }}</x-badge></td>
                             <td class="px-5 py-3.5">
                                 <div class="text-sm font-semibold text-slate-900">{{ $report->item->name }}</div>
-                                <div class="text-xs text-slate-500">{{ $report->item->code }} · {{ $report->item->workshop?->code }}</div>
+                                <div class="text-xs text-slate-500">{{ $report->item->code }} Â· {{ $report->item->workshop?->code }}</div>
                             </td>
                             <td class="whitespace-nowrap px-5 py-3.5 text-sm text-slate-600">{{ $report->reported_at->format('d-m-Y H:i') }}</td>
                             <td class="px-5 py-3.5 text-sm text-slate-600">{{ $report->reporter?->name ?? 'Sistem' }}</td>
@@ -111,7 +117,8 @@
         @if ($reports->hasPages())
             <div class="border-t border-slate-100 px-5 py-4">
                 <div class="flex flex-col items-center justify-between gap-2 sm:flex-row">
-                    <p class="text-sm text-slate-500">Menampilkan {{ $reports->firstItem() ?? 0 }}–{{ $reports->lastItem() ?? 0 }} dari {{ $reports->total() }}</p>
+                    <p class="text-sm text-slate-500">Menampilkan {{ $reports->firstItem() ?? 0 }}â€“{{ $reports->lastItem() ?? 0 }} dari {{ $reports->total() }}</p>
+                    <x-per-page-selector :per-page="$perPage" />
                     {{ $reports->links() }}
                 </div>
             </div>

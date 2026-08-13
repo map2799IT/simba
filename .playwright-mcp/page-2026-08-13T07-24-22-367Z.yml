@@ -1,0 +1,666 @@
+- generic [ref=f8e2]:
+  - complementary "Navigasi utama" [ref=f8e3]:
+    - link "SIMBA Dashboard" [ref=f8e5] [cursor=pointer]:
+      - /url: http://localhost/simba/public/dashboard
+      - generic [ref=f8e6]: 
+      - generic [ref=f8e8]:
+        - generic [ref=f8e9]: SIMBA
+        - generic [ref=f8e10]: Sistem Inventaris Bengkel
+    - generic [ref=f8e12]:
+      - generic [ref=f8e13]: A
+      - generic [ref=f8e14]:
+        - generic [ref=f8e15]: Administrator SIMBA
+        - generic [ref=f8e16]:
+          - generic [ref=f8e17]: Administrator
+          - generic [ref=f8e18]: · Semua Jurusan
+    - navigation [ref=f8e19]:
+      - list [ref=f8e21]:
+        - listitem [ref=f8e22]:
+          - link " Dashboard" [ref=f8e23] [cursor=pointer]:
+            - /url: http://localhost/simba/public/dashboard
+            - generic [ref=f8e24]: 
+            - generic [ref=f8e25]: Dashboard
+      - generic [ref=f8e26]:
+        - generic [ref=f8e27]: Inventaris
+        - list [ref=f8e28]:
+          - listitem [ref=f8e29]:
+            - link " Data Alat & Bahan" [ref=f8e30] [cursor=pointer]:
+              - /url: http://localhost/simba/public/items
+              - generic [ref=f8e31]: 
+              - generic [ref=f8e32]: Data Alat & Bahan
+          - listitem [ref=f8e33]:
+            - link " Unit Alat & QR" [ref=f8e34] [cursor=pointer]:
+              - /url: http://localhost/simba/public/item-assets
+              - generic [ref=f8e35]: 
+              - generic [ref=f8e36]: Unit Alat & QR
+          - listitem [ref=f8e37]:
+            - link " Cetak QR Massal QR" [ref=f8e38] [cursor=pointer]:
+              - /url: http://localhost/simba/public/item-assets/qr-bulk
+              - generic [ref=f8e39]: 
+              - generic [ref=f8e40]: Cetak QR Massal
+              - generic [ref=f8e41]: QR
+      - generic [ref=f8e42]:
+        - generic [ref=f8e43]: Data Jurusan
+        - list [ref=f8e44]:
+          - listitem [ref=f8e45]:
+            - link " Lokasi Penyimpanan Kelola" [ref=f8e46] [cursor=pointer]:
+              - /url: http://localhost/simba/public/locations
+              - generic [ref=f8e47]: 
+              - generic [ref=f8e48]: Lokasi Penyimpanan
+              - generic [ref=f8e49]: Kelola
+      - generic [ref=f8e50]:
+        - generic [ref=f8e51]: Data Sekolah
+        - list [ref=f8e52]:
+          - listitem [ref=f8e53]:
+            - link " Data Siswa Kelola" [ref=f8e54] [cursor=pointer]:
+              - /url: http://localhost/simba/public/students
+              - generic [ref=f8e55]: 
+              - generic [ref=f8e56]: Data Siswa
+              - generic [ref=f8e57]: Kelola
+      - generic [ref=f8e58]:
+        - generic [ref=f8e59]: Transaksi Stok
+        - list [ref=f8e60]:
+          - listitem [ref=f8e61]:
+            - link " Barang Masuk Proses" [ref=f8e62] [cursor=pointer]:
+              - /url: http://localhost/simba/public/stock-receipts
+              - generic [ref=f8e63]: 
+              - generic [ref=f8e64]: Barang Masuk
+              - generic [ref=f8e65]: Proses
+          - listitem [ref=f8e66]:
+            - link " Barang Keluar Proses" [ref=f8e67] [cursor=pointer]:
+              - /url: http://localhost/simba/public/stock-issues
+              - generic [ref=f8e68]: 
+              - generic [ref=f8e69]: Barang Keluar
+              - generic [ref=f8e70]: Proses
+          - listitem [ref=f8e71]:
+            - link " Import Barang Masuk Import" [ref=f8e72] [cursor=pointer]:
+              - /url: http://localhost/simba/public/stock-import
+              - generic [ref=f8e73]: 
+              - generic [ref=f8e74]: Import Barang Masuk
+              - generic [ref=f8e75]: Import
+          - listitem [ref=f8e76]:
+            - link " Pergerakan Stok" [ref=f8e77] [cursor=pointer]:
+              - /url: http://localhost/simba/public/stock-movements
+              - generic [ref=f8e78]: 
+              - generic [ref=f8e79]: Pergerakan Stok
+      - generic [ref=f8e80]:
+        - generic [ref=f8e81]: Peminjaman
+        - list [ref=f8e82]:
+          - listitem [ref=f8e83]:
+            - link " Ajukan Peminjaman" [ref=f8e84] [cursor=pointer]:
+              - /url: http://localhost/simba/public/loans/create
+              - generic [ref=f8e85]: 
+              - generic [ref=f8e86]: Ajukan Peminjaman
+          - listitem [ref=f8e87]:
+            - link " Kelola Peminjaman" [ref=f8e88] [cursor=pointer]:
+              - /url: http://localhost/simba/public/loans
+              - generic [ref=f8e89]: 
+              - generic [ref=f8e90]: Kelola Peminjaman
+          - listitem [ref=f8e91]:
+            - link " Pengembalian" [ref=f8e92] [cursor=pointer]:
+              - /url: http://localhost/simba/public/loan-returns
+              - generic [ref=f8e93]: 
+              - generic [ref=f8e94]: Pengembalian
+          - listitem [ref=f8e95]:
+            - link " Penggantian Alat Ganti" [ref=f8e96] [cursor=pointer]:
+              - /url: http://localhost/simba/public/loans/replacement-requests
+              - generic [ref=f8e97]: 
+              - generic [ref=f8e98]: Penggantian Alat
+              - generic [ref=f8e99]: Ganti
+      - generic [ref=f8e100]:
+        - generic [ref=f8e101]: Kerusakan
+        - list [ref=f8e102]:
+          - listitem [ref=f8e103]:
+            - link " Laporkan Kerusakan" [ref=f8e104] [cursor=pointer]:
+              - /url: http://localhost/simba/public/damage-reports/create
+              - generic [ref=f8e105]: 
+              - generic [ref=f8e106]: Laporkan Kerusakan
+          - listitem [ref=f8e107]:
+            - link " Kelola Kerusakan" [ref=f8e108] [cursor=pointer]:
+              - /url: http://localhost/simba/public/damage-reports
+              - generic [ref=f8e109]: 
+              - generic [ref=f8e110]: Kelola Kerusakan
+      - generic [ref=f8e111]:
+        - generic [ref=f8e112]: Laporan
+        - list [ref=f8e113]:
+          - listitem [ref=f8e114]:
+            - link " Laporan Inventaris" [ref=f8e115] [cursor=pointer]:
+              - /url: http://localhost/simba/public/reports/inventory
+              - generic [ref=f8e117]: 
+              - generic [ref=f8e118]: Laporan Inventaris
+          - listitem [ref=f8e119]:
+            - link " Laporan Stok" [ref=f8e120] [cursor=pointer]:
+              - /url: http://localhost/simba/public/reports/stock
+              - generic [ref=f8e121]: 
+              - generic [ref=f8e122]: Laporan Stok
+          - listitem [ref=f8e123]:
+            - link " Laporan Peminjaman" [ref=f8e124] [cursor=pointer]:
+              - /url: http://localhost/simba/public/reports/loans
+              - generic [ref=f8e125]: 
+              - generic [ref=f8e126]: Laporan Peminjaman
+          - listitem [ref=f8e127]:
+            - link " Laporan Kerusakan" [ref=f8e128] [cursor=pointer]:
+              - /url: http://localhost/simba/public/reports/damages
+              - generic [ref=f8e129]: 
+              - generic [ref=f8e130]: Laporan Kerusakan
+          - listitem [ref=f8e131]:
+            - link " Laporan Pergerakan" [ref=f8e132] [cursor=pointer]:
+              - /url: http://localhost/simba/public/reports/stock-movements
+              - generic [ref=f8e133]: 
+              - generic [ref=f8e134]: Laporan Pergerakan
+      - generic [ref=f8e135]:
+        - generic [ref=f8e136]: Master Sistem
+        - list [ref=f8e137]:
+          - listitem [ref=f8e138]:
+            - link " Bengkel / Jurusan" [ref=f8e139] [cursor=pointer]:
+              - /url: http://localhost/simba/public/workshops
+              - generic [ref=f8e140]: 
+              - generic [ref=f8e141]: Bengkel / Jurusan
+          - listitem [ref=f8e142]:
+            - link " Kategori Barang" [ref=f8e143] [cursor=pointer]:
+              - /url: http://localhost/simba/public/item-categories
+              - generic [ref=f8e144]: 
+              - generic [ref=f8e145]: Kategori Barang
+          - listitem [ref=f8e146]:
+            - link " Satuan" [ref=f8e147] [cursor=pointer]:
+              - /url: http://localhost/simba/public/units
+              - generic [ref=f8e148]: 
+              - generic [ref=f8e149]: Satuan
+      - generic [ref=f8e150]:
+        - generic [ref=f8e151]: Administrasi
+        - list [ref=f8e152]:
+          - listitem [ref=f8e153]:
+            - link " Pengguna" [ref=f8e154] [cursor=pointer]:
+              - /url: http://localhost/simba/public/admin/users
+              - generic [ref=f8e155]: 
+              - generic [ref=f8e156]: Pengguna
+          - listitem [ref=f8e157]:
+            - link " Hak Akses" [ref=f8e158] [cursor=pointer]:
+              - /url: http://localhost/simba/public/admin/access
+              - generic [ref=f8e159]: 
+              - generic [ref=f8e160]: Hak Akses
+          - listitem [ref=f8e161]:
+            - link " Audit Aktivitas" [ref=f8e162] [cursor=pointer]:
+              - /url: http://localhost/simba/public/admin/audit-logs
+              - generic [ref=f8e163]: 
+              - generic [ref=f8e164]: Audit Aktivitas
+          - listitem [ref=f8e165]:
+            - link " Audit Sistem Error" [ref=f8e166] [cursor=pointer]:
+              - /url: http://localhost/simba/public/admin/error-logs
+              - generic [ref=f8e167]: 
+              - generic [ref=f8e168]: Audit Sistem
+              - generic [ref=f8e169]: Error
+    - generic [ref=f8e171]:
+      - link " Profil Saya" [ref=f8e172] [cursor=pointer]:
+        - /url: http://localhost/simba/public/profile
+        - generic [ref=f8e173]: 
+        - generic [ref=f8e174]: Profil Saya
+      - button " Keluar" [ref=f8e176] [cursor=pointer]:
+        - generic [ref=f8e177]: 
+        - generic [ref=f8e178]: Keluar
+  - generic [ref=f8e179]:
+    - banner [ref=f8e180]:
+      - generic [ref=f8e181]: SIMBA
+      - generic [ref=f8e184]:
+        - button "Ganti tema" [ref=f8e185] [cursor=pointer]:
+          - text: 
+          - generic [ref=f8e186]: 
+        - generic [ref=f8e187]:
+          - button "Menu pengguna" [ref=f8e188] [cursor=pointer]:
+            - generic [ref=f8e189]: A
+          - text:  
+    - main [ref=f8e192]:
+      - generic [ref=f8e193]:
+        - generic [ref=f8e194]:
+          - generic [ref=f8e195]:
+            - heading "Laporan Inventaris" [level=1] [ref=f8e196]
+            - paragraph [ref=f8e197]: Jurusan dan lokasi diambil dari unit alat serta transaksi Barang Masuk.
+          - generic [ref=f8e198]:
+            - link " Excel" [ref=f8e199] [cursor=pointer]:
+              - /url: http://localhost/simba/public/reports/export/excel
+              - generic [ref=f8e200]: 
+              - text: Excel
+            - link " PDF" [ref=f8e201] [cursor=pointer]:
+              - /url: http://localhost/simba/public/reports/export/pdf
+              - generic [ref=f8e202]: 
+              - text: PDF
+        - generic [ref=f8e203]:
+          - generic [ref=f8e204]:
+            - paragraph [ref=f8e205]: Total Data
+            - paragraph [ref=f8e206]: "28"
+          - generic [ref=f8e207]:
+            - paragraph [ref=f8e208]: Data Alat
+            - paragraph [ref=f8e209]: "20"
+          - generic [ref=f8e210]:
+            - paragraph [ref=f8e211]: Data Bahan
+            - paragraph [ref=f8e212]: "8"
+          - generic [ref=f8e213]:
+            - paragraph [ref=f8e214]: Total Nilai
+            - paragraph [ref=f8e215]: Rp 0
+        - generic [ref=f8e218]:
+          - generic [ref=f8e219]:
+            - generic [ref=f8e220]: Pencarian
+            - searchbox "Pencarian" [ref=f8e222]
+          - generic [ref=f8e223]:
+            - generic [ref=f8e224]: Jurusan
+            - combobox "Jurusan" [ref=f8e225]:
+              - option "Semua jurusan" [selected]
+              - option "DPIB — Desain Pemodelan dan Informasi Bangunan"
+              - option "RPL — Rekayasa Perangkat Lunak"
+              - option "TAV — Teknik Audio Video"
+              - option "TKJ — Teknik Komputer dan Jaringan"
+              - option "TKR — Teknik Kendaraan Ringan"
+              - option "TP — Teknik Pemesinan"
+              - option "TSM — Teknik Sepeda Motor"
+              - option "TTIL — Teknik Tenaga Instalasi Listrik"
+          - generic [ref=f8e226]:
+            - generic [ref=f8e227]: Kategori
+            - combobox "Kategori" [ref=f8e228]:
+              - option "Semua" [selected]
+              - option "ATK"
+              - option "Bahan Manajemen & Instalasi Kelistrikan"
+              - option "Kabel & Konektor"
+              - option "Media Penyimpanan"
+              - option "Perangkat Jaringan"
+              - option "Perangkat Keras/Elektronik"
+              - option "Perangkat Server"
+              - option "Toolkit"
+          - generic [ref=f8e229]:
+            - generic [ref=f8e230]: Jenis
+            - combobox "Jenis" [ref=f8e231]:
+              - option "Semua" [selected]
+              - option "Alat"
+              - option "Bahan"
+          - generic [ref=f8e232]:
+            - button " Filter" [ref=f8e233] [cursor=pointer]:
+              - generic [ref=f8e234]: 
+              - text: Filter
+            - link "Reset" [ref=f8e235] [cursor=pointer]:
+              - /url: http://localhost/simba/public/reports
+        - generic [ref=f8e236]:
+          - generic [ref=f8e237]:
+            - generic [ref=f8e238]:
+              - heading "Daftar Inventaris" [level=2] [ref=f8e239]
+              - paragraph [ref=f8e240]: Ditemukan 28 data barang.
+            - generic [ref=f8e241]: "Total nilai: Rp 0"
+          - table [ref=f8e243]:
+            - rowgroup [ref=f8e244]:
+              - row [ref=f8e245]:
+                - columnheader "Kode" [ref=f8e246]
+                - columnheader "Barang" [ref=f8e247]
+                - columnheader "Kategori" [ref=f8e248]
+                - columnheader "Jurusan/Lokasi" [ref=f8e249]
+                - columnheader "Kondisi" [ref=f8e250]
+                - columnheader "Status" [ref=f8e251]
+                - columnheader "Stok" [ref=f8e252]
+                - columnheader "Harga" [ref=f8e253]
+                - columnheader "Nilai" [ref=f8e254]
+            - rowgroup [ref=f8e255]:
+              - row [ref=f8e256]:
+                - cell "BHN-0006" [ref=f8e257]
+                - cell "Alcohol 70% -" [ref=f8e258]:
+                  - generic [ref=f8e259]: Alcohol 70%
+                  - generic [ref=f8e260]: "-"
+                - cell "Perakitan & Maintenance" [ref=f8e261]
+                - cell "- -" [ref=f8e262]:
+                  - generic [ref=f8e263]: "-"
+                  - generic [ref=f8e264]: "-"
+                - cell "Baik" [ref=f8e265]
+                - cell "Stok Habis" [ref=f8e268]
+                - cell "0 BTL" [ref=f8e271]
+                - cell "Rp 0" [ref=f8e272]
+                - cell "Rp 0" [ref=f8e273]
+              - row [ref=f8e274]:
+                - cell "BHN-0007" [ref=f8e275]
+                - cell "Cable Duct -" [ref=f8e276]:
+                  - generic [ref=f8e277]: Cable Duct
+                  - generic [ref=f8e278]: "-"
+                - cell "Bahan Manajemen & Instalasi Kelistrikan" [ref=f8e279]
+                - cell "- -" [ref=f8e280]:
+                  - generic [ref=f8e281]: "-"
+                  - generic [ref=f8e282]: "-"
+                - cell "Baik" [ref=f8e283]
+                - cell "Stok Habis" [ref=f8e286]
+                - cell "0 BTG" [ref=f8e289]
+                - cell "Rp 0" [ref=f8e290]
+                - cell "Rp 0" [ref=f8e291]
+              - row [ref=f8e292]:
+                - cell "BHN-0003" [ref=f8e293]
+                - cell "Kabel Listrik -" [ref=f8e294]:
+                  - generic [ref=f8e295]: Kabel Listrik
+                  - generic [ref=f8e296]: "-"
+                - cell "Kabel & Konektor" [ref=f8e297]
+                - cell "- -" [ref=f8e298]:
+                  - generic [ref=f8e299]: "-"
+                  - generic [ref=f8e300]: "-"
+                - cell "Baik" [ref=f8e301]
+                - cell "Stok Habis" [ref=f8e304]
+                - cell "0 ROLL" [ref=f8e307]
+                - cell "Rp 0" [ref=f8e308]
+                - cell "Rp 0" [ref=f8e309]
+              - row [ref=f8e310]:
+                - cell "BHN-0001" [ref=f8e311]
+                - cell "Kabel UTP -" [ref=f8e312]:
+                  - generic [ref=f8e313]: Kabel UTP
+                  - generic [ref=f8e314]: "-"
+                - cell "Kabel & Konektor" [ref=f8e315]
+                - cell "- -" [ref=f8e316]:
+                  - generic [ref=f8e317]: "-"
+                  - generic [ref=f8e318]: "-"
+                - cell "Baik" [ref=f8e319]
+                - cell "Stok Habis" [ref=f8e322]
+                - cell "0 ROLL" [ref=f8e325]
+                - cell "Rp 0" [ref=f8e326]
+                - cell "Rp 0" [ref=f8e327]
+              - row [ref=f8e328]:
+                - cell "BHN-0002" [ref=f8e329]
+                - cell "Konektor RJ45 -" [ref=f8e330]:
+                  - generic [ref=f8e331]: Konektor RJ45
+                  - generic [ref=f8e332]: "-"
+                - cell "Kabel & Konektor" [ref=f8e333]
+                - cell "- -" [ref=f8e334]:
+                  - generic [ref=f8e335]: "-"
+                  - generic [ref=f8e336]: "-"
+                - cell "Baik" [ref=f8e337]
+                - cell "Stok Habis" [ref=f8e340]
+                - cell "0 PACK" [ref=f8e343]
+                - cell "Rp 0" [ref=f8e344]
+                - cell "Rp 0" [ref=f8e345]
+              - row [ref=f8e346]:
+                - cell "BHN-0008" [ref=f8e347]
+                - cell "Patch Cord LAN/Ethernet -" [ref=f8e348]:
+                  - generic [ref=f8e349]: Patch Cord LAN/Ethernet
+                  - generic [ref=f8e350]: "-"
+                - cell "Kabel & Konektor" [ref=f8e351]
+                - cell "- -" [ref=f8e352]:
+                  - generic [ref=f8e353]: "-"
+                  - generic [ref=f8e354]: "-"
+                - cell "Baik" [ref=f8e355]
+                - cell "Stok Habis" [ref=f8e358]
+                - cell "0 PCS" [ref=f8e361]
+                - cell "Rp 0" [ref=f8e362]
+                - cell "Rp 0" [ref=f8e363]
+              - row [ref=f8e364]:
+                - cell "BHN-0005" [ref=f8e365]
+                - cell "Steker Arde -" [ref=f8e366]:
+                  - generic [ref=f8e367]: Steker Arde
+                  - generic [ref=f8e368]: "-"
+                - cell "Bahan Manajemen & Instalasi Kelistrikan" [ref=f8e369]
+                - cell "- -" [ref=f8e370]:
+                  - generic [ref=f8e371]: "-"
+                  - generic [ref=f8e372]: "-"
+                - cell "Baik" [ref=f8e373]
+                - cell "Stok Habis" [ref=f8e376]
+                - cell "0 PCS" [ref=f8e379]
+                - cell "Rp 0" [ref=f8e380]
+                - cell "Rp 0" [ref=f8e381]
+              - row [ref=f8e382]:
+                - cell "BHN-0004" [ref=f8e383]
+                - cell "Stop Kontak -" [ref=f8e384]:
+                  - generic [ref=f8e385]: Stop Kontak
+                  - generic [ref=f8e386]: "-"
+                - cell "Bahan Manajemen & Instalasi Kelistrikan" [ref=f8e387]
+                - cell "- -" [ref=f8e388]:
+                  - generic [ref=f8e389]: "-"
+                  - generic [ref=f8e390]: "-"
+                - cell "Baik" [ref=f8e391]
+                - cell "Stok Habis" [ref=f8e394]
+                - cell "0 PCS" [ref=f8e397]
+                - cell "Rp 0" [ref=f8e398]
+                - cell "Rp 0" [ref=f8e399]
+              - row [ref=f8e400]:
+                - cell "ALT-0006" [ref=f8e401]
+                - cell "CPU -" [ref=f8e402]:
+                  - generic [ref=f8e403]: CPU
+                  - generic [ref=f8e404]: "-"
+                - cell "Perangkat Keras/Elektronik" [ref=f8e405]
+                - cell "- -" [ref=f8e406]:
+                  - generic [ref=f8e407]: "-"
+                  - generic [ref=f8e408]: "-"
+                - cell "Baik" [ref=f8e409]
+                - cell "Stok Habis" [ref=f8e412]
+                - cell "0 UNIT" [ref=f8e415]
+                - cell "Rp 0" [ref=f8e416]
+                - cell "Rp 0" [ref=f8e417]
+              - row [ref=f8e418]:
+                - cell "ALT-0004" [ref=f8e419]
+                - cell "Keyboard -" [ref=f8e420]:
+                  - generic [ref=f8e421]: Keyboard
+                  - generic [ref=f8e422]: "-"
+                - cell "Perangkat Keras/Elektronik" [ref=f8e423]
+                - cell "- -" [ref=f8e424]:
+                  - generic [ref=f8e425]: "-"
+                  - generic [ref=f8e426]: "-"
+                - cell "Baik" [ref=f8e427]
+                - cell "Stok Habis" [ref=f8e430]
+                - cell "0 PCS" [ref=f8e433]
+                - cell "Rp 0" [ref=f8e434]
+                - cell "Rp 0" [ref=f8e435]
+              - row [ref=f8e436]:
+                - cell "ALT-0013" [ref=f8e437]
+                - cell "LAN Tester RJ11/45 -" [ref=f8e438]:
+                  - generic [ref=f8e439]: LAN Tester RJ11/45
+                  - generic [ref=f8e440]: "-"
+                - cell "Toolkit" [ref=f8e441]
+                - cell "- -" [ref=f8e442]:
+                  - generic [ref=f8e443]: "-"
+                  - generic [ref=f8e444]: "-"
+                - cell "Baik" [ref=f8e445]
+                - cell "Stok Habis" [ref=f8e448]
+                - cell "0 PCS" [ref=f8e451]
+                - cell "Rp 0" [ref=f8e452]
+                - cell "Rp 0" [ref=f8e453]
+              - row [ref=f8e454]:
+                - cell "ALT-0003" [ref=f8e455]
+                - cell "Monitor -" [ref=f8e456]:
+                  - generic [ref=f8e457]: Monitor
+                  - generic [ref=f8e458]: "-"
+                - cell "Perangkat Keras/Elektronik" [ref=f8e459]
+                - cell "- -" [ref=f8e460]:
+                  - generic [ref=f8e461]: "-"
+                  - generic [ref=f8e462]: "-"
+                - cell "Baik" [ref=f8e463]
+                - cell "Stok Habis" [ref=f8e466]
+                - cell "0 UNIT" [ref=f8e469]
+                - cell "Rp 0" [ref=f8e470]
+                - cell "Rp 0" [ref=f8e471]
+              - row [ref=f8e472]:
+                - cell "ALT-0015" [ref=f8e473]
+                - cell "Motherboard -" [ref=f8e474]:
+                  - generic [ref=f8e475]: Motherboard
+                  - generic [ref=f8e476]: "-"
+                - cell "Perangkat Keras/Elektronik" [ref=f8e477]
+                - cell "- -" [ref=f8e478]:
+                  - generic [ref=f8e479]: "-"
+                  - generic [ref=f8e480]: "-"
+                - cell "Baik" [ref=f8e481]
+                - cell "Stok Habis" [ref=f8e484]
+                - cell "0 PCS" [ref=f8e487]
+                - cell "Rp 0" [ref=f8e488]
+                - cell "Rp 0" [ref=f8e489]
+              - row [ref=f8e490]:
+                - cell "ALT-0005" [ref=f8e491]
+                - cell "Mouse -" [ref=f8e492]:
+                  - generic [ref=f8e493]: Mouse
+                  - generic [ref=f8e494]: "-"
+                - cell "Perangkat Keras/Elektronik" [ref=f8e495]
+                - cell "- -" [ref=f8e496]:
+                  - generic [ref=f8e497]: "-"
+                  - generic [ref=f8e498]: "-"
+                - cell "Baik" [ref=f8e499]
+                - cell "Stok Habis" [ref=f8e502]
+                - cell "0 PCS" [ref=f8e505]
+                - cell "Rp 0" [ref=f8e506]
+                - cell "Rp 0" [ref=f8e507]
+              - row [ref=f8e508]:
+                - cell "ALT-0014" [ref=f8e509]
+                - cell "Patch Cord LAN/Ethernet -" [ref=f8e510]:
+                  - generic [ref=f8e511]: Patch Cord LAN/Ethernet
+                  - generic [ref=f8e512]: "-"
+                - cell "Perangkat Keras/Elektronik" [ref=f8e513]
+                - cell "- -" [ref=f8e514]:
+                  - generic [ref=f8e515]: "-"
+                  - generic [ref=f8e516]: "-"
+                - cell "Baik" [ref=f8e517]
+                - cell "Stok Habis" [ref=f8e520]
+                - cell "0 PCS" [ref=f8e523]
+                - cell "Rp 0" [ref=f8e524]
+                - cell "Rp 0" [ref=f8e525]
+              - row [ref=f8e526]:
+                - cell "ALT-0020" [ref=f8e527]
+                - cell "PC AIO Lenovo / 24IRH9" [ref=f8e528]:
+                  - generic [ref=f8e529]: PC AIO
+                  - generic [ref=f8e530]: Lenovo / 24IRH9
+                - cell "Perangkat Keras/Elektronik" [ref=f8e531]
+                - cell "TKJ Ruang Guru, Ruang Toolman" [ref=f8e532]:
+                  - generic [ref=f8e533]: TKJ
+                  - generic [ref=f8e534]: Ruang Guru, Ruang Toolman
+                - cell "Baik" [ref=f8e535]
+                - cell "Tersedia" [ref=f8e538]
+                - cell "5 UNIT" [ref=f8e541]
+                - cell "Rp 0" [ref=f8e542]
+                - cell "Rp 0" [ref=f8e543]
+              - row [ref=f8e544]:
+                - cell "ALT-0010" [ref=f8e545]
+                - cell "Printer -" [ref=f8e546]:
+                  - generic [ref=f8e547]: Printer
+                  - generic [ref=f8e548]: "-"
+                - cell "Perangkat Keras/Elektronik" [ref=f8e549]
+                - cell "- -" [ref=f8e550]:
+                  - generic [ref=f8e551]: "-"
+                  - generic [ref=f8e552]: "-"
+                - cell "Baik" [ref=f8e553]
+                - cell "Stok Habis" [ref=f8e556]
+                - cell "0 UNIT" [ref=f8e559]
+                - cell "Rp 0" [ref=f8e560]
+                - cell "Rp 0" [ref=f8e561]
+              - row [ref=f8e562]:
+                - cell "ALT-0016" [ref=f8e563]
+                - cell "Processor + Cooler -" [ref=f8e564]:
+                  - generic [ref=f8e565]: Processor + Cooler
+                  - generic [ref=f8e566]: "-"
+                - cell "Perangkat Keras/Elektronik" [ref=f8e567]
+                - cell "- -" [ref=f8e568]:
+                  - generic [ref=f8e569]: "-"
+                  - generic [ref=f8e570]: "-"
+                - cell "Baik" [ref=f8e571]
+                - cell "Stok Habis" [ref=f8e574]
+                - cell "0 SET" [ref=f8e577]
+                - cell "Rp 0" [ref=f8e578]
+                - cell "Rp 0" [ref=f8e579]
+              - row [ref=f8e580]:
+                - cell "ALT-0018" [ref=f8e581]
+                - cell "PSU -" [ref=f8e582]:
+                  - generic [ref=f8e583]: PSU
+                  - generic [ref=f8e584]: "-"
+                - cell "Perangkat Keras/Elektronik" [ref=f8e585]
+                - cell "- -" [ref=f8e586]:
+                  - generic [ref=f8e587]: "-"
+                  - generic [ref=f8e588]: "-"
+                - cell "Baik" [ref=f8e589]
+                - cell "Stok Habis" [ref=f8e592]
+                - cell "0 PCS" [ref=f8e595]
+                - cell "Rp 0" [ref=f8e596]
+                - cell "Rp 0" [ref=f8e597]
+              - row [ref=f8e598]:
+                - cell "ALT-0019" [ref=f8e599]
+                - cell "RAM -" [ref=f8e600]:
+                  - generic [ref=f8e601]: RAM
+                  - generic [ref=f8e602]: "-"
+                - cell "Perangkat Keras/Elektronik" [ref=f8e603]
+                - cell "- -" [ref=f8e604]:
+                  - generic [ref=f8e605]: "-"
+                  - generic [ref=f8e606]: "-"
+                - cell "Baik" [ref=f8e607]
+                - cell "Stok Habis" [ref=f8e610]
+                - cell "0 PCS" [ref=f8e613]
+                - cell "Rp 0" [ref=f8e614]
+                - cell "Rp 0" [ref=f8e615]
+              - row [ref=f8e616]:
+                - cell "ALT-0001" [ref=f8e617]
+                - cell "Routerboard -" [ref=f8e618]:
+                  - generic [ref=f8e619]: Routerboard
+                  - generic [ref=f8e620]: "-"
+                - cell "Perangkat Jaringan" [ref=f8e621]
+                - cell "- -" [ref=f8e622]:
+                  - generic [ref=f8e623]: "-"
+                  - generic [ref=f8e624]: "-"
+                - cell "Baik" [ref=f8e625]
+                - cell "Stok Habis" [ref=f8e628]
+                - cell "0 UNIT" [ref=f8e631]
+                - cell "Rp 0" [ref=f8e632]
+                - cell "Rp 0" [ref=f8e633]
+              - row [ref=f8e634]:
+                - cell "ALT-0009" [ref=f8e635]
+                - cell "Speaker -" [ref=f8e636]:
+                  - generic [ref=f8e637]: Speaker
+                  - generic [ref=f8e638]: "-"
+                - cell "Perangkat Keras/Elektronik" [ref=f8e639]
+                - cell "- -" [ref=f8e640]:
+                  - generic [ref=f8e641]: "-"
+                  - generic [ref=f8e642]: "-"
+                - cell "Baik" [ref=f8e643]
+                - cell "Stok Habis" [ref=f8e646]
+                - cell "0 PCS" [ref=f8e649]
+                - cell "Rp 0" [ref=f8e650]
+                - cell "Rp 0" [ref=f8e651]
+              - row [ref=f8e652]:
+                - cell "ALT-0017" [ref=f8e653]
+                - cell "SSD -" [ref=f8e654]:
+                  - generic [ref=f8e655]: SSD
+                  - generic [ref=f8e656]: "-"
+                - cell "Media Penyimpanan" [ref=f8e657]
+                - cell "- -" [ref=f8e658]:
+                  - generic [ref=f8e659]: "-"
+                  - generic [ref=f8e660]: "-"
+                - cell "Baik" [ref=f8e661]
+                - cell "Stok Habis" [ref=f8e664]
+                - cell "0 PCS" [ref=f8e667]
+                - cell "Rp 0" [ref=f8e668]
+                - cell "Rp 0" [ref=f8e669]
+              - row [ref=f8e670]:
+                - cell "ALT-0012" [ref=f8e671]
+                - cell "Stop Kontak Extension -" [ref=f8e672]:
+                  - generic [ref=f8e673]: Stop Kontak Extension
+                  - generic [ref=f8e674]: "-"
+                - cell "Perangkat Keras/Elektronik" [ref=f8e675]
+                - cell "- -" [ref=f8e676]:
+                  - generic [ref=f8e677]: "-"
+                  - generic [ref=f8e678]: "-"
+                - cell "Baik" [ref=f8e679]
+                - cell "Stok Habis" [ref=f8e682]
+                - cell "0 SET" [ref=f8e685]
+                - cell "Rp 0" [ref=f8e686]
+                - cell "Rp 0" [ref=f8e687]
+              - row [ref=f8e688]:
+                - cell "ALT-0011" [ref=f8e689]
+                - cell "Switch -" [ref=f8e690]:
+                  - generic [ref=f8e691]: Switch
+                  - generic [ref=f8e692]: "-"
+                - cell "Perangkat Jaringan" [ref=f8e693]
+                - cell "- -" [ref=f8e694]:
+                  - generic [ref=f8e695]: "-"
+                  - generic [ref=f8e696]: "-"
+                - cell "Baik" [ref=f8e697]
+                - cell "Stok Habis" [ref=f8e700]
+                - cell "0 UNIT" [ref=f8e703]
+                - cell "Rp 0" [ref=f8e704]
+                - cell "Rp 0" [ref=f8e705]
+          - generic [ref=f8e707]:
+            - paragraph [ref=f8e708]: Menampilkan 1–25 dari 28
+            - navigation "Navigasi halaman" [ref=f8e709]:
+              - generic [ref=f8e710]: Menampilkan 1 sampai 25 dari 28 data
+              - navigation "Halaman data" [ref=f8e711]:
+                - list [ref=f8e712]:
+                  - listitem [ref=f8e713]:
+                    - generic: ‹ Sebelumnya
+                  - listitem [ref=f8e714]:
+                    - generic [ref=f8e715]: "1"
+                  - listitem [ref=f8e716]:
+                    - link "Buka halaman 2" [ref=f8e717] [cursor=pointer]:
+                      - /url: http://localhost/simba/public/reports/inventory?page=2
+                      - text: "2"
+                  - listitem [ref=f8e718]:
+                    - link "Halaman berikutnya" [ref=f8e719] [cursor=pointer]:
+                      - /url: http://localhost/simba/public/reports/inventory?page=2
+                      - text: Berikutnya ›

@@ -7,6 +7,7 @@ use App\Models\ItemAsset;
 use App\Models\StorageLocation;
 use App\Models\Workshop;
 use App\Services\ItemAssetQrCodeService;
+use App\Traits\SortsIndex;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
@@ -16,6 +17,8 @@ use Illuminate\Validation\ValidationException;
 
 class ItemAssetController extends Controller
 {
+    use SortsIndex;
+
     /**
      * Daftar unit alat.
      *
@@ -25,6 +28,8 @@ class ItemAssetController extends Controller
     public function index(
         Request $request
     ): View {
+        [$sort, $direction, $perPage] = $this->indexSortParams(['asset_number', 'serial_number', 'received_date']);
+
         $assets = ItemAsset::query()
             ->with([
                 'item',
@@ -129,7 +134,8 @@ class ItemAssetController extends Controller
                 )
             )
             ->orderBy('asset_number')
-            ->paginate(25)
+            ->when($sort !== null, fn ($q) => $q->orderBy($sort, $direction))
+            ->paginate($perPage)
             ->withQueryString();
 
         $selectedItem = null;
@@ -161,6 +167,9 @@ class ItemAssetController extends Controller
                     ItemAsset::statusOptions(),
                 'conditionOptions' =>
                     ItemAsset::conditionOptions(),
+                'sort' => $sort,
+                'direction' => $direction,
+                'perPage' => $perPage,
             ]
         );
     }

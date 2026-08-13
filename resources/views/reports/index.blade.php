@@ -140,7 +140,7 @@
         </div>
 
         {{-- Desktop table --}}
-        <div class="hidden overflow-x-auto sm:block">
+        <div class="table-desktop overflow-x-auto">
             <table class="min-w-full divide-y divide-slate-200">
                 <thead class="bg-slate-50/80">
                     <tr>
@@ -184,7 +184,7 @@
         </div>
 
         {{-- Mobile card list --}}
-        <div class="divide-y divide-slate-100 sm:hidden">
+        <div class="card-mobile divide-y divide-slate-100">
             @forelse ($items as $item)
                 <div class="p-4">
                     <div class="flex items-start justify-between gap-2">

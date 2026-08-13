@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\ItemStockMovement;
+use App\Traits\SortsIndex;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
@@ -11,6 +12,8 @@ use Illuminate\Support\Facades\Route;
 
 class StockMovementController extends Controller
 {
+    use SortsIndex;
+
     /**
      * Ringkasan seluruh pergerakan stok.
      *
@@ -20,6 +23,10 @@ class StockMovementController extends Controller
     public function index(
         Request $request
     ): View {
+        [$sort, $direction, $perPage] = $this->indexSortParams([
+            'transaction_date', 'reference_number', 'quantity', 'stock_before', 'stock_after', 'type',
+        ]);
+
         $user = $request->user();
 
         $movements = ItemStockMovement::query()
@@ -38,22 +45,49 @@ class StockMovementController extends Controller
             )
             ->when(
                 $request->filled('type'),
-                fn (
-                    Builder $query
-                ): Builder => $query->where(
-                    'type',
-                    (string) $request->input('type')
+                function (Builder $query) use ($request): void {
+                    $types = (array) $request->input('type');
+                    $types = array_values(array_filter(array_map(
+                        'strval',
+                        $types
+                    )));
+
+                    if (count($types) === 1) {
+                        $query->where('type', $types[0]);
+                    } elseif (count($types) > 1) {
+                        $query->whereIn('type', $types);
+                    }
+                }
+            )
+            ->when(
+                $request->filled('date_from'),
+                fn (Builder $query): Builder => $query->where(
+                    'transaction_date',
+                    '>=',
+                    (string) $request->input('date_from')
+                )
+            )
+            ->when(
+                $request->filled('date_to'),
+                fn (Builder $query): Builder => $query->where(
+                    'transaction_date',
+                    '<=',
+                    (string) $request->input('date_to')
                 )
             )
             ->orderByDesc('transaction_date')
             ->orderByDesc('id')
-            ->paginate(30)
+            ->when($sort !== null, fn ($query) => $query->orderBy($sort, $direction))
+            ->paginate($perPage)
             ->withQueryString();
 
         return view(
             'stock-movements.index',
             [
                 'movements' => $movements,
+                'sort' => $sort,
+                'direction' => $direction,
+                'perPage' => $perPage,
                 'tableAvailable' => true,
                 'typeOptions' =>
                     ItemStockMovement::typeOptions(),

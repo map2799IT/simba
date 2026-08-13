@@ -9,6 +9,7 @@ use App\Models\StorageLocation;
 use App\Models\Workshop;
 use App\Services\BulkItemAssetService;
 use App\Services\StockReceiptCodeService;
+use App\Traits\SortsIndex;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
@@ -20,9 +21,15 @@ use Throwable;
 
 class StockReceiptController extends Controller
 {
+    use SortsIndex;
+
     public function index(Request $request): View
     {
         $user = $request->user();
+
+        [$sort, $direction, $perPage] = $this->indexSortParams([
+            'receipt_code', 'reference_number', 'transaction_date', 'quantity', 'source', 'brand', 'model',
+        ]);
 
         abort_unless(
             in_array((string) $user?->role, ['admin', 'kepala_bengkel', 'toolman'], true),
@@ -116,11 +123,15 @@ class StockReceiptController extends Controller
             )
             ->orderByDesc('transaction_date')
             ->orderByDesc('id')
-            ->paginate(20)
+            ->when($sort !== null, fn ($query) => $query->orderBy($sort, $direction))
+            ->paginate($perPage)
             ->withQueryString();
 
         return view('stock-receipts.index', [
             'movements' => $movements,
+            'sort' => $sort,
+            'direction' => $direction,
+            'perPage' => $perPage,
             'workshops' => Workshop::query()
                 ->where('is_active', true)
                 ->orderBy('code')
@@ -430,6 +441,47 @@ class StockReceiptController extends Controller
             'item' => $item,
             'movements' => $movements,
         ]);
+    }
+
+    public function printPdf(
+        Request $request,
+        ItemStockMovement $stockReceipt
+    ): \Symfony\Component\HttpFoundation\Response {
+        $user = $request->user();
+
+        abort_unless(
+            in_array((string) $user?->role, ['admin', 'kepala_bengkel', 'toolman'], true),
+            403
+        );
+
+        if (
+            (string) $user?->role !== 'admin'
+            && (int) $stockReceipt->workshop_id !== (int) $user?->workshop_id
+        ) {
+            abort(403);
+        }
+
+        $movement = $stockReceipt->load(
+            'item.category',
+            'item.unit',
+            'workshop',
+            'storageLocation',
+            'user'
+        );
+
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView(
+            'stock-receipts.print',
+            [
+                'movement' => $movement,
+            ]
+        )->setPaper('a4', 'portrait');
+
+        return $pdf->download(
+            sprintf(
+                'bukti-barang-masuk-%s.pdf',
+                $movement->receipt_code ?: $movement->id
+            )
+        );
     }
 
     private function movementNotes(

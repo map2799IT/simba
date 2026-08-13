@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Loan;
+use App\Traits\SortsIndex;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Http\RedirectResponse;
@@ -15,6 +16,8 @@ use Illuminate\Validation\ValidationException;
 
 class LoanReturnController extends Controller
 {
+    use SortsIndex;
+
     private const OPEN_STATUSES = [
         'borrowed',
         'overdue',
@@ -35,6 +38,8 @@ class LoanReturnController extends Controller
 
     public function index(Request $request): View
     {
+        [$sort, $direction, $perPage] = $this->indexSortParams(['code', 'returned_at']);
+
         $this->ensureLoanTable();
 
         $loanColumns = Schema::getColumnListing('loans');
@@ -160,8 +165,10 @@ class LoanReturnController extends Controller
             $query->orderByDesc('loans.id');
         }
 
+        $query->when($sort !== null, fn ($q) => $q->orderBy($sort, $direction));
+
         $loans = $query
-            ->paginate(20)
+            ->paginate($perPage)
             ->withQueryString();
 
         return view(
@@ -175,6 +182,9 @@ class LoanReturnController extends Controller
                 'purposeColumn' => $purposeColumn,
                 'requestDateColumn' => $requestDateColumn,
                 'dueDateColumn' => $dueDateColumn,
+                'sort' => $sort,
+                'direction' => $direction,
+                'perPage' => $perPage,
             ]
         );
     }

@@ -5,6 +5,12 @@
 
 @section('content')
     @php
+        $sort = $sort ?? null;
+        $direction = $direction ?? 'asc';
+        $perPage = $perPage ?? 25;
+    @endphp
+
+    @php
         $currentUser = auth()->user();
         $activeCount = $users->getCollection()->where('is_active', true)->count();
         $inactiveCount = $users->getCollection()->where('is_active', false)->count();
@@ -98,11 +104,11 @@
             <table class="min-w-full divide-y divide-slate-200">
                 <thead class="bg-slate-50/80">
                     <tr>
-                        <th class="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Pengguna</th>
+                        <x-sortable-header label="Pengguna" :sort-key="'name'" :sort="$sort" :direction="$direction" />
                         <th class="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Email</th>
-                        <th class="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Peran</th>
+                        <x-sortable-header label="Peran" :sort-key="'role'" :sort="$sort" :direction="$direction" />
                         <th class="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Status</th>
-                        <th class="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Terdaftar</th>
+                        <x-sortable-header label="Terdaftar" :sort-key="'created_at'" :sort="$sort" :direction="$direction" />
                         <th class="px-5 py-3.5 text-right text-xs font-semibold uppercase tracking-wide text-slate-500">Aksi</th>
                     </tr>
                 </thead>
@@ -220,8 +226,11 @@
 
     @if ($users->hasPages())
         <div class="mt-5 flex flex-col items-center justify-between gap-3 sm:flex-row">
-            <p class="text-sm text-slate-500">Menampilkan {{ $users->firstItem() ?? 0 }}–{{ $users->lastItem() ?? 0 }} dari {{ $users->total() }}</p>
-            {{ $users->links() }}
+            <p class="text-sm text-slate-500">Menampilkan {{ $users->firstItem() ?? 0 }}â€“{{ $users->lastItem() ?? 0 }} dari {{ $users->total() }}</p>
+            <div class="flex items-center gap-3">
+                <x-per-page-selector :per-page="$perPage" />
+                {{ $users->links() }}
+            </div>
         </div>
     @endif
 @endsection

@@ -1,5 +1,5 @@
-@source "../../**/*.blade.php";
-@source "../../**/*.js";
+@source "../../resources/views/**/*.blade.php";
+@source "../../resources/js/**/*.js";
 @import "tailwindcss";
 @import "simba.css";
 

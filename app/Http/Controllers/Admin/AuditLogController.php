@@ -8,10 +8,13 @@ use Illuminate\Database\Query\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use App\Traits\SortsIndex;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class AuditLogController extends Controller
 {
+    use SortsIndex;
+
     /**
      * Menampilkan daftar audit log.
      */
@@ -30,6 +33,15 @@ class AuditLogController extends Controller
         $columns = Schema::getColumnListing(
             'audit_logs'
         );
+
+        $sortColumns = array_values(
+            array_filter(
+                ['created_at', 'event', 'description', 'id'],
+                fn (string $c) => in_array($c, $columns, true)
+            )
+        );
+
+        [$sort, $direction, $perPage] = $this->indexSortParams($sortColumns);
 
         $query = DB::table('audit_logs')
             ->select('audit_logs.*');
@@ -143,14 +155,27 @@ class AuditLogController extends Controller
             );
         }
 
+        if ($sort !== null) {
+            $query->orderBy(
+                "audit_logs.{$sort}",
+                $direction
+            );
+        }
+
         return view(
             'admin.audit-logs.index',
             [
                 'logs' => $query
-                    ->paginate(30)
+                    ->paginate($perPage)
                     ->withQueryString(),
 
                 'tableAvailable' => true,
+
+                'sort' => $sort,
+
+                'direction' => $direction,
+
+                'perPage' => $perPage,
             ]
         );
     }
