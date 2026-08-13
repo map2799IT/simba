@@ -79,13 +79,24 @@ class DashboardController extends Controller
                 $missingAssignment
             );
 
+        /*
+         * Jumlah master barang adalah katalog global: tidak boleh
+         * disaring per jurusan (items.workshop_id umumnya NULL).
+         */
+        $masterQuery =
+            DB::table('items')
+                ->where(
+                    'items.is_active',
+                    true
+                );
+
         $stats = [
             'total_items' =>
-                (clone $inventoryQuery)
+                (clone $masterQuery)
                     ->count(),
 
             'tool_masters' =>
-                (clone $inventoryQuery)
+                (clone $masterQuery)
                     ->where(
                         'items.type',
                         'tool'
@@ -93,7 +104,7 @@ class DashboardController extends Controller
                     ->count(),
 
             'material_masters' =>
-                (clone $inventoryQuery)
+                (clone $masterQuery)
                     ->where(
                         'items.type',
                         'material'
