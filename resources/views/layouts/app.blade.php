@@ -13,10 +13,20 @@
     <link rel="stylesheet" href="{{ asset('css/simba-dark.css') }}" id="theme-stylesheet">
     <script>
         (function () {
-            var saved = localStorage.getItem('simba-theme');
-            var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-            var theme = saved || (prefersDark ? 'dark' : 'light');
-            document.documentElement.setAttribute('data-theme', theme);
+            try {
+                var theme = 'light';
+                var saved = localStorage.getItem('simba-theme');
+                if (saved === 'dark' || saved === 'light') {
+                    theme = saved;
+                } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                    theme = 'dark';
+                }
+                document.documentElement.setAttribute('data-theme', theme);
+            } catch (e) {
+                if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                }
+            }
         })();
     </script>
     @stack('styles')
