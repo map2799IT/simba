@@ -77,19 +77,41 @@
         </div>
         <div class="grid grid-cols-1 gap-4 p-5 sm:grid-cols-2 xl:grid-cols-3">
             @forelse ($workshops as $w)
+                @php
+                    $tree = $locationTree[(int) $w->id] ?? null;
+                    $map = $tree['locations'] ?? [];
+                    $roots = $tree['roots'][0] ?? [];
+                    $byParent = $tree['roots'] ?? [];
+                @endphp
                 <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
                     <p class="text-sm font-bold text-slate-900">{{ $w->code }} — {{ $w->name }}</p>
-                    <ul class="mt-2 space-y-1">
-                        @php $wl = $locations[(int) $w->id] ?? []; @endphp
-                        @forelse ($wl as $loc)
-                            <li class="flex items-center justify-between text-sm text-slate-700">
-                                <span><i class="bi bi-geo-alt mr-1 text-slate-400"></i>{{ $loc['name'] }}</span>
-                                <span class="font-mono text-xs text-slate-400">{{ $loc['code'] }}</span>
-                            </li>
-                        @empty
-                            <li class="text-xs text-slate-400">Tidak ada lokasi.</li>
-                        @endforelse
-                    </ul>
+                    @if ($tree === null)
+                        <p class="mt-2 text-xs text-slate-400">Tidak ada lokasi.</p>
+                    @else
+                        <ul class="mt-2 space-y-1">
+                            @forelse ($roots as $locId)
+                                <li>
+                                    <div class="flex items-center justify-between text-sm font-semibold text-slate-800">
+                                        <span><i class="bi bi-diagram-3 mr-1 text-slate-500"></i>{{ $map[$locId]['name'] }}</span>
+                                        <span class="font-mono text-xs text-slate-400">{{ $map[$locId]['code'] }}</span>
+                                    </div>
+                                    @php $kids = $byParent[$locId] ?? []; @endphp
+                                    @if (count($kids) > 0)
+                                        <ul class="mt-1 ml-4 space-y-1 border-l border-slate-200 pl-3">
+                                            @foreach ($kids as $kidId)
+                                                <li class="flex items-center justify-between text-sm text-slate-700">
+                                                    <span><i class="bi bi-geo-alt mr-1 text-slate-400"></i>{{ $map[$kidId]['name'] }}</span>
+                                                    <span class="font-mono text-xs text-slate-400">{{ $map[$kidId]['code'] }}</span>
+                                                </li>
+                                            @endforeach
+                                        </ul>
+                                    @endif
+                                </li>
+                            @empty
+                                <li class="text-xs text-slate-400">Hanya ada turunan tanpa induk? Periksa data lokasi.</li>
+                            @endforelse
+                        </ul>
+                    @endif
                 </div>
             @empty
                 <div class="col-span-full text-sm text-slate-500">Tidak ada jurusan.</div>

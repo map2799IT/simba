@@ -63,6 +63,8 @@ class StockImportController extends Controller
         $ref = $sheet->createSheet();
         $ref->setTitle('REFERENSI');
 
+        $scopedWid = $isAdmin ? null : $r->user()?->workshop_id;
+
         // Bagian 1: Master Barang
         $ref->setCellValue('A1', 'MASTER BARANG (untuk kolom kode_barang / nama_barang_penerimaan)');
         $ref->getStyle('A1:E1')->getFont()->setBold(true);
@@ -88,10 +90,23 @@ class StockImportController extends Controller
         $ref->fromArray(['bengkel','nama_lokasi','kode_lokasi'], null, 'A'.$locStart);
         $ref->getStyle('A'.$locStart.':C'.$locStart)->getFont()->setBold(true);
         $locStart++;
-        foreach (\App\Models\StorageLocation::query()->withoutGlobalScopes()->where('is_active', true)->with('workshop')->orderBy('workshop_id')->orderBy('name')->get(['id','workshop_id','name','code']) as $loc) {
+        $refLocations = \App\Models\StorageLocation::query()
+            ->withoutGlobalScopes()
+            ->where('is_active', true)
+            ->when($scopedWid, fn ($q) => $q->where('workshop_id', $scopedWid))
+            ->with(['workshop', 'parent'])
+            ->orderBy('workshop_id')
+            ->orderByRaw('CASE WHEN parent_id IS NULL THEN 0 ELSE 1 END')
+            ->orderBy('parent_id')
+            ->orderBy('name')
+            ->get(['id', 'workshop_id', 'parent_id', 'name', 'code']);
+        foreach ($refLocations as $loc) {
+            $label = $loc->parent !== null
+                ? '[Turunan] ' . $loc->parent->name . ' ('.$loc->parent->code.') > ' . $loc->name
+                : '[Induk] ' . $loc->name;
             $ref->fromArray([
                 $loc->workshop?->code ?? '-',
-                $loc->name,
+                $label,
                 $loc->code,
             ], null, 'A'.$locStart);
             $locStart++;
@@ -298,7 +313,12 @@ class StockImportController extends Controller
         $this->authorizeAccess($r);
         $isAdmin = $this->role($r) === 'admin';
         $wid = $isAdmin ? ($r->input('workshop_id') ?: null) : $r->user()?->workshop_id;
+        $scoped = ! $isAdmin;
 
+        /*
+         * Master barang adalah katalog umum (tidak per-jurusan):
+         * kode_barang/name harus cocok master global saat import.
+         */
         $items = \App\Models\Item::query()
             ->withoutGlobalScopes()
             ->where('is_active', true)
@@ -309,6 +329,7 @@ class StockImportController extends Controller
         $workshops = \App\Models\Workshop::query()
             ->withoutGlobalScopes()
             ->where('is_active', true)
+            ->when($scoped, fn ($q) => $q->whereKey($wid))
             ->orderBy('code')
             ->get(['id', 'code', 'name']);
 
@@ -316,19 +337,31 @@ class StockImportController extends Controller
             ->withoutGlobalScopes()
             ->where('is_active', true)
             ->when($wid, fn ($q) => $q->where('workshop_id', $wid))
+            ->with('parent')
             ->orderBy('workshop_id')
             ->orderBy('name')
-            ->get(['id', 'workshop_id', 'code', 'name']);
+            ->get(['id', 'workshop_id', 'parent_id', 'code', 'name']);
 
-        $locByWorkshop = [];
+        $locationTree = [];
         foreach ($locations as $loc) {
-            $locByWorkshop[(int) $loc->workshop_id][] = ['id' => (int) $loc->id, 'name' => $loc->name, 'code' => $loc->code];
+            $workshopId = (int) $loc->workshop_id;
+            $locationTree[$workshopId]['locations'][$loc->id] = [
+                'name' => $loc->name,
+                'code' => $loc->code,
+            ];
+            $parentId = $loc->parent_id;
+            if ($loc->parent !== null) {
+                $key = (int) $parentId;
+                $locationTree[$workshopId]['roots'][$key][] = (int) $loc->id;
+            } else {
+                $locationTree[$workshopId]['roots'][0][] = (int) $loc->id;
+            }
         }
 
         return view('stock-transactions.reference', [
             'items' => $items,
             'workshops' => $workshops,
-            'locations' => $locByWorkshop,
+            'locationTree' => $locationTree,
             'isAdmin' => $isAdmin,
             'selectedWorkshopId' => $wid,
         ]);
