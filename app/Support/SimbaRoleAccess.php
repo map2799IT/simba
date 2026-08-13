@@ -176,6 +176,7 @@ class SimbaRoleAccess
             $this->matches(
                 $routeName,
                 [
+                    'stock-import.*',
                     'stock-receipts.index',
                     'stock-receipts.show',
                     'stock-issues.index',
@@ -190,6 +191,7 @@ class SimbaRoleAccess
                     self::ROLE_HEAD,
                     self::ROLE_TOOLMAN,
                     self::ROLE_WAKA_SARPRAS,
+                    self::ROLE_ADMIN,
                 ],
                 true
             );
@@ -231,12 +233,21 @@ class SimbaRoleAccess
             $this->matches(
                 $routeName,
                 [
+                    'stock-import.*',
                     'stock-receipts.*',
                     'stock-issues.*',
                 ]
             )
         ) {
-            return $role === self::ROLE_TOOLMAN;
+            return in_array(
+                $role,
+                [
+                    self::ROLE_TOOLMAN,
+                    self::ROLE_HEAD,
+                    self::ROLE_ADMIN,
+                ],
+                true
+            );
         }
 
         if (

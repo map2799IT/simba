@@ -255,7 +255,8 @@ class StockReceiptController extends Controller
 
                         $receiptCode = $receiptCodeService->generate(
                             $item->type,
-                            $data['receipt_date']
+                            $data['receipt_date'],
+                            $receiptCodes
                         );
 
                         $receiptCodes[] = $receiptCode;

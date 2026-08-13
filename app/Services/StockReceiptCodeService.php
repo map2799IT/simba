@@ -15,7 +15,8 @@ class StockReceiptCodeService
      */
     public function generate(
         string $type,
-        mixed $receiptDate = null
+        mixed $receiptDate = null,
+        array $reserved = []
     ): string {
         $prefix = match (strtolower(trim($type))) {
             'tool' => 'ALT',
@@ -51,11 +52,12 @@ class StockReceiptCodeService
                 STR_PAD_LEFT
             );
 
-            if (! ItemStockMovement::query()
+            $alreadyUsed = ItemStockMovement::query()
                 ->withoutGlobalScopes()
                 ->where('receipt_code', $candidate)
-                ->exists()
-            ) {
+                ->exists();
+
+            if (! $alreadyUsed && ! in_array($candidate, $reserved, true)) {
                 return $candidate;
             }
         }

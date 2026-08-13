@@ -16,21 +16,22 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class StockImportController extends Controller
 {
-    private function role(): string
+    private function role(Request $r): string
     {
-        return (string) request()->user()?->role;
+        return (string) $r->user()?->role;
     }
 
     private function authorizeAccess(Request $r): void
     {
-        abort_unless(in_array((string) $r->user()?->role, ['admin', 'toolman'], true), 403);
+        abort_unless(in_array((string) $r->user()?->role, ['admin', 'toolman', 'kepala_bengkel'], true), 403);
     }
 
     public function create(Request $r): View
     {
         $this->authorizeAccess($r);
         return view('stock-transactions.import', [
-            'isAdmin' => $this->role() === 'admin',
+            'isAdmin' => $this->role($r) === 'admin',
+            'isKepalaBengkel' => $this->role($r) === 'kepala_bengkel',
             'workshops' => Workshop::query()->withoutGlobalScopes()->where('is_active', true)->orderBy('code')->get(['id','code','name']),
         ]);
     }
@@ -38,7 +39,7 @@ class StockImportController extends Controller
     public function template(Request $r): StreamedResponse
     {
         $this->authorizeAccess($r);
-        $isAdmin = $this->role() === 'admin';
+        $isAdmin = $this->role($r) === 'admin';
         $headers = $isAdmin
             ? ['nomor_dokumen','tanggal','bengkel','kode_barang','nama_barang_penerimaan','jumlah','satuan','merek','model','spesifikasi','harga_unit','sumber_perolehan','sumber_dana','kondisi','lokasi']
             : ['nomor_dokumen','tanggal','kode_barang','nama_barang_penerimaan','jumlah','satuan','merek','model','spesifikasi','harga_unit','sumber_perolehan','sumber_dana','kondisi','lokasi'];
@@ -56,6 +57,46 @@ class StockImportController extends Controller
         $guide->setCellValue('A1', 'PANDUAN IMPORT BARANG MASUK');
         $guide->setCellValue('A3', 'Baris 2 contoh. Mulai isi baris 3. Foto TIDAK di Excel: setelah import buka Edit Data lalu upload foto.');
         $guide->setCellValue('A4', 'Kode/nama barang harus ada di master. Toolman: bengkel dari akun.');
+        $guide->setCellValue('A6', 'Gunakan sheet REFERENSI untuk mengisi kode_barang, satuan, dan lokasi yang valid.');
+
+        // Sheet 3: REFERENSI (master barang + lokasi per jurusan)
+        $ref = $sheet->createSheet();
+        $ref->setTitle('REFERENSI');
+
+        // Bagian 1: Master Barang
+        $ref->setCellValue('A1', 'MASTER BARANG (untuk kolom kode_barang / nama_barang_penerimaan)');
+        $ref->getStyle('A1:E1')->getFont()->setBold(true);
+        $ref->fromArray(['kode_barang','nama_barang','jenis','kategori','satuan'], null, 'A2');
+        $ref->getStyle('A2:E2')->getFont()->setBold(true);
+        $rowIdx = 3;
+        foreach (\App\Models\Item::query()->withoutGlobalScopes()->where('is_active', true)->with(['category','unit'])->orderBy('code')->get(['id','code','name','type','item_category_id','unit_id']) as $item) {
+            $ref->fromArray([
+                $item->code,
+                $item->name,
+                $item->type === 'tool' ? 'Alat' : 'Bahan',
+                $item->category?->name ?? '-',
+                $item->unit?->name ?? '-',
+            ], null, 'A'.$rowIdx);
+            $rowIdx++;
+        }
+
+        $locStart = $rowIdx + 1;
+        // Bagian 2: Lokasi per jurusan
+        $ref->setCellValue('A'.$locStart, 'LOKASI PENYIMPANAN (untuk kolom lokasi)');
+        $ref->getStyle('A'.$locStart.':C'.$locStart)->getFont()->setBold(true);
+        $locStart++;
+        $ref->fromArray(['bengkel','nama_lokasi','kode_lokasi'], null, 'A'.$locStart);
+        $ref->getStyle('A'.$locStart.':C'.$locStart)->getFont()->setBold(true);
+        $locStart++;
+        foreach (\App\Models\StorageLocation::query()->withoutGlobalScopes()->where('is_active', true)->with('workshop')->orderBy('workshop_id')->orderBy('name')->get(['id','workshop_id','name','code']) as $loc) {
+            $ref->fromArray([
+                $loc->workshop?->code ?? '-',
+                $loc->name,
+                $loc->code,
+            ], null, 'A'.$locStart);
+            $locStart++;
+        }
+
         $writer = new Xlsx($sheet);
         return response()->streamDownload(function () use ($writer): void {
             $writer->save('php://output');
@@ -65,7 +106,7 @@ class StockImportController extends Controller
     public function store(Request $r): RedirectResponse
     {
         $this->authorizeAccess($r);
-        $isAdmin = $this->role() === 'admin';
+        $isAdmin = $this->role($r) === 'admin';
         $r->validate(['file' => ['required', 'file', 'max:10240', 'mimes:xlsx,csv']]);
         $file = $r->file('file');
         $rows = $this->readRows($file->getRealPath());
@@ -136,6 +177,21 @@ class StockImportController extends Controller
             if ($loc === null) {
                 throw new \RuntimeException("Tidak ada lokasi untuk jurusan $wcode.");
             }
+
+            $condition = strtolower(trim((string) ($row['kondisi'] ?? 'good')));
+            $condition = match ($condition) {
+                'baik' => 'good',
+                'rusak ringan' => 'minor_damage',
+                'rusak berat' => 'major_damage',
+                'dalam perawatan' => 'maintenance',
+                'tidak layak pakai' => 'unfit',
+                default => $condition,
+            };
+
+            if (! array_key_exists($condition, \App\Models\Item::conditionOptions())) {
+                $condition = 'good';
+            }
+
             $items[] = [
                 'item_id' => $itemId,
                 'quantity' => $qty,
@@ -144,7 +200,7 @@ class StockImportController extends Controller
                 'model' => $row['model'] ?? null,
                 'specification' => $row['spesifikasi'] ?? null,
                 'unit_price' => $row['harga_unit'] ?? null,
-                'condition' => $row['kondisi'] ?? 'good',
+                'condition' => $condition,
                 'notes' => null,
             ];
         }
@@ -240,7 +296,7 @@ class StockImportController extends Controller
     public function reference(Request $r): View
     {
         $this->authorizeAccess($r);
-        $isAdmin = $this->role() === 'admin';
+        $isAdmin = $this->role($r) === 'admin';
         $wid = $isAdmin ? ($r->input('workshop_id') ?: null) : $r->user()?->workshop_id;
 
         $items = \App\Models\Item::query()

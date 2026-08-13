@@ -23,7 +23,7 @@
     $isBorrowerOnly = $isTeacher || $isStudent;
 
     $canViewStock = in_array($role, ['admin', 'kepala_bengkel', 'toolman'], true);
-    $canProcessStock = in_array($role, ['admin', 'toolman'], true);
+    $canProcessStock = in_array($role, ['admin', 'toolman', 'kepala_bengkel'], true);
     $canProcessLoans = in_array($role, ['admin', 'toolman'], true);
     $canMonitorLoans = in_array($role, ['admin', 'kepala_bengkel', 'toolman'], true);
 
@@ -52,7 +52,7 @@
         [
             'label' => 'Data Jurusan',
             'items' => [
-                ['route' => $isWakaSarpras ? 'locations.inventory.menu' : 'locations.index', 'label' => $isWakaSarpras ? 'Lokasi & Print' : 'Lokasi Penyimpanan', 'icon' => 'bi-geo-alt-fill', 'active' => ['locations.index', 'locations.create', 'locations.edit', 'locations.inventory.*'], 'show' => $isAdmin || $isWakaSarpras || $isHead || $isToolman, 'badge' => $isWakaSarpras ? 'Lihat/Print' : 'Kelola'],
+                ['route' => $isWakaSarpras ? 'locations.inventory.menu' : (\Illuminate\Support\Facades\Route::has('locations.index') ? 'locations.index' : 'storage-locations.index'), 'label' => $isWakaSarpras ? 'Lokasi & Print' : 'Lokasi Penyimpanan', 'icon' => 'bi-geo-alt-fill', 'active' => ['locations.index', 'storage-locations.index', 'locations.create', 'locations.edit', 'locations.inventory.*', 'storage-locations.*'], 'show' => $isAdmin || $isWakaSarpras || $isHead || $isToolman, 'badge' => $isWakaSarpras ? 'Lihat/Print' : 'Kelola'],
             ],
         ],
         [
@@ -66,6 +66,7 @@
             'items' => [
                 ['route' => 'stock-receipts.index', 'label' => 'Barang Masuk', 'icon' => 'bi-box-arrow-in-down', 'active' => ['stock-receipts.*'], 'show' => $canViewStock, 'badge' => $canProcessStock ? 'Proses' : 'Lihat'],
                 ['route' => 'stock-issues.index', 'label' => 'Barang Keluar', 'icon' => 'bi-box-arrow-up', 'active' => ['stock-issues.*'], 'show' => $canViewStock, 'badge' => $canProcessStock ? 'Proses' : 'Lihat'],
+                ['route' => 'stock-import.index', 'label' => 'Import Barang Masuk', 'icon' => 'bi-file-earmark-arrow-up', 'active' => ['stock-import.*'], 'show' => $canProcessStock, 'badge' => 'Import'],
                 ['route' => 'stock-movements.index', 'label' => 'Pergerakan Stok', 'icon' => 'bi-arrow-left-right', 'active' => ['stock-movements.*'], 'show' => $canViewStock],
             ],
         ],

@@ -1681,7 +1681,7 @@ require __DIR__.'/location-inventory-two-modes.php';
 |--------------------------------------------------------------------------
 */
 
-Route::middleware(['auth', 'role:admin,toolman'])
+Route::middleware(['auth', 'role:admin,toolman,kepala_bengkel'])
     ->prefix('stock-import')
     ->name('stock-import.')
     ->group(function (): void {
