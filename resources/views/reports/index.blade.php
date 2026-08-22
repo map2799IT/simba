@@ -49,6 +49,29 @@
         @endif
     </x-page-header>
 
+    {{-- Tab navigasi: Inventaris / Barang Masuk / Barang Keluar --}}
+    <div class="mb-5 flex flex-wrap gap-2">
+        @php
+            $baseQuery = array_filter([
+                'search' => request('search'),
+                'workshop_id' => $selectedWorkshopId,
+                'item_category_id' => request('item_category_id'),
+                'date_from' => request('date_from'),
+                'date_to' => request('date_to'),
+            ], static fn ($v): bool => $v !== null && $v !== '');
+        @endphp
+        @foreach ([
+            'inventaris' => ['label' => 'Inventaris', 'icon' => 'bi-box-seam'],
+            'barang_masuk' => ['label' => 'Barang Masuk', 'icon' => 'bi-box-arrow-in-down'],
+            'barang_keluar' => ['label' => 'Barang Keluar', 'icon' => 'bi-box-arrow-up'],
+        ] as $tabKey => $tabMeta)
+            <a href="{{ route('reports.inventory', $tabKey === 'inventaris' ? $baseQuery : array_merge($baseQuery, ['tab' => $tabKey])) }}"
+               class="inline-flex items-center gap-2 rounded-xl border px-4 py-2 text-sm font-semibold transition {{ ($tab ?? 'inventaris') === $tabKey ? 'border-blue-600 bg-blue-600 text-white shadow-sm' : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50' }}">
+                <i class="bi {{ $tabMeta['icon'] }}"></i>{{ $tabMeta['label'] }}
+            </a>
+        @endforeach
+    </div>
+
     @if ($accessWarning)
         <div class="mb-5 flex items-start gap-3 rounded-2xl border border-amber-200 bg-amber-50 p-4">
             <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-amber-500 text-white"><i class="bi bi-exclamation-triangle-fill"></i></span>
@@ -121,6 +144,24 @@
                         <option value="material" @selected(request('type') === 'material')>Bahan</option>
                     </select>
                 </div>
+                <div class="w-full lg:w-32">
+                    <label for="year" class="mb-1.5 block text-sm font-semibold text-slate-700">Tahun</label>
+                    <select id="year" name="year" class="w-full rounded-xl border-slate-300 bg-white py-2.5 text-sm shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                        @php $currentYear = date('Y'); $years = range($currentYear - 5, $currentYear + 5); @endphp
+                        <option value="">Semua Tahun</option>
+                        @foreach ($years as $y)
+                            <option value="{{ $y }}" @selected(request('year') == $y)>{{ $y }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="w-full lg:w-32">
+                    <label for="date_from" class="mb-1.5 block text-sm font-semibold text-slate-700">Dari Tanggal</label>
+                    <input id="date_from" type="date" name="date_from" value="{{ request('date_from') }}" class="w-full rounded-xl border-slate-300 bg-white py-2.5 px-3 text-sm shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                </div>
+                <div class="w-full lg:w-32">
+                    <label for="date_to" class="mb-1.5 block text-sm font-semibold text-slate-700">Sampai Tanggal</label>
+                    <input id="date_to" type="date" name="date_to" value="{{ request('date_to') }}" class="w-full rounded-xl border-slate-300 bg-white py-2.5 px-3 text-sm shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                </div>
                 <div class="flex gap-2">
                     <x-button type="submit" variant="primary"><i class="bi bi-funnel"></i> Filter</x-button>
                     <x-button href="{{ route('reports.index') }}" variant="secondary">Reset</x-button>
@@ -129,91 +170,188 @@
         </form>
     </div>
 
-    {{-- Table --}}
-    <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-        <div class="flex flex-col items-start justify-between gap-2 border-b border-slate-100 px-5 py-4 sm:flex-row sm:items-center sm:px-6">
-            <div>
-                <h2 class="text-base font-semibold text-slate-900">Daftar Inventaris</h2>
-                <p class="mt-0.5 text-sm text-slate-500">Ditemukan {{ number_format((int) $items->total(), 0, ',', '.') }} data barang.</p>
-            </div>
-            <div class="text-sm font-bold text-slate-900">Total nilai: {{ $money($summary['total_value']) }}</div>
-        </div>
+     {{-- Table --}}
+     <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+         @if ($tab === 'inventaris')
+             <div class="flex flex-col items-start justify-between gap-2 border-b border-slate-100 px-5 py-4 sm:flex-row sm:items-center sm:px-6">
+                 <div>
+                     <h2 class="text-base font-semibold text-slate-900">Daftar Inventaris</h2>
+                     <p class="mt-0.5 text-sm text-slate-500">Ditemukan {{ number_format((int) $items->total(), 0, ',', '.') }} data barang.</p>
+                 </div>
+                 <div class="text-sm font-bold text-slate-900">Total nilai: {{ $money($summary['total_value']) }}</div>
+             </div>
 
-        {{-- Desktop table --}}
-        <div class="table-desktop overflow-x-auto">
-            <table class="min-w-full divide-y divide-slate-200">
-                <thead class="bg-slate-50/80">
-                    <tr>
-                        <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Kode</th>
-                        <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Barang</th>
-                        <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Kategori</th>
-                        <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Jurusan/Lokasi</th>
-                        <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Kondisi</th>
-                        <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Status</th>
-                        <th class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide text-slate-500">Stok</th>
-                        <th class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide text-slate-500">Harga</th>
-                        <th class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide text-slate-500">Nilai</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-slate-100">
-                    @forelse ($items as $item)
-                        <tr class="transition-colors hover:bg-blue-50/40">
-                            <td class="whitespace-nowrap px-4 py-3 font-mono text-sm font-semibold text-slate-700">{{ $item->code }}</td>
-                            <td class="px-4 py-3">
-                                <div class="text-sm font-semibold text-slate-900">{{ $item->name }}</div>
-                                <div class="text-xs text-slate-500">{{ $item->report_brand ?: '-' }}@if ($item->report_model && $item->report_model !== '-') / {{ $item->report_model }}@endif</div>
-                            </td>
-                            <td class="px-4 py-3 text-sm text-slate-600">{{ $item->category_name ?? '-' }}</td>
-                            <td class="px-4 py-3">
-                                <div class="text-sm font-medium text-slate-700">{{ $item->report_workshop_code }}</div>
-                                <div class="text-xs text-slate-500">{{ $item->report_location_name }}</div>
-                            </td>
-                            <td class="whitespace-nowrap px-4 py-3"><x-badge variant="{{ $conditionVariant($item->report_condition) }}" dot>{{ $conditionLabel($item->report_condition) }}</x-badge></td>
-                            <td class="whitespace-nowrap px-4 py-3"><x-badge variant="{{ $statusVariant($item->report_status) }}" dot>{{ $statusLabel($item->report_status) }}</x-badge></td>
-                            <td class="whitespace-nowrap px-4 py-3 text-right text-sm font-bold text-slate-900">{{ $quantity($item->report_stock, $item->allows_decimal) }} <span class="font-normal text-slate-500">{{ $item->unit_symbol ?: $item->unit_name }}</span></td>
-                            <td class="whitespace-nowrap px-4 py-3 text-right text-sm text-slate-600">{{ $money($item->report_unit_price) }}</td>
-                            <td class="whitespace-nowrap px-4 py-3 text-right text-sm font-bold text-slate-900">{{ $money($item->report_inventory_value) }}</td>
-                        </tr>
-                    @empty
-                        <tr><td colspan="9" class="px-5 py-8">
-                            <x-empty-state icon="bi-bar-chart-line" title="Tidak ada data inventaris" description="Tidak ditemukan data pada jurusan atau filter yang dipilih." />
-                        </td></tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
+             {{-- Desktop table --}}
+             <div class="table-desktop overflow-x-auto">
+                 <table class="min-w-full divide-y divide-slate-200">
+                     <thead class="bg-slate-50/80">
+                         <tr>
+                             <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Kode</th>
+                             <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Barang</th>
+                             <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Kategori</th>
+                             <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Jurusan/Lokasi</th>
+                             <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Kondisi</th>
+                             <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Status</th>
+                             <th class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide text-slate-500">Stok</th>
+                             <th class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide text-slate-500">Harga</th>
+                             <th class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide text-slate-500">Nilai</th>
+                         </tr>
+                     </thead>
+                     <tbody class="divide-y divide-slate-100">
+                         @forelse ($items as $item)
+                             <tr class="transition-colors hover:bg-blue-50/40">
+                                 <td class="whitespace-nowrap px-4 py-3 font-mono text-sm font-semibold text-slate-700">{{ $item->code }}</td>
+                                 <td class="px-4 py-3">
+                                     <div class="text-sm font-semibold text-slate-900">{{ $item->name }}</div>
+                                     <div class="text-xs text-slate-500">{{ $item->report_brand ?: '-' }}@if ($item->report_model && $item->report_model !== '-') / {{ $item->report_model }}@endif</div>
+                                 </td>
+                                 <td class="px-4 py-3 text-sm text-slate-600">{{ $item->category_name ?? '-' }}</td>
+                                 <td class="px-4 py-3">
+                                     <div class="text-sm font-medium text-slate-700">{{ $item->report_workshop_code }}</div>
+                                     <div class="text-xs text-slate-500">{{ $item->report_location_name }}</div>
+                                 </td>
+                                 <td class="whitespace-nowrap px-4 py-3"><x-badge variant="{{ $conditionVariant($item->report_condition) }}" dot>{{ $conditionLabel($item->report_condition) }}</x-badge></td>
+                                 <td class="whitespace-nowrap px-4 py-3"><x-badge variant="{{ $statusVariant($item->report_status) }}" dot>{{ $statusLabel($item->report_status) }}</x-badge></td>
+                                 <td class="whitespace-nowrap px-4 py-3 text-right text-sm font-bold text-slate-900">{{ $quantity($item->report_stock, $item->allows_decimal) }} <span class="font-normal text-slate-500">{{ $item->unit_symbol ?: $item->unit_name }}</span></td>
+                                 <td class="whitespace-nowrap px-4 py-3 text-right text-sm text-slate-600">{{ $money($item->report_unit_price) }}</td>
+                                 <td class="whitespace-nowrap px-4 py-3 text-right text-sm font-bold text-slate-900">{{ $money($item->report_inventory_value) }}</td>
+                             </tr>
+                         @empty
+                             <tr><td colspan="9" class="px-5 py-8">
+                                 <x-empty-state icon="bi-bar-chart-line" title="Tidak ada data inventaris" description="Tidak ditemukan data pada jurusan atau filter yang dipilih." />
+                             </td></tr>
+                         @endforelse
+                     </tbody>
+                 </table>
+             </div>
 
-        {{-- Mobile card list --}}
-        <div class="card-mobile divide-y divide-slate-100">
-            @forelse ($items as $item)
-                <div class="p-4">
-                    <div class="flex items-start justify-between gap-2">
-                        <div class="min-w-0">
-                            <p class="truncate font-mono text-xs text-slate-500">{{ $item->code }}</p>
-                            <p class="truncate font-semibold text-slate-900">{{ $item->name }}</p>
-                        </div>
-                        <x-badge variant="{{ $statusVariant($item->report_status) }}" dot>{{ $statusLabel($item->report_status) }}</x-badge>
-                    </div>
-                    <dl class="mt-3 grid grid-cols-2 gap-3 text-sm">
-                        <div><dt class="text-xs text-slate-500">Kategori</dt><dd class="mt-0.5 font-medium text-slate-700">{{ $item->category_name ?? '-' }}</dd></div>
-                        <div><dt class="text-xs text-slate-500">Jurusan</dt><dd class="mt-0.5 font-medium text-slate-700">{{ $item->report_workshop_code }}</dd></div>
-                        <div><dt class="text-xs text-slate-500">Stok</dt><dd class="mt-0.5 font-bold text-slate-900">{{ $quantity($item->report_stock, $item->allows_decimal) }} {{ $item->unit_symbol ?: $item->unit_name }}</dd></div>
-                        <div><dt class="text-xs text-slate-500">Nilai</dt><dd class="mt-0.5 font-bold text-slate-900">{{ $money($item->report_inventory_value) }}</dd></div>
-                    </dl>
-                    <div class="mt-2"><x-badge variant="{{ $conditionVariant($item->report_condition) }}" dot>{{ $conditionLabel($item->report_condition) }}</x-badge></div>
-                </div>
-            @empty
-                <x-empty-state icon="bi-bar-chart-line" title="Tidak ada data inventaris" description="Tidak ditemukan data pada jurusan atau filter yang dipilih." />
-            @endforelse
-        </div>
+             {{-- Mobile card list --}}
+             <div class="card-mobile divide-y divide-slate-100">
+                 @forelse ($items as $item)
+                     <div class="p-4">
+                         <div class="flex items-start justify-between gap-2">
+                             <div class="min-w-0">
+                                 <p class="truncate font-mono text-xs text-slate-500">{{ $item->code }}</p>
+                                 <p class="truncate font-semibold text-slate-900">{{ $item->name }}</p>
+                             </div>
+                             <x-badge variant="{{ $statusVariant($item->report_status) }}" dot>{{ $statusLabel($item->report_status) }}</x-badge>
+                         </div>
+                         <dl class="mt-3 grid grid-cols-2 gap-3 text-sm">
+                             <div><dt class="text-xs text-slate-500">Kategori</dt><dd class="mt-0.5 font-medium text-slate-700">{{ $item->category_name ?? '-' }}</dd></div>
+                             <div><dt class="text-xs text-slate-500">Jurusan</dt><dd class="mt-0.5 font-medium text-slate-700">{{ $item->report_workshop_code }}</dd></div>
+                             <div><dt class="text-xs text-slate-500">Stok</dt><dd class="mt-0.5 font-bold text-slate-900">{{ $quantity($item->report_stock, $item->allows_decimal) }} {{ $item->unit_symbol ?: $item->unit_name }}</dd></div>
+                             <div><dt class="text-xs text-slate-500">Nilai</dt><dd class="mt-0.5 font-bold text-slate-900">{{ $money($item->report_inventory_value) }}</dd></div>
+                         </dl>
+                         <div class="mt-2"><x-badge variant="{{ $conditionVariant($item->report_condition) }}" dot>{{ $conditionLabel($item->report_condition) }}</x-badge></div>
+                     </div>
+                 @empty
+                     <x-empty-state icon="bi-bar-chart-line" title="Tidak ada data inventaris" description="Tidak ditemukan data pada jurusan atau filter yang dipilih." />
+                 @endforelse
+             </div>
 
-        @if ($items->hasPages())
-            <div class="border-t border-slate-100 px-5 py-4">
-                <div class="flex flex-col items-center justify-between gap-2 sm:flex-row">
-                    <p class="text-sm text-slate-500">Menampilkan {{ $items->firstItem() ?? 0 }}–{{ $items->lastItem() ?? 0 }} dari {{ $items->total() }}</p>
-                    {{ $items->links() }}
-                </div>
-            </div>
-        @endif
-    </div>
+             @if ($items->hasPages())
+                 <div class="border-t border-slate-100 px-5 py-4">
+                     <div class="flex flex-col items-center justify-between gap-2 sm:flex-row">
+                         <p class="text-sm text-slate-500">Menampilkan {{ $items->firstItem() ?? 0 }}–{{ $items->lastItem() ?? 0 }} dari {{ $items->total() }}</p>
+                         {{ $items->links() }}
+                     </div>
+                 </div>
+             @endif
+         @elseif (in_array($tab, ['barang_masuk', 'barang_keluar']))
+             @php
+                 $tabTitle = $tab === 'barang_masuk' ? 'Barang Masuk' : 'Barang Keluar';
+             @endphp
+             <div class="flex flex-col items-start justify-between gap-2 border-b border-slate-100 px-5 py-4 sm:flex-row sm:items-center sm:px-6">
+                 <div>
+                     <h2 class="text-base font-semibold text-slate-900">Laporan {{ $tabTitle }}</h2>
+                     <p class="mt-0.5 text-sm text-slate-500">Ditemukan {{ number_format((int) $movementRows->total(), 0, ',', '.') }} transaksi.</p>
+                 </div>
+                 @if ($tab === 'barang_masuk' && $movementSummary)
+                     <div class="text-sm font-bold text-slate-900">Total nilai: {{ $money($movementSummary['total_value'] ?? 0) }}</div>
+                 @endif
+             </div>
+
+             {{-- Desktop table --}}
+             <div class="table-desktop overflow-x-auto">
+                 <table class="min-w-full divide-y divide-slate-200">
+                     <thead class="bg-slate-50/80">
+                         <tr>
+                             <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Tanggal</th>
+                             <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Kode</th>
+                             <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Barang</th>
+                             <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Kategori</th>
+                             <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Jurusan</th>
+                             @if ($tab === 'barang_masuk')
+                                 <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Sumber</th>
+                             @else
+                                 <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Tujuan</th>
+                             @endif
+                             <th class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide text-slate-500">Jumlah</th>
+                             <th class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide text-slate-500">Satuan</th>
+                             @if ($tab === 'barang_masuk')
+                                 <th class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide text-slate-500">Harga</th>
+                                 <th class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide text-slate-500">Total</th>
+                             @endif
+                         </tr>
+                     </thead>
+                     <tbody class="divide-y divide-slate-100">
+                         @forelse ($movementRows as $row)
+                             <tr class="transition-colors hover:bg-blue-50/40">
+                                 <td class="whitespace-nowrap px-4 py-3 text-sm text-slate-600">{{ $row->transaction_date?->format('Y-m-d') ?? '-' }}</td>
+                                 <td class="whitespace-nowrap px-4 py-3 font-mono text-sm font-semibold text-slate-700">{{ $tab === 'barang_masuk' ? $row->receipt_code : $row->reference_number }}</td>
+                                 <td class="px-4 py-3">
+                                     <div class="text-sm font-semibold text-slate-900">{{ $row->item?->name ?? '-' }}</div>
+                                     <div class="text-xs text-slate-500">{{ $row->brand ?? $row->item?->brand ?? '-' }}</div>
+                                 </td>
+                                 <td class="px-4 py-3 text-sm text-slate-600">{{ $row->item?->category?->name ?? '-' }}</td>
+                                 <td class="px-4 py-3 text-sm text-slate-600">{{ $row->item?->workshop?->code ?? '-' }}</td>
+                                 <td class="px-4 py-3 text-sm text-slate-600">{{ $tab === 'barang_masuk' ? ($row->source ?? '-') : ($row->destination ?? '-') }}</td>
+                                 <td class="whitespace-nowrap px-4 py-3 text-right text-sm font-bold text-slate-900">{{ $quantity($row->quantity, $row->item?->unit?->allows_decimal ?? false) }}</td>
+                                 <td class="whitespace-nowrap px-4 py-3 text-right text-sm text-slate-600">{{ $row->item?->unit?->code ?? '-' }}</td>
+                                 @if ($tab === 'barang_masuk')
+                                     <td class="whitespace-nowrap px-4 py-3 text-right text-sm text-slate-600">{{ $money($row->unit_price ?? 0) }}</td>
+                                     <td class="whitespace-nowrap px-4 py-3 text-right text-sm font-bold text-slate-900">{{ $money(($row->quantity ?? 0) * ($row->unit_price ?? 0)) }}</td>
+                                 @endif
+                             </tr>
+                         @empty
+                             <tr><td colspan="{{ $tab === 'barang_masuk' ? 10 : 8 }}" class="px-5 py-8">
+                                 <x-empty-state icon="bi-box-seam" title="Tidak ada data {{ $tabTitle }}" description="Tidak ditemukan transaksi pada periode atau filter yang dipilih." />
+                             </td></tr>
+                         @endforelse
+                     </tbody>
+                 </table>
+             </div>
+
+             {{-- Mobile card list --}}
+             <div class="card-mobile divide-y divide-slate-100">
+                 @forelse ($movementRows as $row)
+                     <div class="p-4">
+                         <div class="flex items-start justify-between gap-2">
+                             <div class="min-w-0">
+                                 <p class="truncate font-mono text-xs text-slate-500">{{ $tab === 'barang_masuk' ? $row->receipt_code : $row->reference_number }}</p>
+                                 <p class="truncate font-semibold text-slate-900">{{ $row->item?->name ?? '-' }}</p>
+                             </div>
+                         </div>
+                         <dl class="mt-3 grid grid-cols-2 gap-3 text-sm">
+                             <div><dt class="text-xs text-slate-500">Jurusan</dt><dd class="mt-0.5 font-medium text-slate-700">{{ $row->item?->workshop?->code ?? '-' }}</dd></div>
+                             <div><dt class="text-xs text-slate-500">Jumlah</dt><dd class="mt-0.5 font-bold text-slate-900">{{ $quantity($row->quantity, $row->item?->unit?->allows_decimal ?? false) }} {{ $row->item?->unit?->code ?? '-' }}</dd></div>
+                             <div><dt class="text-xs text-slate-500">Tanggal</dt><dd class="mt-0.5 text-slate-600">{{ $row->transaction_date?->format('Y-m-d') ?? '-' }}</dd></div>
+                             <div><dt class="text-xs text-slate-500">{{ $tab === 'barang_masuk' ? 'Sumber' : 'Tujuan' }}</dt><dd class="mt-0.5 text-slate-600">{{ $tab === 'barang_masuk' ? ($row->source ?? '-') : ($row->destination ?? '-') }}</dd></div>
+                         </dl>
+                     </div>
+                 @empty
+                     <x-empty-state icon="bi-box-seam" title="Tidak ada data {{ $tabTitle }}" description="Tidak ditemukan transaksi pada periode atau filter yang dipilih." />
+                 @endforelse
+             </div>
+
+             @if ($movementRows->hasPages())
+                 <div class="border-t border-slate-100 px-5 py-4">
+                     <div class="flex flex-col items-center justify-between gap-2 sm:flex-row">
+                         <p class="text-sm text-slate-500">Menampilkan {{ $movementRows->firstItem() ?? 0 }}–{{ $movementRows->lastItem() ?? 0 }} dari {{ $movementRows->total() }}</p>
+                         {{ $movementRows->links() }}
+                     </div>
+                 </div>
+             @endif
+         @endif
+     </div>
 @endsection

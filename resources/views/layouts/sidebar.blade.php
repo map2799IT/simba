@@ -89,8 +89,7 @@
         [
             'label' => 'Laporan',
             'items' => [
-                ['route' => 'reports.inventory', 'label' => 'Laporan Inventaris', 'icon' => 'bi-bar-chart-line', 'active' => ['reports.inventory', 'reports.inventory.*', 'reports.export.*'], 'show' => ! $isBorrowerOnly || $isWakaSarpras],
-                ['route' => 'reports.stock', 'label' => 'Laporan Stok', 'icon' => 'bi-boxes', 'active' => ['reports.stock', 'reports.stock.*'], 'show' => $canViewStock || $isWakaSarpras],
+                ['route' => 'reports.inventory', 'label' => 'Laporan Inventaris', 'icon' => 'bi-bar-chart-line', 'active' => ['reports.inventory', 'reports.inventory.*', 'reports.export.*', 'reports.stock-receipts', 'reports.stock-receipts.*'], 'show' => ! $isBorrowerOnly || $isWakaSarpras, 'badge' => 'All'],
                 ['route' => 'reports.loans', 'label' => 'Laporan Peminjaman', 'icon' => 'bi-clipboard-data', 'active' => ['reports.loans', 'reports.loans.*'], 'show' => ! $isBorrowerOnly || $isWakaSarpras],
                 ['route' => 'reports.damages', 'label' => 'Laporan Kerusakan', 'icon' => 'bi-graph-down-arrow', 'active' => ['reports.damages', 'reports.damages.*'], 'show' => ! $isBorrowerOnly || $isWakaSarpras],
                 ['route' => 'reports.stock-movements', 'label' => 'Laporan Pergerakan', 'icon' => 'bi-activity', 'active' => ['reports.stock-movements', 'reports.stock-movements.*'], 'show' => $canViewStock || $isWakaSarpras],

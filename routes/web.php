@@ -1425,6 +1425,33 @@ Route::middleware('auth')->group(
             'stockMovementsExcel',
             'reports.stock-movements'
         );
+
+        $safeRoute(
+            'get',
+            '/reports/stock-receipts',
+            'reports.stock-receipts',
+            $controllers['reports'],
+            'stockReceipts',
+            'reports.index'
+        );
+
+        $safeRoute(
+            'get',
+            '/reports/stock-receipts/pdf',
+            'reports.stock-receipts.pdf',
+            $controllers['reports'],
+            'stockReceiptsPdf',
+            'reports.stock-receipts'
+        );
+
+        $safeRoute(
+            'get',
+            '/reports/stock-receipts/excel',
+            'reports.stock-receipts.excel',
+            $controllers['reports'],
+            'stockReceiptsExcel',
+            'reports.stock-receipts'
+        );
     }
 );
 

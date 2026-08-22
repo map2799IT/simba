@@ -29,6 +29,7 @@ class ReportController extends Controller
         'inventory' => 'Inventaris Barang',
         'low_stock' => 'Stok Rendah',
         'stock_movements' => 'Mutasi Stok',
+        'stock_receipts' => 'Barang Masuk',
         'loans' => 'Peminjaman dan Pengembalian',
         'damages' => 'Kerusakan dan Perbaikan',
     ];
@@ -116,6 +117,154 @@ class ReportController extends Controller
         $request->merge(['report' => 'stock_movements']);
 
         return $this->renderNamedReport($request, 'stock_movements');
+    }
+
+    public function stockReceipts(Request $request): View
+    {
+        $workshops = Workshop::query()
+            ->where('is_active', true)
+            ->orderBy('code')
+            ->get();
+
+        $categories = ItemCategory::query()
+            ->where('is_active', true)
+            ->orderBy('name')
+            ->get();
+
+        $rows = $this->stockReceiptsQuery($request)
+            ->paginate(25)
+            ->withQueryString();
+
+        $summary = $this->stockReceiptsSummary($request);
+
+        return view('reports.stock-receipts', [
+            'reportTitle' => 'Laporan Barang Masuk',
+            'rows'        => $rows,
+            'workshops'   => $workshops,
+            'categories'  => $categories,
+            'summary'     => $summary,
+        ]);
+    }
+
+    public function stockReceiptsPdf(Request $request): Response
+    {
+        $rows = $this->stockReceiptsQuery($request)->get();
+
+        $pdf = Pdf::loadView('reports.stock-receipts-pdf', [
+            'reportTitle' => 'Laporan Barang Masuk',
+            'rows'        => $rows,
+            'filters'     => $request->query(),
+            'summary'     => $this->stockReceiptsSummary($request),
+        ])->setPaper('a4', 'landscape');
+
+        return $pdf->download(
+            sprintf('laporan-barang-masuk-%s.pdf', now()->format('Ymd-His'))
+        );
+    }
+
+    public function stockReceiptsExcel(Request $request): StreamedResponse
+    {
+        $rows = $this->stockReceiptsQuery($request)->get();
+
+        $headers = [
+            'Tanggal Masuk',
+            'Kode Penerimaan',
+            'Kode Barang',
+            'Nama Barang',
+            'Kategori',
+            'Bengkel',
+            'Merek',
+            'Model',
+            'Spesifikasi',
+            'Jumlah Masuk',
+            'Satuan',
+            'Kondisi',
+            'Sumber Dana',
+            'Harga Satuan',
+            'Total Nilai',
+            'Referensi',
+            'Sumber',
+            'Lokasi Simpan',
+            'Petugas',
+            'Keterangan',
+        ];
+
+        $excelRows = $rows->map(function (ItemStockMovement $m): array {
+            $qty        = (float) $m->quantity;
+            $unitPrice  = (float) ($m->unit_price ?? 0);
+
+            return [
+                $m->transaction_date?->format('Y-m-d'),
+                $m->receipt_code,
+                $m->item?->code,
+                $m->item?->name,
+                $m->item?->category?->name,
+                $m->item?->workshop?->code,
+                $m->brand ?? $m->item?->brand,
+                $m->model ?? $m->item?->model,
+                $m->specification,
+                $qty,
+                $m->item?->unit?->code,
+                $m->condition,
+                $m->fund_source,
+                $unitPrice ?: null,
+                $unitPrice ? round($qty * $unitPrice, 2) : null,
+                $m->reference_number,
+                $m->source,
+                $m->storageLocation?->name,
+                $m->user?->name ?? 'Sistem',
+                $m->description,
+            ];
+        })->all();
+
+        $reportTitle = 'Laporan Barang Masuk';
+
+        $spreadsheet = new Spreadsheet();
+        $sheet       = $spreadsheet->getActiveSheet();
+        $sheet->setTitle(Str::limit($reportTitle, 31, ''));
+        $sheet->fromArray($headers, null, 'A1');
+
+        $lastColumn = Coordinate::stringFromColumnIndex(count($headers));
+
+        $sheet->getStyle("A1:{$lastColumn}1")->getFont()->setBold(true);
+        $sheet->getStyle("A1:{$lastColumn}1")->getAlignment()
+            ->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle("A1:{$lastColumn}1")->getFill()
+            ->setFillType(Fill::FILL_SOLID)
+            ->getStartColor()->setARGB('FFD9EAF7');
+
+        $rowNumber = 2;
+        foreach ($excelRows as $excelRow) {
+            $sheet->fromArray($excelRow, null, "A{$rowNumber}");
+            if (isset($excelRow[0]) && $excelRow[0] !== null) {
+                $sheet->setCellValueExplicit(
+                    "A{$rowNumber}",
+                    (string) $excelRow[0],
+                    DataType::TYPE_STRING
+                );
+            }
+            $rowNumber++;
+        }
+
+        $lastRow = max(2, $rowNumber - 1);
+        $sheet->freezePane('A2');
+        $sheet->setAutoFilter("A1:{$lastColumn}{$lastRow}");
+
+        for ($i = 1; $i <= count($headers); $i++) {
+            $sheet->getColumnDimension(
+                Coordinate::stringFromColumnIndex($i)
+            )->setAutoSize(true);
+        }
+
+        return response()->streamDownload(
+            function () use ($spreadsheet): void {
+                $writer = new Xlsx($spreadsheet);
+                $writer->save('php://output');
+                $spreadsheet->disconnectWorksheets();
+            },
+            sprintf('laporan-barang-masuk-%s.xlsx', now()->format('Ymd-His')),
+            ['Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet']
+        );
     }
 
     public function stockPdf(Request $request): Response
@@ -432,6 +581,211 @@ class ReportController extends Controller
                     $request
                 ),
         };
+    }
+
+    private function stockReceiptsQuery(Request $request): Builder
+    {
+        $search = trim((string) $request->input('search'));
+
+        return ItemStockMovement::query()
+            ->with([
+                'item.category',
+                'item.unit',
+                'item.workshop',
+                'storageLocation',
+                'user',
+            ])
+            ->where('type', ItemStockMovement::TYPE_INCOMING)
+            ->when(
+                $search !== '',
+                function (Builder $query) use ($search): void {
+                    $query->where(function (Builder $sub) use ($search): void {
+                        $sub->where('receipt_code', 'like', "%{$search}%")
+                            ->orWhere('reference_number', 'like', "%{$search}%")
+                            ->orWhere('source', 'like', "%{$search}%")
+                            ->orWhere('brand', 'like', "%{$search}%")
+                            ->orWhere('fund_source', 'like', "%{$search}%")
+                            ->orWhereHas('item', function (Builder $itemQuery) use ($search): void {
+                                $itemQuery
+                                    ->where('code', 'like', "%{$search}%")
+                                    ->orWhere('name', 'like', "%{$search}%");
+                            });
+                    });
+                }
+            )
+            ->when(
+                $request->filled('workshop_id'),
+                fn (Builder $q): Builder => $q->whereHas(
+                    'item',
+                    fn (Builder $iq): Builder => $iq->where('workshop_id', $request->input('workshop_id'))
+                )
+            )
+            ->when(
+                $request->filled('item_id'),
+                fn (Builder $q): Builder => $q->where('item_id', $request->input('item_id'))
+            )
+            ->when(
+                $request->filled('item_category_id'),
+                fn (Builder $q): Builder => $q->whereHas(
+                    'item',
+                    fn (Builder $iq): Builder => $iq->where('item_category_id', $request->input('item_category_id'))
+                )
+            )
+            ->when(
+                $request->filled('date_from'),
+                fn (Builder $q): Builder => $q->whereDate('transaction_date', '>=', $request->input('date_from'))
+            )
+            ->when(
+                $request->filled('date_to'),
+                fn (Builder $q): Builder => $q->whereDate('transaction_date', '<=', $request->input('date_to'))
+            )
+            ->when(
+                $request->filled('sort'),
+                function (Builder $q) use ($request): void {
+                    $dir = $request->input('direction', 'asc') === 'desc' ? 'desc' : 'asc';
+                    match ($request->input('sort')) {
+                        'item_name'        => $q->orderBy(
+                            \App\Models\Item::select('name')
+                                ->whereColumn('items.id', 'item_stock_movements.item_id')
+                                ->limit(1),
+                            $dir
+                        ),
+                        'transaction_date' => $q->orderBy('transaction_date', $dir),
+                        'quantity'         => $q->orderBy('quantity', $dir),
+                        default            => null,
+                    };
+                },
+                fn (Builder $q): Builder => $q->orderBy(
+                    \App\Models\Item::select('name')
+                        ->whereColumn('items.id', 'item_stock_movements.item_id')
+                        ->limit(1)
+                )->orderByDesc('transaction_date')
+            );
+    }
+
+    private function stockReceiptsSummary(Request $request): array
+    {
+        $base = ItemStockMovement::query()
+            ->where('type', ItemStockMovement::TYPE_INCOMING)
+            ->when(
+                $request->filled('workshop_id'),
+                fn (Builder $q): Builder => $q->whereHas(
+                    'item',
+                    fn (Builder $iq): Builder => $iq->where('workshop_id', $request->input('workshop_id'))
+                )
+            )
+            ->when(
+                $request->filled('date_from'),
+                fn (Builder $q): Builder => $q->whereDate('transaction_date', '>=', $request->input('date_from'))
+            )
+            ->when(
+                $request->filled('date_to'),
+                fn (Builder $q): Builder => $q->whereDate('transaction_date', '<=', $request->input('date_to'))
+            );
+
+        return [
+            'total_transactions' => (clone $base)->count(),
+            'total_quantity'     => (float) (clone $base)->sum('quantity'),
+            'total_value'        => (float) (clone $base)->selectRaw('SUM(quantity * COALESCE(unit_price, 0)) as v')->value('v'),
+            'unique_items'       => (clone $base)->distinct('item_id')->count('item_id'),
+        ];
+    }
+
+    private function stockIssuesQuery(Request $request): Builder
+    {
+        $search = trim((string) $request->input('search'));
+
+        return ItemStockMovement::query()
+            ->with([
+                'item.category',
+                'item.unit',
+                'item.workshop',
+                'storageLocation',
+                'user',
+            ])
+            ->where('type', ItemStockMovement::TYPE_OUTGOING)
+            ->when(
+                $search !== '',
+                function (Builder $query) use ($search): void {
+                    $query->where(function (Builder $sub) use ($search): void {
+                        $sub->where('reference_number', 'like', "%{$search}%")
+                            ->orWhere('destination', 'like', "%{$search}%")
+                            ->orWhere('purpose', 'like', "%{$search}%")
+                            ->orWhere('description', 'like', "%{$search}%")
+                            ->orWhereHas('item', function (Builder $itemQuery) use ($search): void {
+                                $itemQuery
+                                    ->where('code', 'like', "%{$search}%")
+                                    ->orWhere('name', 'like', "%{$search}%");
+                            });
+                    });
+                }
+            )
+            ->when(
+                $request->filled('workshop_id'),
+                fn (Builder $q): Builder => $q->whereHas(
+                    'item',
+                    fn (Builder $iq): Builder => $iq->where('workshop_id', $request->input('workshop_id'))
+                )
+            )
+            ->when(
+                $request->filled('item_category_id'),
+                fn (Builder $q): Builder => $q->whereHas(
+                    'item',
+                    fn (Builder $iq): Builder => $iq->where('item_category_id', $request->input('item_category_id'))
+                )
+            )
+            ->when(
+                $request->filled('date_from'),
+                fn (Builder $q): Builder => $q->whereDate('transaction_date', '>=', $request->input('date_from'))
+            )
+            ->when(
+                $request->filled('date_to'),
+                fn (Builder $q): Builder => $q->whereDate('transaction_date', '<=', $request->input('date_to'))
+            )
+            ->when(
+                $request->filled('sort'),
+                function (Builder $q) use ($request): void {
+                    $dir = $request->input('direction', 'desc') === 'asc' ? 'asc' : 'desc';
+                    match ($request->input('sort')) {
+                        'item_name' => $q->orderBy(
+                            \App\Models\Item::select('name')
+                                ->whereColumn('items.id', 'item_stock_movements.item_id')
+                                ->limit(1),
+                            $dir
+                        ),
+                        'quantity'  => $q->orderBy('quantity', $dir),
+                        default     => $q->orderBy('transaction_date', $dir)->orderByDesc('id'),
+                    };
+                },
+                fn (Builder $q): Builder => $q->orderByDesc('transaction_date')->orderByDesc('id')
+            );
+    }
+
+    private function stockIssuesSummary(Request $request): array
+    {
+        $base = ItemStockMovement::query()
+            ->where('type', ItemStockMovement::TYPE_OUTGOING)
+            ->when(
+                $request->filled('workshop_id'),
+                fn (Builder $q): Builder => $q->whereHas(
+                    'item',
+                    fn (Builder $iq): Builder => $iq->where('workshop_id', $request->input('workshop_id'))
+                )
+            )
+            ->when(
+                $request->filled('date_from'),
+                fn (Builder $q): Builder => $q->whereDate('transaction_date', '>=', $request->input('date_from'))
+            )
+            ->when(
+                $request->filled('date_to'),
+                fn (Builder $q): Builder => $q->whereDate('transaction_date', '<=', $request->input('date_to'))
+            );
+
+        return [
+            'total_transactions' => (clone $base)->count(),
+            'total_quantity'     => (float) (clone $base)->sum('quantity'),
+            'unique_items'       => (clone $base)->distinct('item_id')->count('item_id'),
+        ];
     }
 
     private function inventoryQuery(

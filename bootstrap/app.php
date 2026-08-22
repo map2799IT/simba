@@ -14,6 +14,10 @@ return Application::configure(
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        $middleware->prepend(
+            \App\Http\Middleware\SecurityHeaders::class
+        );
+
         $middleware->appendToGroup(
             'web',
             \App\Http\Middleware\EnforceUserJurusanAssignment::class

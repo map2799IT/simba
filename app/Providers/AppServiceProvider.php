@@ -26,6 +26,29 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         /*
+         * Hapus file hot Vite jika dev server tidak dapat dijangkau dari
+         * browser. Jika hot file mengarah ke IPv6 loopback ([::1]) tetapi
+         * APP_URL menggunakan IP jaringan, browser tidak bisa mengakses
+         * asset Vite sehingga CSS/JS tidak tampil.
+         */
+        $hotFile = public_path('hot');
+        if (file_exists($hotFile)) {
+            $devUrl  = trim(file_get_contents($hotFile));
+            $appHost = parse_url(config('app.url'), PHP_URL_HOST);
+
+            $devHost    = parse_url($devUrl, PHP_URL_HOST);
+            $isLoopback = in_array($devHost, ['localhost', '127.0.0.1', '[::1]'], true)
+                || $devHost === '::1';
+
+            $appIsNetwork = $appHost && ! in_array($appHost, ['localhost', '127.0.0.1', '[::1]'], true)
+                && filter_var($appHost, FILTER_VALIDATE_IP) !== false;
+
+            if ($isLoopback && $appIsNetwork) {
+                @unlink($hotFile);
+            }
+        }
+
+        /*
          * Observer saldo awal barang.
          */
         Item::observe(ItemObserver::class);

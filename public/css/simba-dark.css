@@ -191,6 +191,6 @@ html[data-theme='dark'] .shadow {
 }
 
 /* ---------- Link sekunder (belum diklik) ---------- */
-html[data-theme='dark'] a:not(.btn):not([class*='text-blue-']) {
+html[data-theme='dark'] a:not(.btn):not([class*='text-blue-']):not([class*='text-']):not([class*='hover:']):not(nav a):not(aside a) {
     color: #93c5fd !important;
 }

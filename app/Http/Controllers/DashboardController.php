@@ -879,10 +879,17 @@ class DashboardController extends Controller
         if ($missingAssignment) {
             $query->whereRaw('1 = 0');
         } elseif ($workshopId !== null) {
-            $query->where(
-                'items.workshop_id',
-                $workshopId
-            );
+            /*
+             * Filter per jurusan memakai kolom jurusan pada transaksi
+             * (item_stock_movements.workshop_id), bukan master items
+             * yang merupakan katalog global (workshop_id NULL).
+             */
+            if (Schema::hasColumn('item_stock_movements', 'workshop_id')) {
+                $query->where(
+                    'item_stock_movements.workshop_id',
+                    $workshopId
+                );
+            }
         }
 
         return (float) $query->sum(

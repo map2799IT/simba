@@ -470,6 +470,30 @@ class InventoryPlacementReportService
             }
         }
 
+        if ($request->filled('year')) {
+            $year = (int) $request->input('year');
+            $query->whereRaw(
+                "YEAR(COALESCE(items.received_date, items.created_at)) = ?",
+                [$year]
+            );
+        }
+
+        if ($request->filled('date_from')) {
+            $dateFrom = $request->input('date_from');
+            $query->whereRaw(
+                "COALESCE(items.received_date, items.created_at) >= ?",
+                [$dateFrom]
+            );
+        }
+
+        if ($request->filled('date_to')) {
+            $dateTo = $request->input('date_to');
+            $query->whereRaw(
+                "COALESCE(items.received_date, items.created_at) <= ?",
+                [$dateTo]
+            );
+        }
+
         return $query
             ->orderBy('items.type')
             ->orderBy('items.name')
