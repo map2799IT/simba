@@ -1,0 +1,2302 @@
+{
+  "url": "https://simba.tkjkonek.my.id/",
+  "score": 46,
+  "scanDate": "2026-08-14T00:24:21.688Z",
+  "categories": [
+    {
+      "icon": "https",
+      "name": "HTTP Security Headers",
+      "checks": [
+        {
+          "id": "header-csp",
+          "name": "Content-Security-Policy (CSP)",
+          "result": "FAIL",
+          "details": "Missing CSP header. This header helps prevent XSS attacks by restricting resource loading.",
+          "category": "http-headers",
+          "severity": "high",
+          "confidence": "high",
+          "description": "Restricts which resources can be loaded, preventing XSS attacks",
+          "remediation": "Add a Content-Security-Policy header with appropriate directives to restrict which resources can be loaded. Example: \"default-src 'self'; script-src 'self' trusted-scripts.com\""
+        },
+        {
+          "id": "header-xcto",
+          "name": "X-Content-Type-Options",
+          "result": "FAIL",
+          "details": "Missing or improper implementation. Should be set to \"nosniff\"",
+          "category": "http-headers",
+          "severity": "medium",
+          "confidence": "high",
+          "description": "Prevents MIME type sniffing",
+          "remediation": "Add the X-Content-Type-Options header with the value \"nosniff\" to prevent MIME type sniffing attacks."
+        },
+        {
+          "id": "header-hsts",
+          "name": "Strict-Transport-Security (HSTS)",
+          "result": "FAIL",
+          "details": "Missing HSTS header. This header ensures clients always connect via HTTPS.",
+          "category": "http-headers",
+          "severity": "high",
+          "confidence": "high",
+          "description": "Forces HTTPS connections",
+          "remediation": "Add the Strict-Transport-Security header with a long max-age value, e.g., \"max-age=31536000; includeSubDomains\""
+        },
+        {
+          "id": "header-xfo",
+          "name": "X-Frame-Options",
+          "result": "FAIL",
+          "details": "Missing X-Frame-Options header. This header prevents clickjacking attacks.",
+          "category": "http-headers",
+          "severity": "high",
+          "confidence": "high",
+          "description": "Prevents clickjacking by controlling iframe usage",
+          "remediation": "Add the X-Frame-Options header with the value \"DENY\" (most secure) or \"SAMEORIGIN\" to prevent clickjacking attacks."
+        },
+        {
+          "id": "header-cache",
+          "name": "Cache-Control",
+          "result": "PASS",
+          "details": "Strong cache control implemented: no-cache, private",
+          "category": "http-headers",
+          "severity": "medium",
+          "confidence": "high",
+          "description": "Proper cache directives to prevent sensitive data caching"
+        },
+        {
+          "id": "header-xxp",
+          "name": "X-XSS-Protection",
+          "result": "FAIL",
+          "details": "Missing X-XSS-Protection header. While modern browsers rely on CSP, this provides protection for older browsers.",
+          "category": "http-headers",
+          "severity": "medium",
+          "confidence": "high",
+          "description": "Additional XSS protection for older browsers",
+          "remediation": "Add X-XSS-Protection header with the value \"1; mode=block\" to enable XSS filtering in older browsers."
+        },
+        {
+          "id": "header-referrer",
+          "name": "Referrer-Policy",
+          "result": "FAIL",
+          "details": "Missing Referrer-Policy header. This header controls how much referrer information is included with requests, potentially leaking sensitive data in URLs.",
+          "category": "http-headers",
+          "severity": "medium",
+          "confidence": "high",
+          "description": "Controls information sent in the Referer header",
+          "remediation": "Add Referrer-Policy header with a strict value like \"no-referrer\", \"same-origin\", or \"strict-origin-when-cross-origin\""
+        },
+        {
+          "id": "header-permissions-policy",
+          "name": "Permissions-Policy",
+          "result": "FAIL",
+          "details": "Missing Permissions-Policy header. This header helps restrict which browser features and APIs can be used, enhancing security and privacy.",
+          "category": "http-headers",
+          "severity": "low",
+          "confidence": "high",
+          "description": "Controls which browser features and APIs the site can use",
+          "remediation": "Add Permissions-Policy header to restrict access to sensitive browser features. Example: \"camera=(), microphone=(), geolocation=()\""
+        }
+      ],
+      "category": "http-headers",
+      "confidence": "high",
+      "totalCount": 8,
+      "passedCount": 1
+    },
+    {
+      "icon": "lock",
+      "name": "TLS/SSL Implementation",
+      "checks": [
+        {
+          "id": "tls-version",
+          "name": "Minimum TLS version",
+          "result": "PASS",
+          "details": "TLS 1.2+ supported. No deprecated SSL/TLS versions detected.",
+          "category": "tls-ssl",
+          "severity": "high",
+          "confidence": "high",
+          "description": "TLS 1.2+ only, no support for deprecated SSL/TLS versions",
+          "remediation": "Ensure only TLS 1.2+ is supported and disable deprecated protocols."
+        },
+        {
+          "id": "cert-validity",
+          "name": "Certificate validity",
+          "result": "PASS",
+          "details": "Certificate is valid, properly signed, and matches the domain.",
+          "category": "tls-ssl",
+          "severity": "critical",
+          "confidence": "high",
+          "description": "Properly signed, not expired, correct domain",
+          "remediation": "Ensure SSL certificate is valid, properly signed, and not expired."
+        },
+        {
+          "id": "cipher-suites",
+          "name": "Strong cipher suites",
+          "result": "PASS",
+          "details": "Modern cipher suites are being used.",
+          "category": "tls-ssl",
+          "severity": "high",
+          "confidence": "medium",
+          "description": "Only modern, secure cipher suites enabled",
+          "remediation": "Configure server to use only strong, modern cipher suites and disable weak ones."
+        },
+        {
+          "id": "pfs",
+          "name": "Perfect Forward Secrecy",
+          "result": "PASS",
+          "details": "Perfect Forward Secrecy appears to be supported.",
+          "category": "tls-ssl",
+          "severity": "high",
+          "confidence": "medium",
+          "description": "Required for all connections",
+          "remediation": "Enable Perfect Forward Secrecy on all TLS connections."
+        },
+        {
+          "id": "ocsp-stapling",
+          "name": "OCSP stapling",
+          "result": "INFO",
+          "details": "OCSP stapling status could not be determined with precision.",
+          "category": "tls-ssl",
+          "severity": "medium",
+          "confidence": "low",
+          "description": "Implemented for better performance and privacy",
+          "remediation": "Consider implementing OCSP stapling for improved performance and privacy."
+        }
+      ],
+      "category": "tls-ssl",
+      "totalCount": 4,
+      "passedCount": 4
+    },
+    {
+      "icon": "cookie",
+      "name": "Cookie Security",
+      "checks": [
+        {
+          "id": "httponly-flag",
+          "name": "HttpOnly Flag",
+          "result": "FAIL",
+          "details": "HttpOnly flag missing from cookies. This allows client-side JavaScript to access cookies, increasing the risk of XSS attacks.",
+          "category": "cookie-security",
+          "severity": "high",
+          "confidence": "high",
+          "description": "Protects cookies from being accessed by JavaScript",
+          "remediation": "Set the HttpOnly flag on all sensitive cookies to prevent client-side JavaScript access."
+        },
+        {
+          "id": "secure-flag",
+          "name": "Secure Flag",
+          "result": "FAIL",
+          "details": "Secure flag missing from cookies. This allows cookies to be transmitted over unencrypted HTTP connections.",
+          "category": "cookie-security",
+          "severity": "high",
+          "confidence": "high",
+          "description": "Ensures cookies are only sent over HTTPS",
+          "remediation": "Set the Secure flag on all cookies to ensure they are only transmitted over HTTPS connections."
+        },
+        {
+          "id": "samesite-attribute",
+          "name": "SameSite Attribute",
+          "result": "FAIL",
+          "details": "SameSite attribute missing from cookies. This can enable cross-site request forgery (CSRF) attacks.",
+          "category": "cookie-security",
+          "severity": "high",
+          "confidence": "high",
+          "description": "Restricts cross-site request inclusion of cookies",
+          "remediation": "Set the SameSite attribute to either Strict or Lax on cookies to protect against CSRF attacks."
+        },
+        {
+          "id": "cookie-expiration",
+          "name": "Cookie Expiration",
+          "result": "PASS",
+          "details": "Cookies have proper expiration dates or max-age values, limiting their lifetime.",
+          "category": "cookie-security",
+          "severity": "medium",
+          "confidence": "high",
+          "description": "Ensures cookies have defined expiration dates"
+        },
+        {
+          "id": "cookie-prefixes",
+          "name": "Cookie Prefixes",
+          "result": "INFO",
+          "details": "Cookie prefixes (__Secure- or __Host-) are not in use. While optional, they provide additional security guarantees for cookies in modern browsers.",
+          "category": "cookie-security",
+          "severity": "low",
+          "confidence": "high",
+          "description": "Use of __Secure- or __Host- prefixes for enhanced security",
+          "remediation": "Consider using __Secure- or __Host- prefixes for sensitive cookies to enhance security in modern browsers."
+        }
+      ],
+      "category": "cookie-security",
+      "confidence": "high",
+      "totalCount": 4,
+      "passedCount": 1
+    },
+    {
+      "icon": "refresh-ccw",
+      "name": "Cache Control",
+      "checks": [
+        {
+          "id": "cache-control-header",
+          "name": "Cache-Control Header",
+          "result": "PASS",
+          "details": "Cache-Control header is properly set with secure directives: no-cache, private",
+          "category": "cache-control",
+          "severity": "medium",
+          "confidence": "high",
+          "description": "Proper directives to prevent caching of sensitive data"
+        },
+        {
+          "id": "pragma-header",
+          "name": "Pragma Header",
+          "result": "INFO",
+          "details": "Pragma: no-cache is not set. While modern browsers rely on Cache-Control, this header helps with older HTTP/1.0 caches.",
+          "category": "cache-control",
+          "severity": "low",
+          "confidence": "high",
+          "description": "Legacy header for HTTP/1.0 caches",
+          "remediation": "Consider adding \"Pragma: no-cache\" for compatibility with older HTTP/1.0 caches."
+        },
+        {
+          "id": "expires-header",
+          "name": "Expires Header",
+          "result": "INFO",
+          "details": "Expires header is not set. Modern browsers rely on Cache-Control, but this header provides additional control.",
+          "category": "cache-control",
+          "severity": "low",
+          "confidence": "high",
+          "description": "Controls when content is considered stale",
+          "remediation": "Consider setting \"Expires: 0\" or a past date for sensitive content."
+        },
+        {
+          "id": "etag-header",
+          "name": "ETag Implementation",
+          "result": "INFO",
+          "details": "ETag header is not implemented. While not strictly a security issue, ETags can be used for efficient cache validation when implemented alongside proper Cache-Control directives.",
+          "category": "cache-control",
+          "severity": "low",
+          "confidence": "high",
+          "description": "Entity tag for cache validation"
+        }
+      ],
+      "category": "cache-control",
+      "confidence": "high",
+      "totalCount": 1,
+      "passedCount": 1
+    },
+    {
+      "icon": "shuffle",
+      "name": "Cross-Origin Protections",
+      "checks": [
+        {
+          "id": "x-frame-options",
+          "name": "X-Frame-Options",
+          "result": "FAIL",
+          "details": "X-Frame-Options header is missing. This makes the site vulnerable to clickjacking attacks.",
+          "category": "cross-origin",
+          "severity": "high",
+          "confidence": "high",
+          "description": "Prevents clickjacking by controlling iframe embedding",
+          "remediation": "Add X-Frame-Options header set to DENY or SAMEORIGIN to protect against clickjacking attacks."
+        },
+        {
+          "id": "cors-implementation",
+          "name": "CORS Implementation",
+          "result": "INFO",
+          "details": "No CORS headers detected. If this site serves APIs or resources to other origins, CORS should be properly configured.",
+          "category": "cross-origin",
+          "severity": "low",
+          "confidence": "high",
+          "description": "Cross-Origin Resource Sharing configuration"
+        },
+        {
+          "id": "cross-origin-resource-policy",
+          "name": "Cross-Origin Resource Policy",
+          "result": "INFO",
+          "details": "Cross-Origin Resource Policy header is not set. This modern header provides additional protection against Spectre-like side-channel attacks.",
+          "category": "cross-origin",
+          "severity": "medium",
+          "confidence": "high",
+          "description": "Additional protection against cross-origin information leaks",
+          "remediation": "Consider adding Cross-Origin-Resource-Policy header set to same-origin, same-site, or cross-origin as appropriate."
+        },
+        {
+          "id": "cross-origin-opener-policy",
+          "name": "Cross-Origin Opener Policy",
+          "result": "INFO",
+          "details": "Cross-Origin Opener Policy header is not set. This modern header helps isolate your site from others when opened in new windows.",
+          "category": "cross-origin",
+          "severity": "medium",
+          "confidence": "high",
+          "description": "Controls window.opener relationship with other browsing contexts",
+          "remediation": "Consider adding Cross-Origin-Opener-Policy header set to same-origin or same-origin-allow-popups."
+        },
+        {
+          "id": "cross-origin-embedder-policy",
+          "name": "Cross-Origin Embedder Policy",
+          "result": "INFO",
+          "details": "Cross-Origin Embedder Policy header is not set. This modern header can enable powerful features like SharedArrayBuffer by requiring opt-in for embedded resources.",
+          "category": "cross-origin",
+          "severity": "low",
+          "confidence": "high",
+          "description": "Forces embedded resources to opt-in to being loaded by document",
+          "remediation": "Consider adding Cross-Origin-Embedder-Policy header if you need SharedArrayBuffer or other powerful features requiring cross-origin isolation."
+        }
+      ],
+      "category": "cross-origin",
+      "confidence": "high",
+      "totalCount": 1,
+      "passedCount": 0
+    },
+    {
+      "icon": "server",
+      "name": "Server Information Leakage",
+      "checks": [
+        {
+          "id": "server-header",
+          "name": "Server Header",
+          "result": "FAIL",
+          "details": "Server header reveals server software (LiteSpeed), which can help attackers identify the technology stack.",
+          "category": "server-info",
+          "severity": "medium",
+          "confidence": "high",
+          "description": "Checks if server software is disclosed",
+          "remediation": "Configure your web server to remove or modify the Server header to avoid disclosing implementation details."
+        },
+        {
+          "id": "x-powered-by",
+          "name": "X-Powered-By Header",
+          "result": "FAIL",
+          "details": "X-Powered-By header reveals backend technology (PHP/8.4.24), which can help attackers target specific vulnerabilities.",
+          "category": "server-info",
+          "severity": "medium",
+          "confidence": "high",
+          "description": "Checks if backend technology is disclosed",
+          "remediation": "Configure your application framework to remove the X-Powered-By header."
+        }
+      ],
+      "category": "server-info",
+      "confidence": "high",
+      "totalCount": 2,
+      "passedCount": 0
+    },
+    {
+      "icon": "warning",
+      "name": "Error Handling & Logging",
+      "checks": [
+        {
+          "id": "custom-error-pages",
+          "name": "Custom error pages",
+          "result": "PASS",
+          "details": "Custom error page implemented correctly without sensitive information",
+          "category": "error-handling",
+          "severity": "medium",
+          "confidence": "medium",
+          "description": "No sensitive information in error messages"
+        },
+        {
+          "id": "secure-logging",
+          "name": "Secure logging practices",
+          "result": "INFO",
+          "details": "Logging practices cannot be determined through external scanning",
+          "category": "error-handling",
+          "severity": "medium",
+          "confidence": "low",
+          "description": "No sensitive data in logs, proper log rotation",
+          "remediation": "Ensure logs do not contain sensitive data and implement proper log rotation."
+        },
+        {
+          "id": "log-integrity",
+          "name": "Log integrity",
+          "result": "INFO",
+          "details": "Log integrity cannot be determined through external scanning",
+          "category": "error-handling",
+          "severity": "medium",
+          "confidence": "low",
+          "description": "Tamper-evident logging implementation",
+          "remediation": "Implement tamper-evident logging to detect unauthorized log modifications."
+        }
+      ],
+      "category": "error-handling",
+      "totalCount": 1,
+      "passedCount": 1
+    },
+    {
+      "icon": "bug",
+      "name": "Debug Mode Detection",
+      "checks": [
+        {
+          "id": "debug-indicators",
+          "name": "Debug Mode Indicators",
+          "result": "PASS",
+          "details": "No debug indicators detected",
+          "category": "debug-mode",
+          "severity": "medium",
+          "confidence": "high",
+          "description": "Tests for debug mode indicators",
+          "remediation": "Debug mode appears to be properly disabled."
+        }
+      ],
+      "category": "debug-mode",
+      "confidence": "high",
+      "totalCount": 1,
+      "passedCount": 1
+    },
+    {
+      "icon": "shield-check",
+      "name": "Input Validation & Injection Prevention",
+      "checks": [
+        {
+          "id": "xss-protection",
+          "name": "XSS Protection",
+          "result": "PASS",
+          "details": "XSS protection appears effective - payload not reflected",
+          "category": "input-validation",
+          "severity": "high",
+          "confidence": "high",
+          "description": "Tests for Cross-Site Scripting vulnerabilities",
+          "remediation": "Continue maintaining proper input validation."
+        }
+      ],
+      "category": "input-validation",
+      "confidence": "high",
+      "totalCount": 1,
+      "passedCount": 1
+    },
+    {
+      "icon": "settings",
+      "name": "Environment Configuration",
+      "checks": [
+        {
+          "id": "env-exposure-check",
+          "name": "Environment File Exposure",
+          "result": "PASS",
+          "details": "No environment files found exposed",
+          "category": "environment",
+          "severity": "critical",
+          "confidence": "high",
+          "description": "Tests for exposed environment configuration files",
+          "remediation": "Continue protecting environment configuration files."
+        }
+      ],
+      "category": "environment",
+      "confidence": "high",
+      "totalCount": 1,
+      "passedCount": 1
+    },
+    {
+      "icon": "workflow",
+      "name": "Architecture & Data Flow",
+      "checks": [
+        {
+          "id": "data-flow-diagrams",
+          "name": "Data Flow Documentation",
+          "result": "INFO",
+          "details": "Maintain current data-flow diagrams showing all trust boundaries (public web → app server → DB; integrations; workers).",
+          "category": "architecture",
+          "severity": "medium",
+          "confidence": "low",
+          "description": "Document trust boundaries in data flow diagrams"
+        },
+        {
+          "id": "component-inventory",
+          "name": "Component Inventory",
+          "result": "INFO",
+          "details": "Every component (frontend, backend, DB, queues, serverless functions) should be inventoried with the secrets it can read.",
+          "category": "architecture",
+          "severity": "medium",
+          "confidence": "low",
+          "description": "Inventory components with access to secrets"
+        },
+        {
+          "id": "sensitive-data-paths",
+          "name": "Sensitive Data Path Documentation",
+          "result": "INFO",
+          "details": "Sensitive data paths (login, payments, file upload) should be documented with authentication and transport layer protections.",
+          "category": "architecture",
+          "severity": "high",
+          "confidence": "low",
+          "description": "Document protection for sensitive flows"
+        },
+        {
+          "id": "cross-tenant-access",
+          "name": "Cross-Tenant Access Prevention",
+          "result": "INFO",
+          "details": "Ensure no implicit cross-tenant access occurs. Add negative tests for Insecure Direct Object Reference (IDOR) vulnerabilities.",
+          "category": "architecture",
+          "severity": "critical",
+          "confidence": "low",
+          "description": "Prevent unauthorized access across tenants"
+        }
+      ],
+      "category": "architecture",
+      "confidence": "low",
+      "totalCount": 0,
+      "passedCount": 0,
+      "isInformationalOnly": true
+    },
+    {
+      "icon": "shield-lock",
+      "name": "Access Control Best Practices",
+      "checks": [
+        {
+          "id": "server-side-auth",
+          "name": "Server-Side Authentication",
+          "result": "INFO",
+          "details": "Server-side middleware should enforce authentication/authorization for every protected route. Never rely solely on client-side protections.",
+          "category": "access-control",
+          "severity": "critical",
+          "confidence": "low",
+          "description": "Enforce authentication at the server level"
+        },
+        {
+          "id": "resource-ownership",
+          "name": "Resource Ownership Validation",
+          "result": "INFO",
+          "details": "Implement URI-level auth checks plus resource-level ownership filters in queries to prevent unauthorized access.",
+          "category": "access-control",
+          "severity": "high",
+          "confidence": "low",
+          "description": "Verify resource ownership in every request"
+        },
+        {
+          "id": "least-privilege",
+          "name": "Principle of Least Privilege",
+          "result": "INFO",
+          "details": "Follow the principle of least privilege: define clear roles and ensure normal users cannot modify data beyond their scope.",
+          "category": "access-control",
+          "severity": "high",
+          "confidence": "low",
+          "description": "Grant minimum required access"
+        },
+        {
+          "id": "session-invalidation",
+          "name": "Session Invalidation",
+          "result": "INFO",
+          "details": "Provide an option to invalidate all sessions after password change or reset to prevent continued access from compromised sessions.",
+          "category": "access-control",
+          "severity": "medium",
+          "confidence": "low",
+          "description": "Invalidate sessions after credentials change"
+        }
+      ],
+      "category": "access-control",
+      "confidence": "low",
+      "totalCount": 0,
+      "passedCount": 0,
+      "isInformationalOnly": true
+    },
+    {
+      "icon": "key",
+      "name": "Credential Handling",
+      "checks": [
+        {
+          "id": "password-storage",
+          "name": "Password Storage",
+          "result": "INFO",
+          "details": "Store passwords using modern hashing algorithms like bcrypt or Argon2 with per-user random salts. Never store passwords in plaintext or using weak hashing algorithms like MD5.",
+          "category": "credential-handling",
+          "severity": "critical",
+          "confidence": "low",
+          "description": "Use strong hashing algorithms"
+        },
+        {
+          "id": "mfa-implementation",
+          "name": "Multi-Factor Authentication",
+          "result": "INFO",
+          "details": "Offer Multi-Factor Authentication (MFA) especially for administrative accounts and accounts with access to sensitive data.",
+          "category": "credential-handling",
+          "severity": "high",
+          "confidence": "low",
+          "description": "Implement MFA for sensitive accounts"
+        },
+        {
+          "id": "one-time-tokens",
+          "name": "One-Time Token Security",
+          "result": "INFO",
+          "details": "One-time tokens (invites, password resets) should be cryptographically random, single-use, and expire in 10 minutes or less.",
+          "category": "credential-handling",
+          "severity": "high",
+          "confidence": "low",
+          "description": "Secure implementation of password reset tokens"
+        }
+      ],
+      "category": "credential-handling",
+      "confidence": "low",
+      "totalCount": 0,
+      "passedCount": 0,
+      "isInformationalOnly": true
+    },
+    {
+      "icon": "database",
+      "name": "Database Security",
+      "checks": [
+        {
+          "id": "parameterized-queries",
+          "name": "Parameterized Queries",
+          "result": "INFO",
+          "details": "Use parameterized queries or prepared statements for all database operations. Never build SQL statements using string concatenation with user input.",
+          "category": "database-security",
+          "severity": "critical",
+          "confidence": "low",
+          "description": "Prevent SQL injection with parameterized queries"
+        },
+        {
+          "id": "db-privileges",
+          "name": "Database Privileges",
+          "result": "INFO",
+          "details": "Apply the principle of least privilege to database users. Applications should not use database administrator accounts for regular operations.",
+          "category": "database-security",
+          "severity": "high",
+          "confidence": "low",
+          "description": "Limit database access permissions"
+        },
+        {
+          "id": "db-network-access",
+          "name": "Database Network Access",
+          "result": "INFO",
+          "details": "Limit database access to application servers only. Use firewalls, VPCs, or other network controls to prevent direct public access to databases.",
+          "category": "database-security",
+          "severity": "high",
+          "confidence": "low",
+          "description": "Restrict network access to databases"
+        },
+        {
+          "id": "sensitive-data-encryption",
+          "name": "Sensitive Data Encryption",
+          "result": "INFO",
+          "details": "Implement field-level encryption for personally identifiable information (PII) and other sensitive data, not just relying on database-level encryption.",
+          "category": "database-security",
+          "severity": "high",
+          "confidence": "low",
+          "description": "Encrypt PII and sensitive data"
+        }
+      ],
+      "category": "database-security",
+      "confidence": "low",
+      "totalCount": 0,
+      "passedCount": 0,
+      "isInformationalOnly": true
+    },
+    {
+      "icon": "filter",
+      "name": "Input Validation",
+      "checks": [
+        {
+          "id": "schema-validation",
+          "name": "Schema Validation",
+          "result": "INFO",
+          "details": "Validate all API payloads with a schema validation library (e.g., Zod, Yup, JSON Schema). Ensure all user inputs are checked for type, format, length, and range.",
+          "category": "input-validation",
+          "severity": "high",
+          "confidence": "low",
+          "description": "Validate all API inputs with schemas"
+        },
+        {
+          "id": "no-dynamic-code",
+          "name": "No Dynamic Code Execution",
+          "result": "INFO",
+          "details": "Never use eval() or similar functions with untrusted input. Avoid dynamically generating and executing code from user-provided data.",
+          "category": "input-validation",
+          "severity": "critical",
+          "confidence": "low",
+          "description": "Avoid evaluating user input as code"
+        },
+        {
+          "id": "output-encoding",
+          "name": "Output Encoding",
+          "result": "INFO",
+          "details": "Properly encode all output for its context (HTML, JavaScript, JSON, headers) to prevent injection attacks like XSS.",
+          "category": "input-validation",
+          "severity": "high",
+          "confidence": "low",
+          "description": "Encode output for its context"
+        },
+        {
+          "id": "ssrf-protection",
+          "name": "SSRF Protection",
+          "result": "INFO",
+          "details": "For Server-Side Request Forgery (SSRF) protection, restrict outbound URL fetches to an allowlist of approved protocols and domains.",
+          "category": "input-validation",
+          "severity": "high",
+          "confidence": "low",
+          "description": "Restrict outbound URL fetches"
+        }
+      ],
+      "category": "input-validation",
+      "confidence": "low",
+      "totalCount": 0,
+      "passedCount": 0,
+      "isInformationalOnly": true
+    },
+    {
+      "icon": "activity",
+      "name": "Logging & Monitoring",
+      "checks": [
+        {
+          "id": "security-events",
+          "name": "Security Event Logging",
+          "result": "INFO",
+          "details": "Security events (authentication failures, privilege changes, data exports) should be logged and have alerting capabilities.",
+          "category": "logging-monitoring",
+          "severity": "high",
+          "confidence": "low",
+          "description": "Log and alert on security events"
+        },
+        {
+          "id": "log-sanitization",
+          "name": "Log Sanitization",
+          "result": "INFO",
+          "details": "Scrub logs of secrets, tokens, and payment details. Avoid logging personally identifiable information (PII) or sensitive data.",
+          "category": "logging-monitoring",
+          "severity": "high",
+          "confidence": "low",
+          "description": "Remove sensitive data from logs"
+        },
+        {
+          "id": "tamper-evident-logs",
+          "name": "Tamper-Evident Logging",
+          "result": "INFO",
+          "details": "Implement time-synced, tamper-evident log storage with clear retention policies. Consider using append-only log systems.",
+          "category": "logging-monitoring",
+          "severity": "medium",
+          "confidence": "low",
+          "description": "Ensure logs cannot be modified"
+        }
+      ],
+      "category": "logging-monitoring",
+      "confidence": "low",
+      "totalCount": 0,
+      "passedCount": 0,
+      "isInformationalOnly": true
+    },
+    {
+      "icon": "git-branch",
+      "name": "CI/CD & Operations",
+      "checks": [
+        {
+          "id": "automated-builds",
+          "name": "Automated Builds & Deploys",
+          "result": "INFO",
+          "details": "Builds, tests, and deployments should be fully automated and reproducible from source code and lockfiles.",
+          "category": "cicd-operations",
+          "severity": "medium",
+          "confidence": "low",
+          "description": "Use automated CI/CD pipelines"
+        },
+        {
+          "id": "no-debug-in-prod",
+          "name": "Debug Mode Disabled",
+          "result": "INFO",
+          "details": "Debug and verbose modes should be disabled in production environments to prevent information leakage.",
+          "category": "cicd-operations",
+          "severity": "high",
+          "confidence": "low",
+          "description": "Turn off debug features in production"
+        },
+        {
+          "id": "secrets-management",
+          "name": "Secrets Management",
+          "result": "INFO",
+          "details": "Store secrets in a vault or environment variables manager. Document and implement a rotation schedule for all secrets.",
+          "category": "cicd-operations",
+          "severity": "high",
+          "confidence": "low",
+          "description": "Securely manage application secrets"
+        },
+        {
+          "id": "certificate-renewal",
+          "name": "Certificate Management",
+          "result": "INFO",
+          "details": "TLS certificates should auto-renew to prevent expiration. Consider implementing OCSP stapling for improved performance.",
+          "category": "cicd-operations",
+          "severity": "high",
+          "confidence": "low",
+          "description": "Automate certificate renewals"
+        }
+      ],
+      "category": "cicd-operations",
+      "confidence": "low",
+      "totalCount": 0,
+      "passedCount": 0,
+      "isInformationalOnly": true
+    },
+    {
+      "icon": "settings",
+      "name": "Administrative Interfaces",
+      "checks": [
+        {
+          "id": "admin-mfa",
+          "name": "Admin MFA",
+          "result": "INFO",
+          "details": "Administrative logins should require Multi-Factor Authentication (MFA) to prevent unauthorized access if credentials are compromised.",
+          "category": "admin-interfaces",
+          "severity": "critical",
+          "confidence": "low",
+          "description": "Require strong authentication for admins"
+        },
+        {
+          "id": "admin-auditing",
+          "name": "Admin Action Auditing",
+          "result": "INFO",
+          "details": "Administrative routes should perform additional role verification and generate detailed audit events for all access and actions.",
+          "category": "admin-interfaces",
+          "severity": "high",
+          "confidence": "low",
+          "description": "Log all administrative actions"
+        },
+        {
+          "id": "admin-access-restriction",
+          "name": "Admin Access Restrictions",
+          "result": "INFO",
+          "details": "Restrict administrative interface access by IP or network when possible. Consider using a VPN or dedicated admin gateway.",
+          "category": "admin-interfaces",
+          "severity": "high",
+          "confidence": "low",
+          "description": "Limit admin interface access"
+        }
+      ],
+      "category": "admin-interfaces",
+      "confidence": "low",
+      "totalCount": 0,
+      "passedCount": 0,
+      "isInformationalOnly": true
+    }
+  ],
+  "mediumScore": 50,
+  "mediumTotal": 10,
+  "failedChecks": 13,
+  "mediumFailed": 5,
+  "mediumPassed": 5,
+  "overallScore": 46,
+  "passedChecks": 11,
+  "criticalScore": 46,
+  "lowCategories": [
+    {
+      "icon": "https",
+      "name": "HTTP Security Headers",
+      "checks": [
+        {
+          "id": "header-csp",
+          "name": "Content-Security-Policy (CSP)",
+          "result": "FAIL",
+          "details": "Missing CSP header. This header helps prevent XSS attacks by restricting resource loading.",
+          "category": "http-headers",
+          "severity": "high",
+          "confidence": "high",
+          "description": "Restricts which resources can be loaded, preventing XSS attacks",
+          "remediation": "Add a Content-Security-Policy header with appropriate directives to restrict which resources can be loaded. Example: \"default-src 'self'; script-src 'self' trusted-scripts.com\""
+        },
+        {
+          "id": "header-xcto",
+          "name": "X-Content-Type-Options",
+          "result": "FAIL",
+          "details": "Missing or improper implementation. Should be set to \"nosniff\"",
+          "category": "http-headers",
+          "severity": "medium",
+          "confidence": "high",
+          "description": "Prevents MIME type sniffing",
+          "remediation": "Add the X-Content-Type-Options header with the value \"nosniff\" to prevent MIME type sniffing attacks."
+        },
+        {
+          "id": "header-hsts",
+          "name": "Strict-Transport-Security (HSTS)",
+          "result": "FAIL",
+          "details": "Missing HSTS header. This header ensures clients always connect via HTTPS.",
+          "category": "http-headers",
+          "severity": "high",
+          "confidence": "high",
+          "description": "Forces HTTPS connections",
+          "remediation": "Add the Strict-Transport-Security header with a long max-age value, e.g., \"max-age=31536000; includeSubDomains\""
+        },
+        {
+          "id": "header-xfo",
+          "name": "X-Frame-Options",
+          "result": "FAIL",
+          "details": "Missing X-Frame-Options header. This header prevents clickjacking attacks.",
+          "category": "http-headers",
+          "severity": "high",
+          "confidence": "high",
+          "description": "Prevents clickjacking by controlling iframe usage",
+          "remediation": "Add the X-Frame-Options header with the value \"DENY\" (most secure) or \"SAMEORIGIN\" to prevent clickjacking attacks."
+        },
+        {
+          "id": "header-cache",
+          "name": "Cache-Control",
+          "result": "PASS",
+          "details": "Strong cache control implemented: no-cache, private",
+          "category": "http-headers",
+          "severity": "medium",
+          "confidence": "high",
+          "description": "Proper cache directives to prevent sensitive data caching"
+        },
+        {
+          "id": "header-xxp",
+          "name": "X-XSS-Protection",
+          "result": "FAIL",
+          "details": "Missing X-XSS-Protection header. While modern browsers rely on CSP, this provides protection for older browsers.",
+          "category": "http-headers",
+          "severity": "medium",
+          "confidence": "high",
+          "description": "Additional XSS protection for older browsers",
+          "remediation": "Add X-XSS-Protection header with the value \"1; mode=block\" to enable XSS filtering in older browsers."
+        },
+        {
+          "id": "header-referrer",
+          "name": "Referrer-Policy",
+          "result": "FAIL",
+          "details": "Missing Referrer-Policy header. This header controls how much referrer information is included with requests, potentially leaking sensitive data in URLs.",
+          "category": "http-headers",
+          "severity": "medium",
+          "confidence": "high",
+          "description": "Controls information sent in the Referer header",
+          "remediation": "Add Referrer-Policy header with a strict value like \"no-referrer\", \"same-origin\", or \"strict-origin-when-cross-origin\""
+        },
+        {
+          "id": "header-permissions-policy",
+          "name": "Permissions-Policy",
+          "result": "FAIL",
+          "details": "Missing Permissions-Policy header. This header helps restrict which browser features and APIs can be used, enhancing security and privacy.",
+          "category": "http-headers",
+          "severity": "low",
+          "confidence": "high",
+          "description": "Controls which browser features and APIs the site can use",
+          "remediation": "Add Permissions-Policy header to restrict access to sensitive browser features. Example: \"camera=(), microphone=(), geolocation=()\""
+        }
+      ],
+      "category": "http-headers",
+      "confidence": "high",
+      "totalCount": 8,
+      "passedCount": 1
+    },
+    {
+      "icon": "cookie",
+      "name": "Cookie Security",
+      "checks": [
+        {
+          "id": "httponly-flag",
+          "name": "HttpOnly Flag",
+          "result": "FAIL",
+          "details": "HttpOnly flag missing from cookies. This allows client-side JavaScript to access cookies, increasing the risk of XSS attacks.",
+          "category": "cookie-security",
+          "severity": "high",
+          "confidence": "high",
+          "description": "Protects cookies from being accessed by JavaScript",
+          "remediation": "Set the HttpOnly flag on all sensitive cookies to prevent client-side JavaScript access."
+        },
+        {
+          "id": "secure-flag",
+          "name": "Secure Flag",
+          "result": "FAIL",
+          "details": "Secure flag missing from cookies. This allows cookies to be transmitted over unencrypted HTTP connections.",
+          "category": "cookie-security",
+          "severity": "high",
+          "confidence": "high",
+          "description": "Ensures cookies are only sent over HTTPS",
+          "remediation": "Set the Secure flag on all cookies to ensure they are only transmitted over HTTPS connections."
+        },
+        {
+          "id": "samesite-attribute",
+          "name": "SameSite Attribute",
+          "result": "FAIL",
+          "details": "SameSite attribute missing from cookies. This can enable cross-site request forgery (CSRF) attacks.",
+          "category": "cookie-security",
+          "severity": "high",
+          "confidence": "high",
+          "description": "Restricts cross-site request inclusion of cookies",
+          "remediation": "Set the SameSite attribute to either Strict or Lax on cookies to protect against CSRF attacks."
+        },
+        {
+          "id": "cookie-expiration",
+          "name": "Cookie Expiration",
+          "result": "PASS",
+          "details": "Cookies have proper expiration dates or max-age values, limiting their lifetime.",
+          "category": "cookie-security",
+          "severity": "medium",
+          "confidence": "high",
+          "description": "Ensures cookies have defined expiration dates"
+        },
+        {
+          "id": "cookie-prefixes",
+          "name": "Cookie Prefixes",
+          "result": "INFO",
+          "details": "Cookie prefixes (__Secure- or __Host-) are not in use. While optional, they provide additional security guarantees for cookies in modern browsers.",
+          "category": "cookie-security",
+          "severity": "low",
+          "confidence": "high",
+          "description": "Use of __Secure- or __Host- prefixes for enhanced security",
+          "remediation": "Consider using __Secure- or __Host- prefixes for sensitive cookies to enhance security in modern browsers."
+        }
+      ],
+      "category": "cookie-security",
+      "confidence": "high",
+      "totalCount": 4,
+      "passedCount": 1
+    },
+    {
+      "icon": "refresh-ccw",
+      "name": "Cache Control",
+      "checks": [
+        {
+          "id": "cache-control-header",
+          "name": "Cache-Control Header",
+          "result": "PASS",
+          "details": "Cache-Control header is properly set with secure directives: no-cache, private",
+          "category": "cache-control",
+          "severity": "medium",
+          "confidence": "high",
+          "description": "Proper directives to prevent caching of sensitive data"
+        },
+        {
+          "id": "pragma-header",
+          "name": "Pragma Header",
+          "result": "INFO",
+          "details": "Pragma: no-cache is not set. While modern browsers rely on Cache-Control, this header helps with older HTTP/1.0 caches.",
+          "category": "cache-control",
+          "severity": "low",
+          "confidence": "high",
+          "description": "Legacy header for HTTP/1.0 caches",
+          "remediation": "Consider adding \"Pragma: no-cache\" for compatibility with older HTTP/1.0 caches."
+        },
+        {
+          "id": "expires-header",
+          "name": "Expires Header",
+          "result": "INFO",
+          "details": "Expires header is not set. Modern browsers rely on Cache-Control, but this header provides additional control.",
+          "category": "cache-control",
+          "severity": "low",
+          "confidence": "high",
+          "description": "Controls when content is considered stale",
+          "remediation": "Consider setting \"Expires: 0\" or a past date for sensitive content."
+        },
+        {
+          "id": "etag-header",
+          "name": "ETag Implementation",
+          "result": "INFO",
+          "details": "ETag header is not implemented. While not strictly a security issue, ETags can be used for efficient cache validation when implemented alongside proper Cache-Control directives.",
+          "category": "cache-control",
+          "severity": "low",
+          "confidence": "high",
+          "description": "Entity tag for cache validation"
+        }
+      ],
+      "category": "cache-control",
+      "confidence": "high",
+      "totalCount": 1,
+      "passedCount": 1
+    },
+    {
+      "icon": "shuffle",
+      "name": "Cross-Origin Protections",
+      "checks": [
+        {
+          "id": "x-frame-options",
+          "name": "X-Frame-Options",
+          "result": "FAIL",
+          "details": "X-Frame-Options header is missing. This makes the site vulnerable to clickjacking attacks.",
+          "category": "cross-origin",
+          "severity": "high",
+          "confidence": "high",
+          "description": "Prevents clickjacking by controlling iframe embedding",
+          "remediation": "Add X-Frame-Options header set to DENY or SAMEORIGIN to protect against clickjacking attacks."
+        },
+        {
+          "id": "cors-implementation",
+          "name": "CORS Implementation",
+          "result": "INFO",
+          "details": "No CORS headers detected. If this site serves APIs or resources to other origins, CORS should be properly configured.",
+          "category": "cross-origin",
+          "severity": "low",
+          "confidence": "high",
+          "description": "Cross-Origin Resource Sharing configuration"
+        },
+        {
+          "id": "cross-origin-resource-policy",
+          "name": "Cross-Origin Resource Policy",
+          "result": "INFO",
+          "details": "Cross-Origin Resource Policy header is not set. This modern header provides additional protection against Spectre-like side-channel attacks.",
+          "category": "cross-origin",
+          "severity": "medium",
+          "confidence": "high",
+          "description": "Additional protection against cross-origin information leaks",
+          "remediation": "Consider adding Cross-Origin-Resource-Policy header set to same-origin, same-site, or cross-origin as appropriate."
+        },
+        {
+          "id": "cross-origin-opener-policy",
+          "name": "Cross-Origin Opener Policy",
+          "result": "INFO",
+          "details": "Cross-Origin Opener Policy header is not set. This modern header helps isolate your site from others when opened in new windows.",
+          "category": "cross-origin",
+          "severity": "medium",
+          "confidence": "high",
+          "description": "Controls window.opener relationship with other browsing contexts",
+          "remediation": "Consider adding Cross-Origin-Opener-Policy header set to same-origin or same-origin-allow-popups."
+        },
+        {
+          "id": "cross-origin-embedder-policy",
+          "name": "Cross-Origin Embedder Policy",
+          "result": "INFO",
+          "details": "Cross-Origin Embedder Policy header is not set. This modern header can enable powerful features like SharedArrayBuffer by requiring opt-in for embedded resources.",
+          "category": "cross-origin",
+          "severity": "low",
+          "confidence": "high",
+          "description": "Forces embedded resources to opt-in to being loaded by document",
+          "remediation": "Consider adding Cross-Origin-Embedder-Policy header if you need SharedArrayBuffer or other powerful features requiring cross-origin isolation."
+        }
+      ],
+      "category": "cross-origin",
+      "confidence": "high",
+      "totalCount": 1,
+      "passedCount": 0
+    }
+  ],
+  "mediumCategories": [
+    {
+      "icon": "https",
+      "name": "HTTP Security Headers",
+      "checks": [
+        {
+          "id": "header-csp",
+          "name": "Content-Security-Policy (CSP)",
+          "result": "FAIL",
+          "details": "Missing CSP header. This header helps prevent XSS attacks by restricting resource loading.",
+          "category": "http-headers",
+          "severity": "high",
+          "confidence": "high",
+          "description": "Restricts which resources can be loaded, preventing XSS attacks",
+          "remediation": "Add a Content-Security-Policy header with appropriate directives to restrict which resources can be loaded. Example: \"default-src 'self'; script-src 'self' trusted-scripts.com\""
+        },
+        {
+          "id": "header-xcto",
+          "name": "X-Content-Type-Options",
+          "result": "FAIL",
+          "details": "Missing or improper implementation. Should be set to \"nosniff\"",
+          "category": "http-headers",
+          "severity": "medium",
+          "confidence": "high",
+          "description": "Prevents MIME type sniffing",
+          "remediation": "Add the X-Content-Type-Options header with the value \"nosniff\" to prevent MIME type sniffing attacks."
+        },
+        {
+          "id": "header-hsts",
+          "name": "Strict-Transport-Security (HSTS)",
+          "result": "FAIL",
+          "details": "Missing HSTS header. This header ensures clients always connect via HTTPS.",
+          "category": "http-headers",
+          "severity": "high",
+          "confidence": "high",
+          "description": "Forces HTTPS connections",
+          "remediation": "Add the Strict-Transport-Security header with a long max-age value, e.g., \"max-age=31536000; includeSubDomains\""
+        },
+        {
+          "id": "header-xfo",
+          "name": "X-Frame-Options",
+          "result": "FAIL",
+          "details": "Missing X-Frame-Options header. This header prevents clickjacking attacks.",
+          "category": "http-headers",
+          "severity": "high",
+          "confidence": "high",
+          "description": "Prevents clickjacking by controlling iframe usage",
+          "remediation": "Add the X-Frame-Options header with the value \"DENY\" (most secure) or \"SAMEORIGIN\" to prevent clickjacking attacks."
+        },
+        {
+          "id": "header-cache",
+          "name": "Cache-Control",
+          "result": "PASS",
+          "details": "Strong cache control implemented: no-cache, private",
+          "category": "http-headers",
+          "severity": "medium",
+          "confidence": "high",
+          "description": "Proper cache directives to prevent sensitive data caching"
+        },
+        {
+          "id": "header-xxp",
+          "name": "X-XSS-Protection",
+          "result": "FAIL",
+          "details": "Missing X-XSS-Protection header. While modern browsers rely on CSP, this provides protection for older browsers.",
+          "category": "http-headers",
+          "severity": "medium",
+          "confidence": "high",
+          "description": "Additional XSS protection for older browsers",
+          "remediation": "Add X-XSS-Protection header with the value \"1; mode=block\" to enable XSS filtering in older browsers."
+        },
+        {
+          "id": "header-referrer",
+          "name": "Referrer-Policy",
+          "result": "FAIL",
+          "details": "Missing Referrer-Policy header. This header controls how much referrer information is included with requests, potentially leaking sensitive data in URLs.",
+          "category": "http-headers",
+          "severity": "medium",
+          "confidence": "high",
+          "description": "Controls information sent in the Referer header",
+          "remediation": "Add Referrer-Policy header with a strict value like \"no-referrer\", \"same-origin\", or \"strict-origin-when-cross-origin\""
+        },
+        {
+          "id": "header-permissions-policy",
+          "name": "Permissions-Policy",
+          "result": "FAIL",
+          "details": "Missing Permissions-Policy header. This header helps restrict which browser features and APIs can be used, enhancing security and privacy.",
+          "category": "http-headers",
+          "severity": "low",
+          "confidence": "high",
+          "description": "Controls which browser features and APIs the site can use",
+          "remediation": "Add Permissions-Policy header to restrict access to sensitive browser features. Example: \"camera=(), microphone=(), geolocation=()\""
+        }
+      ],
+      "category": "http-headers",
+      "confidence": "high",
+      "totalCount": 8,
+      "passedCount": 1
+    },
+    {
+      "icon": "lock",
+      "name": "TLS/SSL Implementation",
+      "checks": [
+        {
+          "id": "tls-version",
+          "name": "Minimum TLS version",
+          "result": "PASS",
+          "details": "TLS 1.2+ supported. No deprecated SSL/TLS versions detected.",
+          "category": "tls-ssl",
+          "severity": "high",
+          "confidence": "high",
+          "description": "TLS 1.2+ only, no support for deprecated SSL/TLS versions",
+          "remediation": "Ensure only TLS 1.2+ is supported and disable deprecated protocols."
+        },
+        {
+          "id": "cert-validity",
+          "name": "Certificate validity",
+          "result": "PASS",
+          "details": "Certificate is valid, properly signed, and matches the domain.",
+          "category": "tls-ssl",
+          "severity": "critical",
+          "confidence": "high",
+          "description": "Properly signed, not expired, correct domain",
+          "remediation": "Ensure SSL certificate is valid, properly signed, and not expired."
+        },
+        {
+          "id": "cipher-suites",
+          "name": "Strong cipher suites",
+          "result": "PASS",
+          "details": "Modern cipher suites are being used.",
+          "category": "tls-ssl",
+          "severity": "high",
+          "confidence": "medium",
+          "description": "Only modern, secure cipher suites enabled",
+          "remediation": "Configure server to use only strong, modern cipher suites and disable weak ones."
+        },
+        {
+          "id": "pfs",
+          "name": "Perfect Forward Secrecy",
+          "result": "PASS",
+          "details": "Perfect Forward Secrecy appears to be supported.",
+          "category": "tls-ssl",
+          "severity": "high",
+          "confidence": "medium",
+          "description": "Required for all connections",
+          "remediation": "Enable Perfect Forward Secrecy on all TLS connections."
+        },
+        {
+          "id": "ocsp-stapling",
+          "name": "OCSP stapling",
+          "result": "INFO",
+          "details": "OCSP stapling status could not be determined with precision.",
+          "category": "tls-ssl",
+          "severity": "medium",
+          "confidence": "low",
+          "description": "Implemented for better performance and privacy",
+          "remediation": "Consider implementing OCSP stapling for improved performance and privacy."
+        }
+      ],
+      "category": "tls-ssl",
+      "totalCount": 4,
+      "passedCount": 4
+    },
+    {
+      "icon": "cookie",
+      "name": "Cookie Security",
+      "checks": [
+        {
+          "id": "httponly-flag",
+          "name": "HttpOnly Flag",
+          "result": "FAIL",
+          "details": "HttpOnly flag missing from cookies. This allows client-side JavaScript to access cookies, increasing the risk of XSS attacks.",
+          "category": "cookie-security",
+          "severity": "high",
+          "confidence": "high",
+          "description": "Protects cookies from being accessed by JavaScript",
+          "remediation": "Set the HttpOnly flag on all sensitive cookies to prevent client-side JavaScript access."
+        },
+        {
+          "id": "secure-flag",
+          "name": "Secure Flag",
+          "result": "FAIL",
+          "details": "Secure flag missing from cookies. This allows cookies to be transmitted over unencrypted HTTP connections.",
+          "category": "cookie-security",
+          "severity": "high",
+          "confidence": "high",
+          "description": "Ensures cookies are only sent over HTTPS",
+          "remediation": "Set the Secure flag on all cookies to ensure they are only transmitted over HTTPS connections."
+        },
+        {
+          "id": "samesite-attribute",
+          "name": "SameSite Attribute",
+          "result": "FAIL",
+          "details": "SameSite attribute missing from cookies. This can enable cross-site request forgery (CSRF) attacks.",
+          "category": "cookie-security",
+          "severity": "high",
+          "confidence": "high",
+          "description": "Restricts cross-site request inclusion of cookies",
+          "remediation": "Set the SameSite attribute to either Strict or Lax on cookies to protect against CSRF attacks."
+        },
+        {
+          "id": "cookie-expiration",
+          "name": "Cookie Expiration",
+          "result": "PASS",
+          "details": "Cookies have proper expiration dates or max-age values, limiting their lifetime.",
+          "category": "cookie-security",
+          "severity": "medium",
+          "confidence": "high",
+          "description": "Ensures cookies have defined expiration dates"
+        },
+        {
+          "id": "cookie-prefixes",
+          "name": "Cookie Prefixes",
+          "result": "INFO",
+          "details": "Cookie prefixes (__Secure- or __Host-) are not in use. While optional, they provide additional security guarantees for cookies in modern browsers.",
+          "category": "cookie-security",
+          "severity": "low",
+          "confidence": "high",
+          "description": "Use of __Secure- or __Host- prefixes for enhanced security",
+          "remediation": "Consider using __Secure- or __Host- prefixes for sensitive cookies to enhance security in modern browsers."
+        }
+      ],
+      "category": "cookie-security",
+      "confidence": "high",
+      "totalCount": 4,
+      "passedCount": 1
+    },
+    {
+      "icon": "refresh-ccw",
+      "name": "Cache Control",
+      "checks": [
+        {
+          "id": "cache-control-header",
+          "name": "Cache-Control Header",
+          "result": "PASS",
+          "details": "Cache-Control header is properly set with secure directives: no-cache, private",
+          "category": "cache-control",
+          "severity": "medium",
+          "confidence": "high",
+          "description": "Proper directives to prevent caching of sensitive data"
+        },
+        {
+          "id": "pragma-header",
+          "name": "Pragma Header",
+          "result": "INFO",
+          "details": "Pragma: no-cache is not set. While modern browsers rely on Cache-Control, this header helps with older HTTP/1.0 caches.",
+          "category": "cache-control",
+          "severity": "low",
+          "confidence": "high",
+          "description": "Legacy header for HTTP/1.0 caches",
+          "remediation": "Consider adding \"Pragma: no-cache\" for compatibility with older HTTP/1.0 caches."
+        },
+        {
+          "id": "expires-header",
+          "name": "Expires Header",
+          "result": "INFO",
+          "details": "Expires header is not set. Modern browsers rely on Cache-Control, but this header provides additional control.",
+          "category": "cache-control",
+          "severity": "low",
+          "confidence": "high",
+          "description": "Controls when content is considered stale",
+          "remediation": "Consider setting \"Expires: 0\" or a past date for sensitive content."
+        },
+        {
+          "id": "etag-header",
+          "name": "ETag Implementation",
+          "result": "INFO",
+          "details": "ETag header is not implemented. While not strictly a security issue, ETags can be used for efficient cache validation when implemented alongside proper Cache-Control directives.",
+          "category": "cache-control",
+          "severity": "low",
+          "confidence": "high",
+          "description": "Entity tag for cache validation"
+        }
+      ],
+      "category": "cache-control",
+      "confidence": "high",
+      "totalCount": 1,
+      "passedCount": 1
+    },
+    {
+      "icon": "shuffle",
+      "name": "Cross-Origin Protections",
+      "checks": [
+        {
+          "id": "x-frame-options",
+          "name": "X-Frame-Options",
+          "result": "FAIL",
+          "details": "X-Frame-Options header is missing. This makes the site vulnerable to clickjacking attacks.",
+          "category": "cross-origin",
+          "severity": "high",
+          "confidence": "high",
+          "description": "Prevents clickjacking by controlling iframe embedding",
+          "remediation": "Add X-Frame-Options header set to DENY or SAMEORIGIN to protect against clickjacking attacks."
+        },
+        {
+          "id": "cors-implementation",
+          "name": "CORS Implementation",
+          "result": "INFO",
+          "details": "No CORS headers detected. If this site serves APIs or resources to other origins, CORS should be properly configured.",
+          "category": "cross-origin",
+          "severity": "low",
+          "confidence": "high",
+          "description": "Cross-Origin Resource Sharing configuration"
+        },
+        {
+          "id": "cross-origin-resource-policy",
+          "name": "Cross-Origin Resource Policy",
+          "result": "INFO",
+          "details": "Cross-Origin Resource Policy header is not set. This modern header provides additional protection against Spectre-like side-channel attacks.",
+          "category": "cross-origin",
+          "severity": "medium",
+          "confidence": "high",
+          "description": "Additional protection against cross-origin information leaks",
+          "remediation": "Consider adding Cross-Origin-Resource-Policy header set to same-origin, same-site, or cross-origin as appropriate."
+        },
+        {
+          "id": "cross-origin-opener-policy",
+          "name": "Cross-Origin Opener Policy",
+          "result": "INFO",
+          "details": "Cross-Origin Opener Policy header is not set. This modern header helps isolate your site from others when opened in new windows.",
+          "category": "cross-origin",
+          "severity": "medium",
+          "confidence": "high",
+          "description": "Controls window.opener relationship with other browsing contexts",
+          "remediation": "Consider adding Cross-Origin-Opener-Policy header set to same-origin or same-origin-allow-popups."
+        },
+        {
+          "id": "cross-origin-embedder-policy",
+          "name": "Cross-Origin Embedder Policy",
+          "result": "INFO",
+          "details": "Cross-Origin Embedder Policy header is not set. This modern header can enable powerful features like SharedArrayBuffer by requiring opt-in for embedded resources.",
+          "category": "cross-origin",
+          "severity": "low",
+          "confidence": "high",
+          "description": "Forces embedded resources to opt-in to being loaded by document",
+          "remediation": "Consider adding Cross-Origin-Embedder-Policy header if you need SharedArrayBuffer or other powerful features requiring cross-origin isolation."
+        }
+      ],
+      "category": "cross-origin",
+      "confidence": "high",
+      "totalCount": 1,
+      "passedCount": 0
+    },
+    {
+      "icon": "server",
+      "name": "Server Information Leakage",
+      "checks": [
+        {
+          "id": "server-header",
+          "name": "Server Header",
+          "result": "FAIL",
+          "details": "Server header reveals server software (LiteSpeed), which can help attackers identify the technology stack.",
+          "category": "server-info",
+          "severity": "medium",
+          "confidence": "high",
+          "description": "Checks if server software is disclosed",
+          "remediation": "Configure your web server to remove or modify the Server header to avoid disclosing implementation details."
+        },
+        {
+          "id": "x-powered-by",
+          "name": "X-Powered-By Header",
+          "result": "FAIL",
+          "details": "X-Powered-By header reveals backend technology (PHP/8.4.24), which can help attackers target specific vulnerabilities.",
+          "category": "server-info",
+          "severity": "medium",
+          "confidence": "high",
+          "description": "Checks if backend technology is disclosed",
+          "remediation": "Configure your application framework to remove the X-Powered-By header."
+        }
+      ],
+      "category": "server-info",
+      "confidence": "high",
+      "totalCount": 2,
+      "passedCount": 0
+    },
+    {
+      "icon": "warning",
+      "name": "Error Handling & Logging",
+      "checks": [
+        {
+          "id": "custom-error-pages",
+          "name": "Custom error pages",
+          "result": "PASS",
+          "details": "Custom error page implemented correctly without sensitive information",
+          "category": "error-handling",
+          "severity": "medium",
+          "confidence": "medium",
+          "description": "No sensitive information in error messages"
+        },
+        {
+          "id": "secure-logging",
+          "name": "Secure logging practices",
+          "result": "INFO",
+          "details": "Logging practices cannot be determined through external scanning",
+          "category": "error-handling",
+          "severity": "medium",
+          "confidence": "low",
+          "description": "No sensitive data in logs, proper log rotation",
+          "remediation": "Ensure logs do not contain sensitive data and implement proper log rotation."
+        },
+        {
+          "id": "log-integrity",
+          "name": "Log integrity",
+          "result": "INFO",
+          "details": "Log integrity cannot be determined through external scanning",
+          "category": "error-handling",
+          "severity": "medium",
+          "confidence": "low",
+          "description": "Tamper-evident logging implementation",
+          "remediation": "Implement tamper-evident logging to detect unauthorized log modifications."
+        }
+      ],
+      "category": "error-handling",
+      "totalCount": 1,
+      "passedCount": 1
+    },
+    {
+      "icon": "bug",
+      "name": "Debug Mode Detection",
+      "checks": [
+        {
+          "id": "debug-indicators",
+          "name": "Debug Mode Indicators",
+          "result": "PASS",
+          "details": "No debug indicators detected",
+          "category": "debug-mode",
+          "severity": "medium",
+          "confidence": "high",
+          "description": "Tests for debug mode indicators",
+          "remediation": "Debug mode appears to be properly disabled."
+        }
+      ],
+      "category": "debug-mode",
+      "confidence": "high",
+      "totalCount": 1,
+      "passedCount": 1
+    }
+  ],
+  "criticalHighTotal": 13,
+  "criticalCategories": [
+    {
+      "icon": "https",
+      "name": "HTTP Security Headers",
+      "checks": [
+        {
+          "id": "header-csp",
+          "name": "Content-Security-Policy (CSP)",
+          "result": "FAIL",
+          "details": "Missing CSP header. This header helps prevent XSS attacks by restricting resource loading.",
+          "category": "http-headers",
+          "severity": "high",
+          "confidence": "high",
+          "description": "Restricts which resources can be loaded, preventing XSS attacks",
+          "remediation": "Add a Content-Security-Policy header with appropriate directives to restrict which resources can be loaded. Example: \"default-src 'self'; script-src 'self' trusted-scripts.com\""
+        },
+        {
+          "id": "header-xcto",
+          "name": "X-Content-Type-Options",
+          "result": "FAIL",
+          "details": "Missing or improper implementation. Should be set to \"nosniff\"",
+          "category": "http-headers",
+          "severity": "medium",
+          "confidence": "high",
+          "description": "Prevents MIME type sniffing",
+          "remediation": "Add the X-Content-Type-Options header with the value \"nosniff\" to prevent MIME type sniffing attacks."
+        },
+        {
+          "id": "header-hsts",
+          "name": "Strict-Transport-Security (HSTS)",
+          "result": "FAIL",
+          "details": "Missing HSTS header. This header ensures clients always connect via HTTPS.",
+          "category": "http-headers",
+          "severity": "high",
+          "confidence": "high",
+          "description": "Forces HTTPS connections",
+          "remediation": "Add the Strict-Transport-Security header with a long max-age value, e.g., \"max-age=31536000; includeSubDomains\""
+        },
+        {
+          "id": "header-xfo",
+          "name": "X-Frame-Options",
+          "result": "FAIL",
+          "details": "Missing X-Frame-Options header. This header prevents clickjacking attacks.",
+          "category": "http-headers",
+          "severity": "high",
+          "confidence": "high",
+          "description": "Prevents clickjacking by controlling iframe usage",
+          "remediation": "Add the X-Frame-Options header with the value \"DENY\" (most secure) or \"SAMEORIGIN\" to prevent clickjacking attacks."
+        },
+        {
+          "id": "header-cache",
+          "name": "Cache-Control",
+          "result": "PASS",
+          "details": "Strong cache control implemented: no-cache, private",
+          "category": "http-headers",
+          "severity": "medium",
+          "confidence": "high",
+          "description": "Proper cache directives to prevent sensitive data caching"
+        },
+        {
+          "id": "header-xxp",
+          "name": "X-XSS-Protection",
+          "result": "FAIL",
+          "details": "Missing X-XSS-Protection header. While modern browsers rely on CSP, this provides protection for older browsers.",
+          "category": "http-headers",
+          "severity": "medium",
+          "confidence": "high",
+          "description": "Additional XSS protection for older browsers",
+          "remediation": "Add X-XSS-Protection header with the value \"1; mode=block\" to enable XSS filtering in older browsers."
+        },
+        {
+          "id": "header-referrer",
+          "name": "Referrer-Policy",
+          "result": "FAIL",
+          "details": "Missing Referrer-Policy header. This header controls how much referrer information is included with requests, potentially leaking sensitive data in URLs.",
+          "category": "http-headers",
+          "severity": "medium",
+          "confidence": "high",
+          "description": "Controls information sent in the Referer header",
+          "remediation": "Add Referrer-Policy header with a strict value like \"no-referrer\", \"same-origin\", or \"strict-origin-when-cross-origin\""
+        },
+        {
+          "id": "header-permissions-policy",
+          "name": "Permissions-Policy",
+          "result": "FAIL",
+          "details": "Missing Permissions-Policy header. This header helps restrict which browser features and APIs can be used, enhancing security and privacy.",
+          "category": "http-headers",
+          "severity": "low",
+          "confidence": "high",
+          "description": "Controls which browser features and APIs the site can use",
+          "remediation": "Add Permissions-Policy header to restrict access to sensitive browser features. Example: \"camera=(), microphone=(), geolocation=()\""
+        }
+      ],
+      "category": "http-headers",
+      "confidence": "high",
+      "totalCount": 8,
+      "passedCount": 1
+    },
+    {
+      "icon": "lock",
+      "name": "TLS/SSL Implementation",
+      "checks": [
+        {
+          "id": "tls-version",
+          "name": "Minimum TLS version",
+          "result": "PASS",
+          "details": "TLS 1.2+ supported. No deprecated SSL/TLS versions detected.",
+          "category": "tls-ssl",
+          "severity": "high",
+          "confidence": "high",
+          "description": "TLS 1.2+ only, no support for deprecated SSL/TLS versions",
+          "remediation": "Ensure only TLS 1.2+ is supported and disable deprecated protocols."
+        },
+        {
+          "id": "cert-validity",
+          "name": "Certificate validity",
+          "result": "PASS",
+          "details": "Certificate is valid, properly signed, and matches the domain.",
+          "category": "tls-ssl",
+          "severity": "critical",
+          "confidence": "high",
+          "description": "Properly signed, not expired, correct domain",
+          "remediation": "Ensure SSL certificate is valid, properly signed, and not expired."
+        },
+        {
+          "id": "cipher-suites",
+          "name": "Strong cipher suites",
+          "result": "PASS",
+          "details": "Modern cipher suites are being used.",
+          "category": "tls-ssl",
+          "severity": "high",
+          "confidence": "medium",
+          "description": "Only modern, secure cipher suites enabled",
+          "remediation": "Configure server to use only strong, modern cipher suites and disable weak ones."
+        },
+        {
+          "id": "pfs",
+          "name": "Perfect Forward Secrecy",
+          "result": "PASS",
+          "details": "Perfect Forward Secrecy appears to be supported.",
+          "category": "tls-ssl",
+          "severity": "high",
+          "confidence": "medium",
+          "description": "Required for all connections",
+          "remediation": "Enable Perfect Forward Secrecy on all TLS connections."
+        },
+        {
+          "id": "ocsp-stapling",
+          "name": "OCSP stapling",
+          "result": "INFO",
+          "details": "OCSP stapling status could not be determined with precision.",
+          "category": "tls-ssl",
+          "severity": "medium",
+          "confidence": "low",
+          "description": "Implemented for better performance and privacy",
+          "remediation": "Consider implementing OCSP stapling for improved performance and privacy."
+        }
+      ],
+      "category": "tls-ssl",
+      "totalCount": 4,
+      "passedCount": 4
+    },
+    {
+      "icon": "cookie",
+      "name": "Cookie Security",
+      "checks": [
+        {
+          "id": "httponly-flag",
+          "name": "HttpOnly Flag",
+          "result": "FAIL",
+          "details": "HttpOnly flag missing from cookies. This allows client-side JavaScript to access cookies, increasing the risk of XSS attacks.",
+          "category": "cookie-security",
+          "severity": "high",
+          "confidence": "high",
+          "description": "Protects cookies from being accessed by JavaScript",
+          "remediation": "Set the HttpOnly flag on all sensitive cookies to prevent client-side JavaScript access."
+        },
+        {
+          "id": "secure-flag",
+          "name": "Secure Flag",
+          "result": "FAIL",
+          "details": "Secure flag missing from cookies. This allows cookies to be transmitted over unencrypted HTTP connections.",
+          "category": "cookie-security",
+          "severity": "high",
+          "confidence": "high",
+          "description": "Ensures cookies are only sent over HTTPS",
+          "remediation": "Set the Secure flag on all cookies to ensure they are only transmitted over HTTPS connections."
+        },
+        {
+          "id": "samesite-attribute",
+          "name": "SameSite Attribute",
+          "result": "FAIL",
+          "details": "SameSite attribute missing from cookies. This can enable cross-site request forgery (CSRF) attacks.",
+          "category": "cookie-security",
+          "severity": "high",
+          "confidence": "high",
+          "description": "Restricts cross-site request inclusion of cookies",
+          "remediation": "Set the SameSite attribute to either Strict or Lax on cookies to protect against CSRF attacks."
+        },
+        {
+          "id": "cookie-expiration",
+          "name": "Cookie Expiration",
+          "result": "PASS",
+          "details": "Cookies have proper expiration dates or max-age values, limiting their lifetime.",
+          "category": "cookie-security",
+          "severity": "medium",
+          "confidence": "high",
+          "description": "Ensures cookies have defined expiration dates"
+        },
+        {
+          "id": "cookie-prefixes",
+          "name": "Cookie Prefixes",
+          "result": "INFO",
+          "details": "Cookie prefixes (__Secure- or __Host-) are not in use. While optional, they provide additional security guarantees for cookies in modern browsers.",
+          "category": "cookie-security",
+          "severity": "low",
+          "confidence": "high",
+          "description": "Use of __Secure- or __Host- prefixes for enhanced security",
+          "remediation": "Consider using __Secure- or __Host- prefixes for sensitive cookies to enhance security in modern browsers."
+        }
+      ],
+      "category": "cookie-security",
+      "confidence": "high",
+      "totalCount": 4,
+      "passedCount": 1
+    },
+    {
+      "icon": "shuffle",
+      "name": "Cross-Origin Protections",
+      "checks": [
+        {
+          "id": "x-frame-options",
+          "name": "X-Frame-Options",
+          "result": "FAIL",
+          "details": "X-Frame-Options header is missing. This makes the site vulnerable to clickjacking attacks.",
+          "category": "cross-origin",
+          "severity": "high",
+          "confidence": "high",
+          "description": "Prevents clickjacking by controlling iframe embedding",
+          "remediation": "Add X-Frame-Options header set to DENY or SAMEORIGIN to protect against clickjacking attacks."
+        },
+        {
+          "id": "cors-implementation",
+          "name": "CORS Implementation",
+          "result": "INFO",
+          "details": "No CORS headers detected. If this site serves APIs or resources to other origins, CORS should be properly configured.",
+          "category": "cross-origin",
+          "severity": "low",
+          "confidence": "high",
+          "description": "Cross-Origin Resource Sharing configuration"
+        },
+        {
+          "id": "cross-origin-resource-policy",
+          "name": "Cross-Origin Resource Policy",
+          "result": "INFO",
+          "details": "Cross-Origin Resource Policy header is not set. This modern header provides additional protection against Spectre-like side-channel attacks.",
+          "category": "cross-origin",
+          "severity": "medium",
+          "confidence": "high",
+          "description": "Additional protection against cross-origin information leaks",
+          "remediation": "Consider adding Cross-Origin-Resource-Policy header set to same-origin, same-site, or cross-origin as appropriate."
+        },
+        {
+          "id": "cross-origin-opener-policy",
+          "name": "Cross-Origin Opener Policy",
+          "result": "INFO",
+          "details": "Cross-Origin Opener Policy header is not set. This modern header helps isolate your site from others when opened in new windows.",
+          "category": "cross-origin",
+          "severity": "medium",
+          "confidence": "high",
+          "description": "Controls window.opener relationship with other browsing contexts",
+          "remediation": "Consider adding Cross-Origin-Opener-Policy header set to same-origin or same-origin-allow-popups."
+        },
+        {
+          "id": "cross-origin-embedder-policy",
+          "name": "Cross-Origin Embedder Policy",
+          "result": "INFO",
+          "details": "Cross-Origin Embedder Policy header is not set. This modern header can enable powerful features like SharedArrayBuffer by requiring opt-in for embedded resources.",
+          "category": "cross-origin",
+          "severity": "low",
+          "confidence": "high",
+          "description": "Forces embedded resources to opt-in to being loaded by document",
+          "remediation": "Consider adding Cross-Origin-Embedder-Policy header if you need SharedArrayBuffer or other powerful features requiring cross-origin isolation."
+        }
+      ],
+      "category": "cross-origin",
+      "confidence": "high",
+      "totalCount": 1,
+      "passedCount": 0
+    },
+    {
+      "icon": "shield-check",
+      "name": "Input Validation & Injection Prevention",
+      "checks": [
+        {
+          "id": "xss-protection",
+          "name": "XSS Protection",
+          "result": "PASS",
+          "details": "XSS protection appears effective - payload not reflected",
+          "category": "input-validation",
+          "severity": "high",
+          "confidence": "high",
+          "description": "Tests for Cross-Site Scripting vulnerabilities",
+          "remediation": "Continue maintaining proper input validation."
+        }
+      ],
+      "category": "input-validation",
+      "confidence": "high",
+      "totalCount": 1,
+      "passedCount": 1
+    },
+    {
+      "icon": "settings",
+      "name": "Environment Configuration",
+      "checks": [
+        {
+          "id": "env-exposure-check",
+          "name": "Environment File Exposure",
+          "result": "PASS",
+          "details": "No environment files found exposed",
+          "category": "environment",
+          "severity": "critical",
+          "confidence": "high",
+          "description": "Tests for exposed environment configuration files",
+          "remediation": "Continue protecting environment configuration files."
+        }
+      ],
+      "category": "environment",
+      "confidence": "high",
+      "totalCount": 1,
+      "passedCount": 1
+    }
+  ],
+  "criticalHighFailed": 7,
+  "criticalHighPassed": 6,
+  "informationalCategories": [
+    {
+      "icon": "workflow",
+      "name": "Architecture & Data Flow",
+      "checks": [
+        {
+          "id": "data-flow-diagrams",
+          "name": "Data Flow Documentation",
+          "result": "INFO",
+          "details": "Maintain current data-flow diagrams showing all trust boundaries (public web → app server → DB; integrations; workers).",
+          "category": "architecture",
+          "severity": "medium",
+          "confidence": "low",
+          "description": "Document trust boundaries in data flow diagrams"
+        },
+        {
+          "id": "component-inventory",
+          "name": "Component Inventory",
+          "result": "INFO",
+          "details": "Every component (frontend, backend, DB, queues, serverless functions) should be inventoried with the secrets it can read.",
+          "category": "architecture",
+          "severity": "medium",
+          "confidence": "low",
+          "description": "Inventory components with access to secrets"
+        },
+        {
+          "id": "sensitive-data-paths",
+          "name": "Sensitive Data Path Documentation",
+          "result": "INFO",
+          "details": "Sensitive data paths (login, payments, file upload) should be documented with authentication and transport layer protections.",
+          "category": "architecture",
+          "severity": "high",
+          "confidence": "low",
+          "description": "Document protection for sensitive flows"
+        },
+        {
+          "id": "cross-tenant-access",
+          "name": "Cross-Tenant Access Prevention",
+          "result": "INFO",
+          "details": "Ensure no implicit cross-tenant access occurs. Add negative tests for Insecure Direct Object Reference (IDOR) vulnerabilities.",
+          "category": "architecture",
+          "severity": "critical",
+          "confidence": "low",
+          "description": "Prevent unauthorized access across tenants"
+        }
+      ],
+      "category": "architecture",
+      "confidence": "low",
+      "totalCount": 0,
+      "passedCount": 0,
+      "isInformationalOnly": true
+    },
+    {
+      "icon": "shield-lock",
+      "name": "Access Control Best Practices",
+      "checks": [
+        {
+          "id": "server-side-auth",
+          "name": "Server-Side Authentication",
+          "result": "INFO",
+          "details": "Server-side middleware should enforce authentication/authorization for every protected route. Never rely solely on client-side protections.",
+          "category": "access-control",
+          "severity": "critical",
+          "confidence": "low",
+          "description": "Enforce authentication at the server level"
+        },
+        {
+          "id": "resource-ownership",
+          "name": "Resource Ownership Validation",
+          "result": "INFO",
+          "details": "Implement URI-level auth checks plus resource-level ownership filters in queries to prevent unauthorized access.",
+          "category": "access-control",
+          "severity": "high",
+          "confidence": "low",
+          "description": "Verify resource ownership in every request"
+        },
+        {
+          "id": "least-privilege",
+          "name": "Principle of Least Privilege",
+          "result": "INFO",
+          "details": "Follow the principle of least privilege: define clear roles and ensure normal users cannot modify data beyond their scope.",
+          "category": "access-control",
+          "severity": "high",
+          "confidence": "low",
+          "description": "Grant minimum required access"
+        },
+        {
+          "id": "session-invalidation",
+          "name": "Session Invalidation",
+          "result": "INFO",
+          "details": "Provide an option to invalidate all sessions after password change or reset to prevent continued access from compromised sessions.",
+          "category": "access-control",
+          "severity": "medium",
+          "confidence": "low",
+          "description": "Invalidate sessions after credentials change"
+        }
+      ],
+      "category": "access-control",
+      "confidence": "low",
+      "totalCount": 0,
+      "passedCount": 0,
+      "isInformationalOnly": true
+    },
+    {
+      "icon": "key",
+      "name": "Credential Handling",
+      "checks": [
+        {
+          "id": "password-storage",
+          "name": "Password Storage",
+          "result": "INFO",
+          "details": "Store passwords using modern hashing algorithms like bcrypt or Argon2 with per-user random salts. Never store passwords in plaintext or using weak hashing algorithms like MD5.",
+          "category": "credential-handling",
+          "severity": "critical",
+          "confidence": "low",
+          "description": "Use strong hashing algorithms"
+        },
+        {
+          "id": "mfa-implementation",
+          "name": "Multi-Factor Authentication",
+          "result": "INFO",
+          "details": "Offer Multi-Factor Authentication (MFA) especially for administrative accounts and accounts with access to sensitive data.",
+          "category": "credential-handling",
+          "severity": "high",
+          "confidence": "low",
+          "description": "Implement MFA for sensitive accounts"
+        },
+        {
+          "id": "one-time-tokens",
+          "name": "One-Time Token Security",
+          "result": "INFO",
+          "details": "One-time tokens (invites, password resets) should be cryptographically random, single-use, and expire in 10 minutes or less.",
+          "category": "credential-handling",
+          "severity": "high",
+          "confidence": "low",
+          "description": "Secure implementation of password reset tokens"
+        }
+      ],
+      "category": "credential-handling",
+      "confidence": "low",
+      "totalCount": 0,
+      "passedCount": 0,
+      "isInformationalOnly": true
+    },
+    {
+      "icon": "database",
+      "name": "Database Security",
+      "checks": [
+        {
+          "id": "parameterized-queries",
+          "name": "Parameterized Queries",
+          "result": "INFO",
+          "details": "Use parameterized queries or prepared statements for all database operations. Never build SQL statements using string concatenation with user input.",
+          "category": "database-security",
+          "severity": "critical",
+          "confidence": "low",
+          "description": "Prevent SQL injection with parameterized queries"
+        },
+        {
+          "id": "db-privileges",
+          "name": "Database Privileges",
+          "result": "INFO",
+          "details": "Apply the principle of least privilege to database users. Applications should not use database administrator accounts for regular operations.",
+          "category": "database-security",
+          "severity": "high",
+          "confidence": "low",
+          "description": "Limit database access permissions"
+        },
+        {
+          "id": "db-network-access",
+          "name": "Database Network Access",
+          "result": "INFO",
+          "details": "Limit database access to application servers only. Use firewalls, VPCs, or other network controls to prevent direct public access to databases.",
+          "category": "database-security",
+          "severity": "high",
+          "confidence": "low",
+          "description": "Restrict network access to databases"
+        },
+        {
+          "id": "sensitive-data-encryption",
+          "name": "Sensitive Data Encryption",
+          "result": "INFO",
+          "details": "Implement field-level encryption for personally identifiable information (PII) and other sensitive data, not just relying on database-level encryption.",
+          "category": "database-security",
+          "severity": "high",
+          "confidence": "low",
+          "description": "Encrypt PII and sensitive data"
+        }
+      ],
+      "category": "database-security",
+      "confidence": "low",
+      "totalCount": 0,
+      "passedCount": 0,
+      "isInformationalOnly": true
+    },
+    {
+      "icon": "filter",
+      "name": "Input Validation",
+      "checks": [
+        {
+          "id": "schema-validation",
+          "name": "Schema Validation",
+          "result": "INFO",
+          "details": "Validate all API payloads with a schema validation library (e.g., Zod, Yup, JSON Schema). Ensure all user inputs are checked for type, format, length, and range.",
+          "category": "input-validation",
+          "severity": "high",
+          "confidence": "low",
+          "description": "Validate all API inputs with schemas"
+        },
+        {
+          "id": "no-dynamic-code",
+          "name": "No Dynamic Code Execution",
+          "result": "INFO",
+          "details": "Never use eval() or similar functions with untrusted input. Avoid dynamically generating and executing code from user-provided data.",
+          "category": "input-validation",
+          "severity": "critical",
+          "confidence": "low",
+          "description": "Avoid evaluating user input as code"
+        },
+        {
+          "id": "output-encoding",
+          "name": "Output Encoding",
+          "result": "INFO",
+          "details": "Properly encode all output for its context (HTML, JavaScript, JSON, headers) to prevent injection attacks like XSS.",
+          "category": "input-validation",
+          "severity": "high",
+          "confidence": "low",
+          "description": "Encode output for its context"
+        },
+        {
+          "id": "ssrf-protection",
+          "name": "SSRF Protection",
+          "result": "INFO",
+          "details": "For Server-Side Request Forgery (SSRF) protection, restrict outbound URL fetches to an allowlist of approved protocols and domains.",
+          "category": "input-validation",
+          "severity": "high",
+          "confidence": "low",
+          "description": "Restrict outbound URL fetches"
+        }
+      ],
+      "category": "input-validation",
+      "confidence": "low",
+      "totalCount": 0,
+      "passedCount": 0,
+      "isInformationalOnly": true
+    },
+    {
+      "icon": "activity",
+      "name": "Logging & Monitoring",
+      "checks": [
+        {
+          "id": "security-events",
+          "name": "Security Event Logging",
+          "result": "INFO",
+          "details": "Security events (authentication failures, privilege changes, data exports) should be logged and have alerting capabilities.",
+          "category": "logging-monitoring",
+          "severity": "high",
+          "confidence": "low",
+          "description": "Log and alert on security events"
+        },
+        {
+          "id": "log-sanitization",
+          "name": "Log Sanitization",
+          "result": "INFO",
+          "details": "Scrub logs of secrets, tokens, and payment details. Avoid logging personally identifiable information (PII) or sensitive data.",
+          "category": "logging-monitoring",
+          "severity": "high",
+          "confidence": "low",
+          "description": "Remove sensitive data from logs"
+        },
+        {
+          "id": "tamper-evident-logs",
+          "name": "Tamper-Evident Logging",
+          "result": "INFO",
+          "details": "Implement time-synced, tamper-evident log storage with clear retention policies. Consider using append-only log systems.",
+          "category": "logging-monitoring",
+          "severity": "medium",
+          "confidence": "low",
+          "description": "Ensure logs cannot be modified"
+        }
+      ],
+      "category": "logging-monitoring",
+      "confidence": "low",
+      "totalCount": 0,
+      "passedCount": 0,
+      "isInformationalOnly": true
+    },
+    {
+      "icon": "git-branch",
+      "name": "CI/CD & Operations",
+      "checks": [
+        {
+          "id": "automated-builds",
+          "name": "Automated Builds & Deploys",
+          "result": "INFO",
+          "details": "Builds, tests, and deployments should be fully automated and reproducible from source code and lockfiles.",
+          "category": "cicd-operations",
+          "severity": "medium",
+          "confidence": "low",
+          "description": "Use automated CI/CD pipelines"
+        },
+        {
+          "id": "no-debug-in-prod",
+          "name": "Debug Mode Disabled",
+          "result": "INFO",
+          "details": "Debug and verbose modes should be disabled in production environments to prevent information leakage.",
+          "category": "cicd-operations",
+          "severity": "high",
+          "confidence": "low",
+          "description": "Turn off debug features in production"
+        },
+        {
+          "id": "secrets-management",
+          "name": "Secrets Management",
+          "result": "INFO",
+          "details": "Store secrets in a vault or environment variables manager. Document and implement a rotation schedule for all secrets.",
+          "category": "cicd-operations",
+          "severity": "high",
+          "confidence": "low",
+          "description": "Securely manage application secrets"
+        },
+        {
+          "id": "certificate-renewal",
+          "name": "Certificate Management",
+          "result": "INFO",
+          "details": "TLS certificates should auto-renew to prevent expiration. Consider implementing OCSP stapling for improved performance.",
+          "category": "cicd-operations",
+          "severity": "high",
+          "confidence": "low",
+          "description": "Automate certificate renewals"
+        }
+      ],
+      "category": "cicd-operations",
+      "confidence": "low",
+      "totalCount": 0,
+      "passedCount": 0,
+      "isInformationalOnly": true
+    },
+    {
+      "icon": "settings",
+      "name": "Administrative Interfaces",
+      "checks": [
+        {
+          "id": "admin-mfa",
+          "name": "Admin MFA",
+          "result": "INFO",
+          "details": "Administrative logins should require Multi-Factor Authentication (MFA) to prevent unauthorized access if credentials are compromised.",
+          "category": "admin-interfaces",
+          "severity": "critical",
+          "confidence": "low",
+          "description": "Require strong authentication for admins"
+        },
+        {
+          "id": "admin-auditing",
+          "name": "Admin Action Auditing",
+          "result": "INFO",
+          "details": "Administrative routes should perform additional role verification and generate detailed audit events for all access and actions.",
+          "category": "admin-interfaces",
+          "severity": "high",
+          "confidence": "low",
+          "description": "Log all administrative actions"
+        },
+        {
+          "id": "admin-access-restriction",
+          "name": "Admin Access Restrictions",
+          "result": "INFO",
+          "details": "Restrict administrative interface access by IP or network when possible. Consider using a VPN or dedicated admin gateway.",
+          "category": "admin-interfaces",
+          "severity": "high",
+          "confidence": "low",
+          "description": "Limit admin interface access"
+        }
+      ],
+      "category": "admin-interfaces",
+      "confidence": "low",
+      "totalCount": 0,
+      "passedCount": 0,
+      "isInformationalOnly": true
+    }
+  ]
+}
