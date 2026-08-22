@@ -888,16 +888,6 @@ Route::middleware('auth')->group(
         );
 
         $safeRoute(
-            'put',
-            '/stock-receipts/{stockReceipt}',
-            'stock-receipts.update',
-            $controllers['stockReceipts'],
-            'update',
-            'stock-receipts.index',
-            ['stockReceipt']
-        );
-
-        $safeRoute(
             'post',
             '/stock-receipts/{stockReceipt}/post',
             'stock-receipts.post',
