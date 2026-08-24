@@ -114,6 +114,10 @@ class WorkshopAwareInventoryReportController extends Controller
                 $request->filled('date_to'),
                 fn (Builder $q): Builder => $q->whereDate('transaction_date', '<=', $request->input('date_to'))
             )
+            ->when(
+                $request->filled('year'),
+                fn (Builder $q): Builder => $q->whereYear('transaction_date', $request->integer('year'))
+            )
             ->orderByDesc('transaction_date')
             ->orderByDesc('id');
     }
@@ -136,6 +140,10 @@ class WorkshopAwareInventoryReportController extends Controller
             ->when(
                 $request->filled('date_to'),
                 fn (Builder $q): Builder => $q->whereDate('transaction_date', '<=', $request->input('date_to'))
+            )
+            ->when(
+                $request->filled('year'),
+                fn (Builder $q): Builder => $q->whereYear('transaction_date', $request->integer('year'))
             );
 
         $result = [

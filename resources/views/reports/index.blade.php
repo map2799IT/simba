@@ -108,7 +108,11 @@
 
     {{-- Filter --}}
     <div class="mb-4 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-        <form method="GET" action="{{ route('reports.index') }}" class="p-4 sm:p-5">
+        <form method="GET" action="{{ url()->current() }}" class="p-4 sm:p-5">
+            {{-- Pertahankan tab aktif saat submit form, agar tidak redirect ke tab Inventaris --}}
+            @if (($tab ?? 'inventaris') !== 'inventaris')
+                <input type="hidden" name="tab" value="{{ $tab }}">
+            @endif
             <div class="flex flex-col gap-3 lg:flex-row lg:items-end">
                 <div class="flex-1">
                     <label for="search" class="mb-1.5 block text-sm font-semibold text-slate-700">Pencarian</label>
