@@ -14,6 +14,14 @@
                 ? rtrim(rtrim(number_format((float) $value, 3, ',', '.'), '0'), ',')
                 : number_format((float) $value, 0, ',', '.');
         };
+        $workshopCode = static function (mixed $row): string {
+            // Prioritas: item.workshop -> item_assets.workshop -> '-'
+            $code = $row->item?->workshop?->code;
+            if ($code === null || $code === '') {
+                $code = $row->item?->itemAssets?->first()?->workshop?->code;
+            }
+            return $code ?? '-';
+        };
         $conditionLabel = static fn (mixed $value): string => match ($value) {
             'good' => 'Baik', 'minor_damage' => 'Rusak Ringan', 'major_damage' => 'Rusak Berat', 'mixed' => 'Beragam',
             default => ucfirst(str_replace('_', ' ', (string) $value)),
@@ -313,7 +321,7 @@
                                      <div class="text-xs text-slate-500">{{ $row->brand ?? $row->item?->brand ?? '-' }}</div>
                                  </td>
                                  <td class="px-4 py-3 text-sm text-slate-600">{{ $row->item?->category?->name ?? '-' }}</td>
-                                 <td class="px-4 py-3 text-sm text-slate-600">{{ $row->item?->workshop?->code ?? '-' }}</td>
+                                 <td class="px-4 py-3 text-sm text-slate-600">{{ $workshopCode($row) }}</td>
                                  <td class="px-4 py-3 text-sm text-slate-600">{{ $tab === 'barang_masuk' ? ($row->source ?? '-') : ($row->destination ?? '-') }}</td>
                                  <td class="whitespace-nowrap px-4 py-3 text-right text-sm font-bold text-slate-900">{{ $quantity($row->quantity, $row->item?->unit?->allows_decimal ?? false) }}</td>
                                  <td class="whitespace-nowrap px-4 py-3 text-right text-sm text-slate-600">{{ $row->item?->unit?->code ?? '-' }}</td>
@@ -342,7 +350,7 @@
                              </div>
                          </div>
                          <dl class="mt-3 grid grid-cols-2 gap-3 text-sm">
-                             <div><dt class="text-xs text-slate-500">Jurusan</dt><dd class="mt-0.5 font-medium text-slate-700">{{ $row->item?->workshop?->code ?? '-' }}</dd></div>
+                             <div><dt class="text-xs text-slate-500">Jurusan</dt><dd class="mt-0.5 font-medium text-slate-700">{{ $workshopCode($row) }}</dd></div>
                              <div><dt class="text-xs text-slate-500">Jumlah</dt><dd class="mt-0.5 font-bold text-slate-900">{{ $quantity($row->quantity, $row->item?->unit?->allows_decimal ?? false) }} {{ $row->item?->unit?->code ?? '-' }}</dd></div>
                              <div><dt class="text-xs text-slate-500">Tanggal</dt><dd class="mt-0.5 text-slate-600">{{ $row->transaction_date?->format('Y-m-d') ?? '-' }}</dd></div>
                              <div><dt class="text-xs text-slate-500">{{ $tab === 'barang_masuk' ? 'Sumber' : 'Tujuan' }}</dt><dd class="mt-0.5 text-slate-600">{{ $tab === 'barang_masuk' ? ($row->source ?? '-') : ($row->destination ?? '-') }}</dd></div>

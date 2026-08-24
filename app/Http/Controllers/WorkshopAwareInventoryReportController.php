@@ -73,7 +73,7 @@ class WorkshopAwareInventoryReportController extends Controller
         $search = trim((string) $request->input('search'));
 
         return ItemStockMovement::query()
-            ->with(['item.category', 'item.unit', 'item.workshop', 'storageLocation', 'user'])
+            ->with(['item.category', 'item.unit', 'item.workshop', 'item.itemAssets.workshop', 'storageLocation', 'user'])
             ->where('type', $type)
             ->when(
                 $search !== '',

@@ -173,12 +173,21 @@ class WorkshopAwareInventoryReportExportController extends Controller
         return '';
     }
 
+    private function workshopCode(mixed $movement): ?string
+    {
+        $code = $movement->item?->workshop?->code;
+        if ($code === null || $code === '') {
+            $code = $movement->item?->itemAssets?->first()?->workshop?->code;
+        }
+        return $code ?: null;
+    }
+
     private function movementExportQuery(Request $request, string $type): \Illuminate\Database\Eloquent\Builder
     {
         $search = trim((string) $request->input('search'));
 
         return ItemStockMovement::query()
-            ->with(['item.category', 'item.unit', 'item.workshop', 'storageLocation', 'user'])
+            ->with(['item.category', 'item.unit', 'item.workshop', 'item.itemAssets.workshop', 'storageLocation', 'user'])
             ->where('type', $type)
             ->when(
                 $search !== '',
@@ -409,7 +418,7 @@ class WorkshopAwareInventoryReportExportController extends Controller
                 $m->item?->code,
                 $m->item?->name,
                 $m->item?->category?->name,
-                $m->item?->workshop?->code,
+                $this->workshopCode($m),
                 $m->brand ?? $m->item?->brand,
                 $m->model ?? $m->item?->model,
                 $qty,
@@ -432,7 +441,7 @@ class WorkshopAwareInventoryReportExportController extends Controller
                     $m->item?->code,
                     $m->item?->name,
                     $m->item?->category?->name,
-                    $m->item?->workshop?->code,
+                    $this->workshopCode($m),
                     $m->brand ?? $m->item?->brand,
                     $m->model ?? $m->item?->model,
                     $qty,
