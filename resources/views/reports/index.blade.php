@@ -37,6 +37,10 @@
             'type' => request('type'),
             'condition' => request('condition'),
             'status' => request('status'),
+            'tab' => $tab ?? null,
+            'year' => request('year'),
+            'date_from' => request('date_from'),
+            'date_to' => request('date_to'),
         ], static fn ($value): bool => $value !== null && $value !== '');
     @endphp
 
