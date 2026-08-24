@@ -3,7 +3,7 @@
 @section('content')
 
 <x-page-header
-    title="{{ $reportTitle }}"
+    title="{{ $reportTitle }}{{ request('year') ? ' ' . request('year') : '' }}"
     description="Laporan penerimaan barang masuk dikelompokkan per nama barang."
     :breadcrumb="['Laporan', $reportTitle]"
 >
@@ -141,9 +141,12 @@
 {{-- Table --}}
 <section class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
     <div class="border-b border-slate-100 px-5 py-4">
-        <h2 class="text-base font-semibold text-slate-900">{{ $reportTitle }}</h2>
+        <h2 class="text-base font-semibold text-slate-900">{{ $reportTitle }}{{ request('year') ? ' ' . request('year') : '' }}</h2>
         <p class="mt-1 text-sm text-slate-500">
             {{ $rows->total() }} entri ditemukan
+            @if(request('year'))
+                — tahun {{ request('year') }}
+            @endif
             @if(request('date_from') || request('date_to'))
                 — periode
                 @if(request('date_from')) {{ \Carbon\Carbon::parse(request('date_from'))->isoFormat('D MMM YYYY') }} @endif
@@ -156,7 +159,7 @@
         <table class="min-w-full divide-y divide-slate-200 text-sm">
             <thead class="bg-slate-50">
                 <tr>
-                    <th class="whitespace-nowrap px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Tanggal</th>
+                    <th class="whitespace-nowrap px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Tanggal Masuk</th>
                     <th class="whitespace-nowrap px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Kode Penerimaan</th>
                     <th class="whitespace-nowrap px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Kode Barang</th>
                     <th class="whitespace-nowrap px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Nama Barang</th>

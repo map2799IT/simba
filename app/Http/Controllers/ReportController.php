@@ -640,6 +640,10 @@ class ReportController extends Controller
                 fn (Builder $q): Builder => $q->whereDate('transaction_date', '<=', $request->input('date_to'))
             )
             ->when(
+                $request->filled('year'),
+                fn (Builder $q): Builder => $q->whereYear('transaction_date', $request->integer('year'))
+            )
+            ->when(
                 $request->filled('sort'),
                 function (Builder $q) use ($request): void {
                     $dir = $request->input('direction', 'asc') === 'desc' ? 'desc' : 'asc';
@@ -681,6 +685,10 @@ class ReportController extends Controller
             ->when(
                 $request->filled('date_to'),
                 fn (Builder $q): Builder => $q->whereDate('transaction_date', '<=', $request->input('date_to'))
+            )
+            ->when(
+                $request->filled('year'),
+                fn (Builder $q): Builder => $q->whereYear('transaction_date', $request->integer('year'))
             );
 
         return [

@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
     <meta charset="utf-8">
-    <title>{{ $reportTitle ?? 'Laporan Barang Masuk' }}</title>
+    <title>{{ $reportTitle ?? 'Laporan Barang Masuk' }}{{ !empty($filters['year']) ? ' ' . $filters['year'] : '' }}</title>
 
     <style>
         @page {
@@ -128,7 +128,7 @@
         </div>
         <div class="right">
             <div class="number">{{ $officialDocument['number'] }}</div>
-            <div class="title">{{ $reportTitle ?? 'Laporan Barang Masuk' }}</div>
+            <div class="title">{{ $reportTitle ?? 'Laporan Barang Masuk' }}{{ !empty($filters['year']) ? ' ' . $filters['year'] : '' }}</div>
         </div>
     </header>
 
@@ -136,6 +136,9 @@
         Ruang lingkup: {{ $officialDocument['workshopLabel'] }}
         · Dicetak: {{ $generatedAt->format('d-m-Y H:i') }}
         · Jumlah entri: {{ collect($rows)->count() }}
+        @if (!empty($filters['year']))
+            · Tahun: {{ $filters['year'] }}
+        @endif
         @if (!empty($filters['date_from']) || !empty($filters['date_to']))
             · Periode:
             {{ !empty($filters['date_from']) ? \Carbon\Carbon::parse($filters['date_from'])->format('d-m-Y') : '…' }}
@@ -168,10 +171,11 @@
     <table class="data">
         <thead>
             <tr>
-                <th>Tanggal</th>
+                <th>Tanggal Masuk</th>
                 <th>Kode Penerimaan</th>
                 <th>Kode Barang</th>
                 <th>Nama Barang</th>
+                <th>Kategori</th>
                 <th>Bengkel</th>
                 <th>Merek / Model</th>
                 <th class="text-right">Jml Masuk</th>
@@ -182,6 +186,7 @@
                 <th class="text-right">Total Nilai</th>
                 <th>Referensi</th>
                 <th>Sumber</th>
+                <th>Lokasi Simpan</th>
                 <th>Petugas</th>
             </tr>
         </thead>
@@ -200,7 +205,7 @@
                 @endphp
                 @if ($newGroup)
                     <tr class="group-row">
-                        <td colspan="15">
+                        <td colspan="17">
                             {{ $itemName }}
                             @if ($row->item?->code) · {{ $row->item->code }} @endif
                             @if ($row->item?->category) · {{ $row->item->category->name }} @endif
@@ -212,6 +217,7 @@
                     <td>{{ $row->receipt_code ?? '-' }}</td>
                     <td>{{ $row->item?->code ?? '-' }}</td>
                     <td>{{ $itemName }}</td>
+                    <td>{{ $row->item?->category?->name ?? '-' }}</td>
                     <td>{{ $row->item?->workshop?->code ?? '-' }}</td>
                     <td>{{ implode(' / ', array_filter([$brand, $model])) ?: '-' }}</td>
                     <td class="text-right text-green">+{{ number_format($qty, 2, ',', '.') }}</td>
@@ -222,11 +228,12 @@
                     <td class="text-right">{{ $total ? 'Rp '.number_format($total, 0, ',', '.') : '-' }}</td>
                     <td>{{ $row->reference_number ?? '-' }}</td>
                     <td>{{ $row->source ?? '-' }}</td>
+                    <td>{{ $row->storageLocation?->name ?? '-' }}</td>
                     <td>{{ $row->user?->name ?? 'Sistem' }}</td>
                 </tr>
             @empty
                 <tr>
-                    <td colspan="15" style="text-align:center;padding:12px;color:#64748b;">
+                    <td colspan="17" style="text-align:center;padding:12px;color:#64748b;">
                         Tidak ada data barang masuk.
                     </td>
                 </tr>
