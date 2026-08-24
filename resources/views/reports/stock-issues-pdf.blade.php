@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
     <meta charset="utf-8">
-    <title>{{ $reportTitle ?? 'Laporan Barang Keluar' }}{{ !empty($filters['year']) ? ' ' . $filters['year'] : '' }}</title>
+    <title>{{ $reportTitle ?? 'Laporan Barang Keluar' }}</title>
 
     <style>
         @page {
@@ -119,6 +119,10 @@
 
         $condMap   = ['good' => 'Baik', 'damaged' => 'Rusak', 'needs_repair' => 'Perlu Perbaikan'];
         $lastItemName = null;
+
+        $fmtQty = static function (mixed $value, mixed $unitOrAllowsDecimal = false): string {
+            return \App\Support\QuantityFormatter::format($value, $unitOrAllowsDecimal);
+        };
     @endphp
 
     <header class="header">
@@ -128,7 +132,7 @@
         </div>
         <div class="right">
             <div class="number">{{ $officialDocument['number'] }}</div>
-            <div class="title">{{ $reportTitle ?? 'Laporan Barang Keluar' }}{{ !empty($filters['year']) ? ' ' . $filters['year'] : '' }}</div>
+            <div class="title">{{ $reportTitle ?? 'Laporan Barang Keluar' }}</div>
         </div>
     </header>
 
@@ -159,7 +163,7 @@
         </div>
         <div class="summary-cell">
             <div class="label">Total Kuantitas</div>
-            <div class="value">{{ number_format($summary['total_quantity'] ?? 0, 2, ',', '.') }}</div>
+            <div class="value">{{ $fmtQty($summary['total_quantity']) }}</div>
         </div>
         <div class="summary-cell">
             <div class="label">Total Barang Keluar</div>
@@ -216,7 +220,7 @@
                     <td>{{ $row->item?->category?->name ?? '-' }}</td>
                     <td>{{ $row->item?->workshop?->code ?? '-' }}</td>
                     <td>{{ implode(' / ', array_filter([$brand, $model])) ?: '-' }}</td>
-                    <td class="text-right text-red">-{{ number_format($qty, 2, ',', '.') }}</td>
+                    <td class="text-right text-red">-{{ $fmtQty($qty, $row->item?->unit) }}</td>
                     <td>{{ $row->item?->unit?->code ?? '-' }}</td>
                     <td>{{ $condLabel }}</td>
                     <td>{{ $row->destination ?? '-' }}</td>

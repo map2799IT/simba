@@ -60,6 +60,7 @@
                 'search' => request('search'),
                 'workshop_id' => $selectedWorkshopId,
                 'item_category_id' => request('item_category_id'),
+                'year' => request('year'),
                 'date_from' => request('date_from'),
                 'date_to' => request('date_to'),
             ], static fn ($v): bool => $v !== null && $v !== '');

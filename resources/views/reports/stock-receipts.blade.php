@@ -29,7 +29,7 @@
     </div>
     <div class="rounded-2xl border border-slate-200 bg-white px-5 py-4 shadow-sm">
         <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Total Kuantitas</p>
-        <p class="mt-1 text-2xl font-bold text-slate-900">{{ number_format($summary['total_quantity'], 2, ',', '.') }}</p>
+        <p class="mt-1 text-2xl font-bold text-slate-900">{{ \App\Support\QuantityFormatter::format($summary['total_quantity']) }}</p>
     </div>
     <div class="rounded-2xl border border-slate-200 bg-white px-5 py-4 shadow-sm">
         <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Total Nilai</p>
@@ -224,7 +224,7 @@
                             @endif
                         </td>
                         <td class="px-4 py-3 text-right font-bold text-emerald-700">
-                            +{{ number_format($qty, 2, ',', '.') }}
+                            +{{ \App\Support\QuantityFormatter::format($qty, $row->item?->unit) }}
                         </td>
                         <td class="px-4 py-3 text-slate-600">{{ $row->item?->unit?->code ?? '-' }}</td>
                         <td class="px-4 py-3 text-slate-600">{{ $condLabel }}</td>

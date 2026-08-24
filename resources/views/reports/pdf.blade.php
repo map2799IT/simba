@@ -82,6 +82,11 @@
 </head>
 
 <body>
+    @php
+        $fmtQty = static function (mixed $value, mixed $unitOrAllowsDecimal = false): string {
+            return \App\Support\QuantityFormatter::format($value, $unitOrAllowsDecimal);
+        };
+    @endphp
     <h1>
         {{ $reportTitle }}
     </h1>
@@ -211,8 +216,8 @@
                             <div class="small">{{ $item->report_location_name ?? '-' }}</div>
                         </td>
                         <td>{{ $condLabel }}</td>
-                        <td class="right">{{ number_format((float)($item->report_stock ?? 0),3,',','.') }} {{ $item->unit_symbol ?: ($item->unit_name ?? '') }}</td>
-                        <td class="right">{{ number_format((float)($item->minimum_stock ?? 0),3,',','.') }}</td>
+                        <td class="right">{{ $fmtQty($item->report_stock ?? 0, $item) }} {{ $item->unit_symbol ?: ($item->unit_name ?? '') }}</td>
+                        <td class="right">{{ $fmtQty($item->minimum_stock ?? 0) }}</td>
                         <td>{{ $statLabel }}</td>
                         <td class="right">Rp {{ number_format($itemValue,0,',','.') }}</td>
                     </tr>
@@ -260,9 +265,9 @@
                         <td>{{ $mvType }}</td>
                         <td>{{ $movement->reference_number ?? '-' }}</td>
                         <td>{{ $movement->source ?? $movement->destination ?? '-' }}</td>
-                        <td class="right">{{ number_format((float)($movement->stock_before ?? 0),3,',','.') }}</td>
-                        <td class="right">{{ number_format($diff,3,',','.') }}</td>
-                        <td class="right">{{ number_format((float)($movement->stock_after ?? 0),3,',','.') }}</td>
+                        <td class="right">{{ $fmtQty($movement->stock_before ?? 0) }}</td>
+                        <td class="right">{{ $fmtQty($diff) }}</td>
+                        <td class="right">{{ $fmtQty($movement->stock_after ?? 0) }}</td>
                         <td>{{ $movement->user?->name ?? 'Sistem' }}</td>
                     </tr>
                 @empty

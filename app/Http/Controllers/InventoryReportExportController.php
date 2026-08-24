@@ -124,112 +124,84 @@ class InventoryReportExportController extends Controller
     }
 
     /**
-     * Export laporan inventaris ke CSV yang dapat dibuka Excel.
-     *
-     * Method ini disediakan agar tombol Export Excel juga tidak
-     * mengalami error method/route berikutnya.
+     * Export laporan inventaris ke XLSX asli.
      */
     public function excel(Request $request): StreamedResponse
     {
+        $headers = [
+            'Kode', 'Nama Barang', 'Jenis', 'Kategori', 'Bengkel', 'Lokasi',
+            'Merek', 'Model', 'Kondisi', 'Status', 'Stok', 'Satuan',
+            'Harga Satuan', 'Nilai Inventaris',
+        ];
+
+        $items = $this->inventoryQuery($request)
+            ->orderBy('items.id')
+            ->get();
+
+        $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+        $sheet       = $spreadsheet->getActiveSheet();
+        $sheet->setTitle('Inventaris');
+        $sheet->fromArray($headers, null, 'A1');
+
+        $lastColumn = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex(count($headers));
+        $sheet->getStyle("A1:{$lastColumn}1")->getFont()->setBold(true);
+        $sheet->getStyle("A1:{$lastColumn}1")->getAlignment()
+            ->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle("A1:{$lastColumn}1")->getFill()
+            ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+            ->getStartColor()->setARGB('FFD9EAF7');
+
+        $rowNumber = 2;
+        foreach ($items as $item) {
+            $stock = (float) $item->stock;
+            $price = (float) $item->unit_price;
+
+            // Alat dinilai dari harga satuan; bahan = stok x harga.
+            $value = $item->type === 'tool' ? $price : $stock * $price;
+
+            $sheet->fromArray([
+                $item->code,
+                $item->name,
+                $this->typeLabel($item->type),
+                $item->category_name ?? '-',
+                $item->workshop_code ?? '-',
+                $item->location_name ?? '-',
+                $item->brand ?? '-',
+                $item->model ?? '-',
+                $this->label($item->condition),
+                $this->label($item->status),
+                $stock,
+                $item->unit_symbol ?: ($item->unit_name ?? ''),
+                $price,
+                $value,
+            ], null, "A{$rowNumber}");
+
+            $rowNumber++;
+        }
+
+        $lastRow = max(2, $rowNumber - 1);
+        $sheet->freezePane('A2');
+        $sheet->setAutoFilter("A1:{$lastColumn}{$lastRow}");
+
+        for ($i = 1; $i <= count($headers); $i++) {
+            $sheet->getColumnDimension(
+                \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($i)
+            )->setAutoSize(true);
+        }
+
         $filename =
             'laporan-inventaris-'.
             now()->format('Ymd-His').
-            '.csv';
+            '.xlsx';
 
         return response()->streamDownload(
-            function () use ($request): void {
-                $output = fopen(
-                    'php://output',
-                    'wb'
-                );
-
-                if ($output === false) {
-                    return;
-                }
-
-                /*
-                 * UTF-8 BOM agar karakter Indonesia terbaca Excel.
-                 */
-                fwrite(
-                    $output,
-                    "\xEF\xBB\xBF"
-                );
-
-                fputcsv(
-                    $output,
-                    [
-                        'Kode',
-                        'Nama Barang',
-                        'Jenis',
-                        'Kategori',
-                        'Bengkel',
-                        'Lokasi',
-                        'Merek',
-                        'Model',
-                        'Kondisi',
-                        'Status',
-                        'Stok',
-                        'Satuan',
-                        'Harga Satuan',
-                        'Nilai Inventaris',
-                    ],
-                    ';'
-                );
-
-                $this->inventoryQuery($request)
-                    ->orderBy('items.id')
-                    ->chunk(
-                        500,
-                        function (
-                            Collection $items
-                        ) use ($output): void {
-                            foreach ($items as $item) {
-                                fputcsv(
-                                    $output,
-                                    [
-                                        $item->code,
-                                        $item->name,
-                                        $this->typeLabel(
-                                            $item->type
-                                        ),
-                                        $item->category_name
-                                            ?? '-',
-                                        $item->workshop_code
-                                            ?? '-',
-                                        $item->location_name
-                                            ?? '-',
-                                        $item->brand
-                                            ?? '-',
-                                        $item->model
-                                            ?? '-',
-                                        $this->label(
-                                            $item->condition
-                                        ),
-                                        $this->label(
-                                            $item->status
-                                        ),
-                                        $item->stock,
-                                        $item->unit_symbol
-                                            ?: (
-                                                $item->unit_name
-                                                ?? ''
-                                            ),
-                                        $item->unit_price,
-                                        $item->inventory_value,
-                                    ],
-                                    ';'
-                                );
-                            }
-                        }
-                    );
-
-                fclose($output);
+            function () use ($spreadsheet): void {
+                $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+                $writer->save('php://output');
+                $spreadsheet->disconnectWorksheets();
             },
             $filename,
-            [
-                'Content-Type' =>
-                    'text/csv; charset=UTF-8',
-            ]
+            ['Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet']
         );
     }
 

@@ -61,7 +61,7 @@
         <dl class="grid grid-cols-2 gap-x-4 gap-y-4 p-5 sm:grid-cols-3 lg:grid-cols-6">
             <div><dt class="text-xs font-semibold uppercase tracking-wide text-slate-500">Barang</dt><dd class="mt-1 text-sm font-bold text-slate-900">{{ $movement->item?->name ?? '-' }}</dd></div>
             <div><dt class="text-xs font-semibold uppercase tracking-wide text-slate-500">Kode</dt><dd class="mt-1 font-mono text-sm font-semibold text-slate-700">{{ $movement->item?->code ?? '-' }}</dd></div>
-            <div><dt class="text-xs font-semibold uppercase tracking-wide text-slate-500">Jumlah Saat Ini</dt><dd class="mt-1 text-sm font-bold text-slate-900">{{ number_format((float)$movement->quantity, 3, ',', '.') }} {{ $movement->item?->unit?->name }}</dd></div>
+            <div><dt class="text-xs font-semibold uppercase tracking-wide text-slate-500">Jumlah Saat Ini</dt><dd class="mt-1 text-sm font-bold text-slate-900">{{ \App\Support\QuantityFormatter::format($movement->quantity, $movement->item?->unit) }} {{ $movement->item?->unit?->name }}</dd></div>
             <div><dt class="text-xs font-semibold uppercase tracking-wide text-slate-500">Tanggal</dt><dd class="mt-1 text-sm font-bold text-slate-900">{{ $movement->transaction_date?->format('d-m-Y') ?? '-' }}</dd></div>
             <div><dt class="text-xs font-semibold uppercase tracking-wide text-slate-500">Jurusan</dt><dd class="mt-1 text-sm font-bold text-slate-900">{{ $movement->workshop?->code ?? '-' }}</dd></div>
             <div><dt class="text-xs font-semibold uppercase tracking-wide text-slate-500">Referensi</dt><dd class="mt-1 font-mono text-xs text-slate-700">{{ $movement->reference_number ?? '-' }}</dd></div>
@@ -90,7 +90,7 @@
                             class="w-full rounded-xl border-slate-300 bg-white px-3.5 py-2.5 pr-16 text-sm shadow-sm focus:border-blue-500 focus:ring-blue-500 @error('quantity') border-red-400 @enderror">
                         <span class="absolute inset-y-0 right-0 flex items-center pr-4 text-sm text-slate-500">{{ $movement->item?->unit?->name }}</span>
                     </div>
-                    <p class="mt-1 text-xs text-slate-500">Jumlah saat ini: {{ number_format((float)$movement->quantity, 3, ',', '.') }} {{ $movement->item?->unit?->name }}</p>
+                    <p class="mt-1 text-xs text-slate-500">Jumlah saat ini: {{ \App\Support\QuantityFormatter::format($movement->quantity, $movement->item?->unit) }} {{ $movement->item?->unit?->name }}</p>
                     @error('quantity')<p class="mt-1.5 text-xs text-red-600"><i class="bi bi-exclamation-circle"></i> {{ $message }}</p>@enderror
                 </div>
                 <div>

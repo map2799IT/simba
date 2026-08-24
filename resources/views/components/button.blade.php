@@ -28,7 +28,7 @@
 @endphp
 
 @if ($href)
-    <a href="{{ $href }}" class="{{ $classes }} {{ $attributes->get('class', '') }}" {!! $attributes->except(['class']) !!}>
+    <a href="{!! $href !!}" class="{{ $classes }} {{ $attributes->get('class', '') }}" {!! $attributes->except(['class']) !!}>
         {{ $slot }}
     </a>
 @else

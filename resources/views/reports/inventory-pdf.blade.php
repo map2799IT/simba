@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
 
-    <title>Laporan Inventaris</title>
+    <title>Laporan Inventaris{{ !empty($periodLabel) ? ' ' . $periodLabel : '' }}</title>
 
     <style>
         @page {
@@ -140,7 +140,7 @@
         </div>
     @endif
 
-    <h1>Laporan Inventaris</h1>
+    <h1>Laporan Inventaris{{ !empty($periodLabel) ? ' ' . $periodLabel : '' }}</h1>
 
     <div class="meta">
         Ruang lingkup:
@@ -149,6 +149,19 @@
 
         Jurusan dan lokasi bersumber dari unit fisik
         serta transaksi Barang Masuk.
+        @if (!empty($filters['year']) || !empty($filters['date_from']) || !empty($filters['date_to']))
+            <br>
+            Filter:
+            @if (!empty($filters['year']))
+                Tahun {{ $filters['year'] }}
+            @endif
+            @if (!empty($filters['date_from']))
+                dari {{ \Illuminate\Support\Carbon::parse($filters['date_from'])->format('d-m-Y') }}
+            @endif
+            @if (!empty($filters['date_to']))
+                s/d {{ \Illuminate\Support\Carbon::parse($filters['date_to'])->format('d-m-Y') }}
+            @endif
+        @endif
         <br>
 
         Dicetak:

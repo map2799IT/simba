@@ -48,7 +48,7 @@
                                         @if ($item->item?->isTool())
                                             {{ count($item->asset_ids ?? []) }} unit
                                         @else
-                                            {{ number_format((float) $item->quantity, 3, ',', '.') }}
+                                            {{ \App\Support\QuantityFormatter::format($item->quantity, $item->item?->unit) }}
                                             {{ $item->item?->unit?->name ?? '' }}
                                         @endif
                                     </td>

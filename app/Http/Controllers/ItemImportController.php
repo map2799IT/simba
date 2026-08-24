@@ -1061,7 +1061,7 @@ class ItemImportController extends Controller
 
         /*
          * Mendukung format Indonesia:
-         * 1.500,50 menjadi 1500.50
+         * 1.500,50 menjadi 1500.50 (koma = desimal, titik = ribuan)
          */
         if (str_contains($normalized, ',')) {
             $normalized = str_replace(
@@ -1073,6 +1073,19 @@ class ItemImportController extends Controller
             $normalized = str_replace(
                 ',',
                 '.',
+                $normalized
+            );
+        } elseif (substr_count($normalized, '.') > 1) {
+            /*
+             * Tanpa koma, tetapi ada lebih dari satu titik:
+             * 3.800.000.000.000 -> 3800000000000 (semua titik adalah
+             * pemisah ribuan, bukan desimal). `(float)` langsung akan
+             * memotong di titik kedua, jadi titik ribuan harus dihapus
+             * sebelum dikonversi.
+             */
+            $normalized = str_replace(
+                '.',
+                '',
                 $normalized
             );
         }

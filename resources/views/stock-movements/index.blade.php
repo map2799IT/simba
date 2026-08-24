@@ -77,8 +77,8 @@
                                 <div class="text-sm font-semibold text-slate-900">{{ $movement->item?->name ?? '-' }}</div>
                                 <div class="text-xs text-slate-500">{{ $movement->item?->code ?? '-' }}</div>
                             </td>
-                            <td class="whitespace-nowrap px-5 py-4 text-right text-sm font-bold text-slate-900">{{ number_format((float) $movement->quantity, 3, ',', '.') }}</td>
-                            <td class="whitespace-nowrap px-5 py-4 text-right text-sm text-slate-600">{{ number_format((float) $movement->stock_before, 3, ',', '.') }} → <strong class="text-slate-900">{{ number_format((float) $movement->stock_after, 3, ',', '.') }}</strong></td>
+                            <td class="whitespace-nowrap px-5 py-4 text-right text-sm font-bold text-slate-900">{{ \App\Support\QuantityFormatter::format($movement->quantity, $movement->item?->unit) }}</td>
+                            <td class="whitespace-nowrap px-5 py-4 text-right text-sm text-slate-600">{{ \App\Support\QuantityFormatter::format($movement->stock_before) }} → <strong class="text-slate-900">{{ \App\Support\QuantityFormatter::format($movement->stock_after) }}</strong></td>
                             <td class="px-5 py-4 text-sm text-slate-600">{{ $movement->reference_number ?: '-' }}</td>
                             <td class="px-5 py-4 text-sm text-slate-600">{{ $movement->user?->name ?? '-' }}</td>
                         </tr>
@@ -108,8 +108,8 @@
                     @else<x-badge variant="neutral" dot>{{ $movement->typeLabel() }}</x-badge>@endif
                 </div>
                 <dl class="mt-3 grid grid-cols-2 gap-3 text-sm">
-                    <div><dt class="text-xs text-slate-500">Jumlah</dt><dd class="mt-0.5 font-bold text-slate-900">{{ number_format((float) $movement->quantity, 3, ',', '.') }}</dd></div>
-                    <div><dt class="text-xs text-slate-500">Stok</dt><dd class="mt-0.5 font-medium text-slate-700">{{ number_format((float) $movement->stock_before, 3, ',', '.') }} → {{ number_format((float) $movement->stock_after, 3, ',', '.') }}</dd></div>
+    <div><dt class="text-xs text-slate-500">Jumlah</dt><dd class="mt-0.5 font-bold text-slate-900">{{ \App\Support\QuantityFormatter::format($movement->quantity, $movement->item?->unit) }}</dd></div>
+    <div><dt class="text-xs text-slate-500">Stok</dt><dd class="mt-0.5 font-medium text-slate-700">{{ \App\Support\QuantityFormatter::format($movement->stock_before) }} → {{ \App\Support\QuantityFormatter::format($movement->stock_after) }}</dd></div>
                     <div><dt class="text-xs text-slate-500">Referensi</dt><dd class="mt-0.5 font-medium text-slate-700">{{ $movement->reference_number ?: '-' }}</dd></div>
                     <div><dt class="text-xs text-slate-500">Petugas</dt><dd class="mt-0.5 font-medium text-slate-700">{{ $movement->user?->name ?? '-' }}</dd></div>
                 </dl>

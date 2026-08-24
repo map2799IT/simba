@@ -45,13 +45,13 @@
                                         @if (abs($delta) > 0.000001)
                                             <div class="flex items-center gap-2">
                                                 <span class="text-xs text-slate-500">Jumlah:</span>
-                                                <span class="text-slate-600 line-through">{{ number_format($oldQty, 3, ',', '.') }}</span>
+                                                <span class="text-slate-600 line-through">{{ \App\Support\QuantityFormatter::format($oldQty, $req->movement?->item?->unit) }}</span>
                                                 <i class="bi bi-arrow-right text-slate-400"></i>
                                                 <span class="font-semibold {{ $delta > 0 ? 'text-red-600' : 'text-emerald-600' }}">
-                                                    {{ number_format($newQty, 3, ',', '.') }} {{ $unitName }}
+                                                    {{ \App\Support\QuantityFormatter::format($newQty, $req->movement?->item?->unit) }} {{ $unitName }}
                                                 </span>
                                                 <x-badge variant="{{ $delta > 0 ? 'danger' : 'success' }}">
-                                                    {{ $delta > 0 ? '+' : '' }}{{ number_format($delta, 3, ',', '.') }}
+                                                    {{ $delta > 0 ? '+' : '' }}{{ \App\Support\QuantityFormatter::format($delta, $req->movement?->item?->unit) }}
                                                 </x-badge>
                                             </div>
                                         @endif
@@ -145,9 +145,9 @@
                     @if (abs($delta) > 0.000001)
                         <div class="mt-3 rounded-xl border border-slate-100 bg-slate-50 p-3 text-sm">
                             <span class="text-slate-500">Jumlah: </span>
-                            <span class="line-through text-slate-400">{{ number_format($oldQty, 3, ',', '.') }}</span>
+                            <span class="line-through text-slate-400">{{ \App\Support\QuantityFormatter::format($oldQty, $req->movement?->item?->unit) }}</span>
                             <i class="bi bi-arrow-right mx-1 text-slate-400"></i>
-                            <span class="font-bold {{ $delta > 0 ? 'text-red-600' : 'text-emerald-600' }}">{{ number_format($newQty, 3, ',', '.') }} {{ $unitName }}</span>
+                            <span class="font-bold {{ $delta > 0 ? 'text-red-600' : 'text-emerald-600' }}">{{ \App\Support\QuantityFormatter::format($newQty, $req->movement?->item?->unit) }} {{ $unitName }}</span>
                         </div>
                     @endif
                     <p class="mt-2 text-xs text-slate-500">Oleh <strong>{{ $req->requester?->name }}</strong> · {{ $req->created_at?->format('d-m-Y H:i') }}</p>
