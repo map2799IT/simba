@@ -14,6 +14,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             SimbaDemoSeeder::class,
             WorkshopRoleAccountSeeder::class,
+            ReportTestDummyDataSeeder::class,
         ]);
     }
 }
