@@ -334,6 +334,7 @@ class LoanController extends Controller
             'workshop',
             'items.item.unit',
             'items.item.workshop',
+            'items.itemAsset',
             'items.returnedBy',
         ]);
 
