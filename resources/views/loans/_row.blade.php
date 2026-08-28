@@ -101,17 +101,45 @@
         </div>
 
         <div class="col-12 col-lg-4">
-            <label class="form-label">
-                Unit yang Dipilih Otomatis
-            </label>
+            <div class="d-flex align-items-center justify-content-between mb-1">
+                <label class="form-label mb-0">
+                    Pilihan Unit
+                </label>
 
+                <div class="btn-group btn-group-sm unit-mode-toggle" role="group" aria-label="Mode pemilihan unit">
+                    <input type="hidden" name="items[{{ $index }}][unit_mode]" class="unit-mode-input" value="auto">
+                    <button type="button" class="btn btn-outline-primary unit-mode-btn unit-mode-auto active" data-mode="auto">
+                        Otomatis
+                    </button>
+                    <button type="button" class="btn btn-outline-primary unit-mode-btn unit-mode-manual" data-mode="manual">
+                        Manual
+                    </button>
+                </div>
+            </div>
+
+            {{-- Auto mode: preview read-only --}}
             <div
-                class="auto-unit-preview border rounded bg-light p-2"
+                class="auto-unit-preview border rounded bg-light p-2 unit-auto-view"
                 style="min-height: 76px; max-height: 190px; overflow-y: auto;"
             >
                 <span class="text-secondary">
                     Pilih barang dan masukkan jumlah.
                 </span>
+            </div>
+
+            {{-- Manual mode: checkbox unit tersedia --}}
+            <div
+                class="manual-unit-list border rounded bg-white p-2 d-none unit-manual-view"
+                style="min-height: 76px; max-height: 190px; overflow-y: auto;"
+                data-manual-list
+            >
+                <span class="text-secondary manual-placeholder">
+                    Pilih barang terlebih dahulu.
+                </span>
+            </div>
+
+            <div class="form-text manual-error text-danger d-none" data-manual-error>
+                Jumlah unit yang dipilih manual harus sama dengan jumlah alat.
             </div>
         </div>
 

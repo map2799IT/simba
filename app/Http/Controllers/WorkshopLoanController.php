@@ -473,6 +473,23 @@ class WorkshopLoanController
                 'gt:0',
                 'max:99999999999.999',
             ],
+
+            'items.*.unit_mode' => [
+                'nullable',
+                'string',
+                'in:auto,manual',
+            ],
+
+            'items.*.asset_ids' => [
+                'nullable',
+                'array',
+            ],
+
+            'items.*.asset_ids.*' => [
+                'nullable',
+                'integer',
+                'exists:item_assets,id',
+            ],
         ];
 
         $data =
@@ -693,18 +710,66 @@ class WorkshopLoanController
                             }
 
                             /*
-                             * Pemilihan unit tidak mempercayai browser.
-                             * Backend mengambil nomor inventaris terkecil
-                             * yang benar-benar masih tersedia.
+                             * Pemilihan unit.
+                             * - Mode 'manual': gunakan unit/QR spesifik yang dicentang.
+                             * - Mode 'auto' (default): backend mengambil nomor
+                             *   inventaris terkecil yang benar-benar tersedia.
                              */
-                            $assets =
-                                $this->inventory
-                                    ->selectToolAssetsBySequence(
-                                        (int) $item->id,
-                                        (int) $workshop->id,
-                                        $quantity,
-                                        true
-                                    );
+                            $unitMode =
+                                (string) (
+                                    $row['unit_mode']
+                                    ?? 'auto'
+                                );
+
+                            $manualAssetIds =
+                                isset(
+                                    $row['asset_ids']
+                                )
+                                    ? collect(
+                                        $row['asset_ids']
+                                    )
+                                        ->map(
+                                            static fn (
+                                                mixed $id
+                                            ): int =>
+                                                (int) $id
+                                        )
+                                        ->values()
+                                    : collect();
+
+                            if (
+                                $unitMode === 'manual'
+                                && $manualAssetIds->isNotEmpty()
+                            ) {
+                                if (
+                                    $manualAssetIds->count()
+                                    !== $quantity
+                                ) {
+                                    throw ValidationException::
+                                        withMessages([
+                                            "items.{$index}.asset_ids" =>
+                                                'Jumlah unit yang dipilih manual harus sama dengan jumlah alat.',
+                                        ]);
+                                }
+
+                                $assets =
+                                    $this->inventory
+                                        ->selectToolAssetsByIds(
+                                            (int) $item->id,
+                                            (int) $workshop->id,
+                                            $manualAssetIds->all(),
+                                            true
+                                        );
+                            } else {
+                                $assets =
+                                    $this->inventory
+                                        ->selectToolAssetsBySequence(
+                                            (int) $item->id,
+                                            (int) $workshop->id,
+                                            $quantity,
+                                            true
+                                        );
+                            }
 
                             if (
                                 $assets->count()

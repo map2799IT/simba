@@ -347,6 +347,37 @@ class WorkshopLoanInventoryService
         return $query->get();
     }
 
+    /**
+     * Alokasikan unit alat spesifik (pemilihan manual oleh Toolman/Admin).
+     */
+    public function selectToolAssetsByIds(
+        int $itemId,
+        int $workshopId,
+        array $assetIds,
+        bool $lock = true
+    ): Collection {
+        if ($assetIds === []) {
+            return collect();
+        }
+
+        $query =
+            $this
+                ->allocatableAssetsQuery(
+                    $workshopId,
+                    $itemId
+                )
+                ->whereIn(
+                    'id',
+                    $assetIds
+                );
+
+        if ($lock) {
+            $query->lockForUpdate();
+        }
+
+        return $query->get();
+    }
+
     public function inventorySummary(
         int $workshopId
     ): array {

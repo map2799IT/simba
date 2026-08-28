@@ -395,6 +395,195 @@
                             '.auto-unit-preview'
                         );
 
+                    const modeToggle =
+                        row.querySelector(
+                            '.unit-mode-toggle'
+                        );
+
+                    const modeInput =
+                        row.querySelector(
+                            '.unit-mode-input'
+                        );
+
+                    const modeBtns =
+                        row.querySelectorAll(
+                            '.unit-mode-btn'
+                        );
+
+                    const autoView =
+                        row.querySelector(
+                            '.unit-auto-view'
+                        );
+
+                    const manualView =
+                        row.querySelector(
+                            '.unit-manual-view'
+                        );
+
+                    const manualList =
+                        row.querySelector(
+                            '[data-manual-list]'
+                        );
+
+                    const manualError =
+                        row.querySelector(
+                            '[data-manual-error]'
+                        );
+
+                    function setMode(mode) {
+                        modeInput.value = mode;
+
+                        modeBtns.forEach(
+                            function (btn) {
+                                btn.classList.toggle(
+                                    'active',
+                                    btn.dataset.mode === mode
+                                );
+                            }
+                        );
+
+                        autoView.classList.toggle(
+                            'd-none',
+                            mode === 'manual'
+                        );
+
+                        manualView.classList.toggle(
+                            'd-none',
+                            mode !== 'manual'
+                        );
+
+                        if (mode === 'manual') {
+                            renderManualList();
+                        } else {
+                            validateManual();
+                        }
+                    }
+
+                    function renderManualList() {
+                        const option =
+                            item.selectedOptions[0];
+
+                        const itemId =
+                            item.value;
+
+                        const available =
+                            toolAssets[itemId]
+                            ?? [];
+
+                        if (available.length === 0) {
+                            manualList.innerHTML =
+                                '<span class="text-secondary">Tidak ada unit tersedia untuk barang ini.</span>';
+
+                            validateManual();
+                            return;
+                        }
+
+                        manualList.innerHTML =
+                            available.map(
+                                function (asset) {
+                                    const serial =
+                                        asset.serial
+                                            ? ' — SN ' + escapeHtml(asset.serial)
+                                            : '';
+
+                                    return (
+                                        '<label class="form-check d-block mb-1 ps-0">'
+                                        + '<input type="checkbox" class="form-check-input manual-unit-check me-2" '
+                                        + 'name="items[' + row.dataset.index + '][asset_ids][]" '
+                                        + 'value="' + asset.id + '" '
+                                        + 'data-number="' + escapeHtml(asset.number) + '">'
+                                        + '<span class="font-monospace fw-semibold">'
+                                        + escapeHtml(asset.number)
+                                        + '</span>'
+                                        + serial
+                                        + ' — '
+                                        + escapeHtml(asset.location)
+                                        + '</label>'
+                                    );
+                                }
+                            ).join('')
+                            + '<div class="small text-secondary mt-1">'
+                            + 'Centang unit yang ingin dipinjam. Jumlah centang harus sama dengan jumlah alat.'
+                            + '</div>';
+
+                        manualList
+                            .querySelectorAll(
+                                '.manual-unit-check'
+                            )
+                            .forEach(
+                                function (checkbox) {
+                                    checkbox.addEventListener(
+                                        'change',
+                                        validateManual
+                                    );
+                                }
+                            );
+
+                        validateManual();
+                    }
+
+                    function validateManual() {
+                        if (modeInput.value !== 'manual') {
+                            manualError.classList.add('d-none');
+                            return;
+                        }
+
+                        const option =
+                            item.selectedOptions[0];
+
+                        const type =
+                            option?.dataset.type
+                            ?? '';
+
+                        if (type !== 'tool') {
+                            manualError.classList.add('d-none');
+                            return;
+                        }
+
+                        const requested =
+                            Number(
+                                quantity.value
+                                || 0
+                            );
+
+                        const checked =
+                            manualList.querySelectorAll(
+                                '.manual-unit-check:checked'
+                            ).length;
+
+                        const ok =
+                            checked === requested;
+
+                        manualError.classList.toggle(
+                            'd-none',
+                            ok
+                        );
+
+                        if (! ok && requested > 0) {
+                            quantity.setCustomValidity(
+                                'Jumlah unit manual harus sama dengan jumlah alat.'
+                            );
+                        } else {
+                            quantity.setCustomValidity('');
+                        }
+                    }
+
+                    modeToggle?.addEventListener(
+                        'click',
+                        function (event) {
+                            const btn =
+                                event.target.closest(
+                                    '.unit-mode-btn'
+                                );
+
+                            if (btn) {
+                                setMode(
+                                    btn.dataset.mode
+                                );
+                            }
+                        }
+                    );
+
                     function refresh() {
                         const option =
                             item
@@ -441,6 +630,11 @@
                             preview.innerHTML =
                                 '<span class="text-secondary">Pilih barang dan masukkan jumlah.</span>';
 
+                            if (manualList) {
+                                manualList.innerHTML =
+                                    '<span class="text-secondary manual-placeholder">Pilih barang terlebih dahulu.</span>';
+                            }
+
                             return;
                         }
 
@@ -475,6 +669,11 @@
 
                             preview.innerHTML =
                                 '<span class="text-secondary">Bahan habis pakai tidak mempunyai nomor unit/QR.</span>';
+
+                            if (manualList) {
+                                manualList.innerHTML =
+                                    '<span class="text-secondary">Bahan tidak memakai unit.</span>';
+                            }
 
                             return;
                         }
@@ -522,6 +721,11 @@
                             preview.innerHTML =
                                 '<span class="text-secondary">Masukkan jumlah alat minimal 1.</span>';
 
+                            if (manualList) {
+                                manualList.innerHTML =
+                                    '<span class="text-secondary">Tidak ada unit tersedia untuk jumlah ini.</span>';
+                            }
+
                             return;
                         }
 
@@ -550,6 +754,12 @@
                             + '<div class="small text-secondary mt-2">'
                             + 'Nomor final diverifikasi kembali oleh server saat pengajuan disimpan.'
                             + '</div>';
+
+                        if (modeInput.value === 'manual') {
+                            renderManualList();
+                        } else {
+                            validateManual();
+                        }
                     }
 
                     item.addEventListener(
@@ -809,5 +1019,60 @@
                 @endif
             }
         );
+
+        // ===== Auto-save draft (sessionStorage) =====
+        (function () {
+            const STORAGE_KEY = 'simba-loan-draft';
+            const form = document.getElementById('loan-form');
+            if (!form) return;
+
+            function isInput(el) {
+                return el && (el.tagName === 'INPUT' || el.tagName === 'SELECT' || el.tagName === 'TEXTAREA') && el.type !== 'hidden' && el.name;
+            }
+
+            function saveDraft() {
+                try {
+                    const data = { savedAt: Date.now(), values: {} };
+                    const rowsContainer = document.getElementById('loan-rows');
+                    if (rowsContainer) {
+                        const rowData = [];
+                        rowsContainer.querySelectorAll('.loan-row').forEach((row) => {
+                            const item = {};
+                            row.querySelectorAll('input, select').forEach((el) => {
+                                if (el.name) item[el.name] = el.value;
+                            });
+                            if (Object.keys(item).length) rowData.push(item);
+                        });
+                        data.values['__rows__'] = rowData;
+                    }
+                    form.querySelectorAll('input, select, textarea').forEach((el) => {
+                        if (!isInput(el)) return;
+                        if (el.closest('#loan-rows')) return; // sudah di __rows__
+                        if (el.type === 'checkbox' || el.type === 'radio') {
+                            if (el.checked) data.values[el.name] = el.value;
+                        } else {
+                            data.values[el.name] = el.value;
+                        }
+                    });
+                    sessionStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+                } catch (e) { /* abaikan */ }
+            }
+
+            // Simpan saat ada perubahan (debounce).
+            let debounceTimer = null;
+            form.addEventListener('input', () => {
+                clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(saveDraft, 400);
+            });
+            form.addEventListener('change', () => {
+                clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(saveDraft, 400);
+            });
+
+            // Hapus draft setelah submit berhasil.
+            form.addEventListener('submit', () => {
+                try { sessionStorage.removeItem(STORAGE_KEY); } catch (e) {}
+            });
+        })();
     </script>
 @endpush
