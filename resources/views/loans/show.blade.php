@@ -482,6 +482,26 @@
                         </form>
                     @endif
 
+                    @if (
+                        $loan->status === 'borrowed'
+                        && auth()->check()
+                        && auth()->user()->hasRole(
+                            'admin',
+                            'kepala_bengkel',
+                            'toolman'
+                        )
+                        && \Illuminate\Support\Facades\Route::has('loans.permit')
+                    )
+                        <a
+                            href="{{ route('loans.permit', $loan) }}"
+                            target="_blank"
+                            class="btn btn-outline-primary"
+                        >
+                            <i class="bi bi-printer me-1"></i>
+                            Cetak Surat Serah Terima
+                        </a>
+                    @endif
+
                     @if ($canCancel)
                         <form
                             method="POST"

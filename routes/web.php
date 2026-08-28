@@ -280,6 +280,20 @@ Route::middleware('auth')->group(
 
         /*
         |--------------------------------------------------------------------------
+        | Pencarian Global (Ctrl+K)
+        |--------------------------------------------------------------------------
+        */
+
+        $safeRoute(
+            'get',
+            '/global-search',
+            'global-search',
+            $controllers['dashboard'],
+            'search'
+        );
+
+        /*
+        |--------------------------------------------------------------------------
         | Profil
         |--------------------------------------------------------------------------
         */
@@ -1070,6 +1084,16 @@ Route::middleware('auth')->group(
             'loans.cancel',
             $controllers['loans'],
             'cancel',
+            'loans.index',
+            ['loan']
+        );
+
+        $safeRoute(
+            'get',
+            '/loans/{loan}/permit',
+            'loans.permit',
+            $controllers['loans'],
+            'permit',
             'loans.index',
             ['loan']
         );
