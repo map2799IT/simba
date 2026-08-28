@@ -264,6 +264,22 @@ class SimbaRoleAccess
             return true;
         }
 
+        /*
+         * Cetak Surat Serah Terima: hanya Kepala Bengkel atau Toolman
+         * (Admin ditangani early return di atas). Rule ini harus sebelum
+         * 'loans.*' agar tidak tervalidasi sebagai toolman-only.
+         */
+        if ($this->matches($routeName, ['loans.permit'])) {
+            return in_array(
+                $role,
+                [
+                    self::ROLE_HEAD,
+                    self::ROLE_TOOLMAN,
+                ],
+                true
+            );
+        }
+
         if ($this->matches($routeName, ['loans.*'])) {
             return $role === self::ROLE_TOOLMAN;
         }
