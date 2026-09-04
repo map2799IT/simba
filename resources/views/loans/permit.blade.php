@@ -41,6 +41,28 @@
             font-weight: bold;
         }
 
+        table.identity {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 8px 0 14px;
+        }
+
+        table.identity td {
+            border: 0;
+            padding: 2px 0;
+            vertical-align: top;
+        }
+
+        table.identity td.label {
+            width: 30%;
+            font-weight: bold;
+        }
+
+        table.identity td.sep {
+            width: 1%;
+            padding-right: 6px;
+        }
+
         table.data {
             border-collapse: collapse;
             width: 100%;
@@ -72,6 +94,19 @@
 
         .signature {
             margin-top: 34px;
+            page-break-inside: avoid;
+        }
+
+        table.data {
+            page-break-inside: auto;
+        }
+
+        table.data tr {
+            page-break-inside: avoid;
+        }
+
+        .title {
+            page-break-after: avoid;
         }
     </style>
 </head>
@@ -93,6 +128,20 @@
         );
 
         $approver = $loan->approver ?? $loan->borrower;
+
+        $monthNames = [
+            1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April',
+            5 => 'Mei', 6 => 'Juni', 7 => 'Juli', 8 => 'Agustus',
+            9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember',
+        ];
+
+        $formatIdDate = static function (?string $value) use ($monthNames): string {
+            $date = $value ? \Carbon\Carbon::parse($value) : null;
+            if ($date === null) {
+                return '-';
+            }
+            return $date->format('j') . ' ' . ($monthNames[(int) $date->format('n')] ?? $date->format('F')) . ' ' . $date->format('Y');
+        };
     @endphp
 
     @include('prints.official-letterhead', [
@@ -103,35 +152,51 @@
 
     <h2 class="title">Surat Serah Terima Alat</h2>
 
-    <div class="meta-row">
-        <span class="meta-label">Nomor Peminjaman:</span>
-        {{ $loan->code }}
-    </div>
-    <div class="meta-row">
-        <span class="meta-label">Nama Peminjam:</span>
-        {{ $loan->borrower?->name ?? '-' }}
-    </div>
-    <div class="meta-row">
-        <span class="meta-label">Peran:</span>
-        {{ $loan->borrower?->roleLabel() ?? '-' }}
-    </div>
-    <div class="meta-row">
-        <span class="meta-label">Jurusan:</span>
-        {{ $loan->workshop?->code ?? $loan->borrower?->workshop?->code ?? '-' }}
-    </div>
-    <div class="meta-row">
-        <span class="meta-label">Batas Pengembalian:</span>
-        {{ optional($loan->due_at)->format('d-m-Y H:i') ?? '-' }}
-    </div>
-    <div class="meta-row">
-        <span class="meta-label">Keperluan:</span>
-        {{ $loan->purpose ?? '-' }}
-    </div>
+    <table class="identity">
+        <tr>
+            <td class="label">Nomor Surat</td>
+            <td class="sep">:</td>
+            <td>{{ $officialDocument['number'] ?? '-' }}</td>
+        </tr>
+        <tr>
+            <td class="label">Nomor Peminjaman</td>
+            <td class="sep">:</td>
+            <td>{{ $loan->code }}</td>
+        </tr>
+        <tr>
+            <td class="label">Nama Peminjam</td>
+            <td class="sep">:</td>
+            <td>{{ $loan->borrower?->name ?? '-' }}</td>
+        </tr>
+        <tr>
+            <td class="label">Peran</td>
+            <td class="sep">:</td>
+            <td>{{ $loan->borrower?->roleLabel() ?? '-' }}</td>
+        </tr>
+        <tr>
+            <td class="label">Jurusan</td>
+            <td class="sep">:</td>
+            <td>{{ $loan->workshop?->code ?? $loan->borrower?->workshop?->code ?? '-' }}</td>
+        </tr>
+        <tr>
+            <td class="label">Batas Pengembalian</td>
+            <td class="sep">:</td>
+            <td>{{ $loan->due_at ? $formatIdDate($loan->due_at) . ' pukul ' . $loan->due_at->format('H:i') . ' WIB' : '-' }}</td>
+        </tr>
+        <tr>
+            <td class="label">Keperluan</td>
+            <td class="sep">:</td>
+            <td>{{ $loan->purpose ?? '-' }}</td>
+        </tr>
+    </table>
 
     <p class="statement">
-        Dengan ini dinyatakan bahwa alat-alat berikut telah diserahkan kepada peminjam
-        pada tanggal {{ optional($loan->borrowed_at ?? $loan->approved_at)->format('d-m-Y') ?? '-' }}
-        dalam kondisi baik, untuk dipergunakan sesuai keperluan yang tertera di atas.
+        Yang bertanda tangan di bawah ini, kami pihak yang bertanggung jawab atas
+        pengelolaan inventaris bengkel, dengan ini menyatakan bahwa alat-alat yang
+        tercantum dalam tabel berikut telah diserahkan kepada peminjam pada tanggal
+        {{ $formatIdDate($loan->borrowed_at ?? $loan->approved_at) }} dalam kondisi
+        baik dan layak digunakan, guna dipergunakan sesuai dengan keperluan sebagaimana
+        yang telah diuraikan di atas.
     </p>
 
     <table class="data">
@@ -183,8 +248,17 @@
     </table>
 
     <p class="statement">
-        Peminjam bertanggung jawab penuh atas keutuhan, kebersihan, dan keamanan alat
-        yang dipinjam, dan wajib mengembalikannya tepat waktu dalam kondisi baik.
+        Peminjam bertanggung jawab sepenuhnya atas keutuhan, kebersihan, dan keamanan
+        alat-alat yang dipinjam selama masa peminjaman, serta berkewajiban untuk
+        mengembalikannya tepat waktu dalam kondisi baik dan layak sebagaimana saat
+        diserahkan. Segala kerusakan, kehilangan, atau penyalahgunaan yang timbul
+        selama masa peminjaman merupakan tanggung jawab peminjam dan akan diproses
+        sesuai dengan ketentuan yang berlaku.
+    </p>
+
+    <p class="statement">
+        Demikian surat serah terima ini dibuat dengan sebenar-benarnya dan dipergunakan
+        sebagaimana mestinya. Atas perhatian dan kerja samanya, diucapkan terima kasih.
     </p>
 
     <div class="signature">
