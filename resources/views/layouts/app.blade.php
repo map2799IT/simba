@@ -67,7 +67,7 @@
         <div class="lg:pl-[304px]">
             {{-- Topbar --}}
             <header class="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-slate-200 bg-white/90 px-4 backdrop-blur-md lg:px-6">
-                <div class="flex items-center gap-3 min-w-0">
+                <div class="flex min-w-0 items-center gap-3">
                     <button
                         type="button"
                         @click="sidebarOpen = true"
@@ -78,13 +78,16 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
                         </svg>
                     </button>
-                    <div class="flex items-center gap-2 min-w-0">
+                    <div class="flex min-w-0 items-center gap-2">
                         <span class="text-base font-bold tracking-tight text-slate-900">SIMBA</span>
                         <span class="hidden text-xs text-slate-400 sm:inline">Sistem Inventaris Bengkel</span>
                     </div>
                 </div>
 
                 <div class="flex items-center gap-2 sm:gap-3">
+                    {{-- Global Search (Ctrl+K) --}}
+                    @include('partials.global-search-trigger')
+
                     {{-- Theme toggle --}}
                     <button
                         type="button"
@@ -154,6 +157,9 @@
         </div>
     </div>
 
+    {{-- Global Search (Ctrl+K) --}}
+    @include('partials.global-search')
+
     {{-- Flash toast (fixed positioned) --}}
     <x-flash-toast />
 
@@ -183,6 +189,54 @@
             });
         });
     </script>
+
+    <script>
+        window.toastHub = function () {
+            return {
+                toasts: [],
+                init($el) {
+                    this.seed();
+                    window.addEventListener('simba:toast', (e) => {
+                        const detail = e && e.detail ? e.detail : {};
+                        this.push(detail.type || 'info', detail.message, detail.title);
+                    });
+                },
+                seed() {
+                    const flash = window.__simbaFlashMessages || [];
+                    flash.forEach((item) => this.push(item.type || 'info', item.message, null));
+                },
+                configs: {
+                    success: { icon: 'bi-check-circle-fill', iconColor: 'text-emerald-600', iconBg: 'bg-emerald-50', border: 'border-emerald-200', progress: 'bg-emerald-500', title: 'Berhasil', duration: 4000, role: 'status', live: 'polite' },
+                    status: { icon: 'bi-check-circle-fill', iconColor: 'text-emerald-600', iconBg: 'bg-emerald-50', border: 'border-emerald-200', progress: 'bg-emerald-500', title: 'Berhasil', duration: 4000, role: 'status', live: 'polite' },
+                    password_success: { icon: 'bi-check-circle-fill', iconColor: 'text-emerald-600', iconBg: 'bg-emerald-50', border: 'border-emerald-200', progress: 'bg-emerald-500', title: 'Berhasil', duration: 4000, role: 'status', live: 'polite' },
+                    error: { icon: 'bi-x-circle-fill', iconColor: 'text-red-600', iconBg: 'bg-red-50', border: 'border-red-200', progress: 'bg-red-500', title: 'Terjadi Kesalahan', duration: 6000, role: 'alert', live: 'assertive' },
+                    warning: { icon: 'bi-exclamation-triangle-fill', iconColor: 'text-amber-600', iconBg: 'bg-amber-50', border: 'border-amber-200', progress: 'bg-amber-500', title: 'Perhatian', duration: 5500, role: 'status', live: 'polite' },
+                    info: { icon: 'bi-info-circle-fill', iconColor: 'text-blue-600', iconBg: 'bg-blue-50', border: 'border-blue-200', progress: 'bg-blue-500', title: 'Informasi', duration: 4500, role: 'status', live: 'polite' },
+                },
+                push(type, message, title) {
+                    const cfg = this.configs[type] || this.configs.info;
+                    const id = Date.now() + '-' + Math.random().toString(36).slice(2, 7);
+                    this.toasts.push(Object.assign({}, cfg, {
+                        id,
+                        type,
+                        message: message || cfg.title,
+                        title: title || cfg.title,
+                        show: true,
+                    }));
+                    setTimeout(() => this.dismiss(this.toasts.length - 1), cfg.duration);
+                },
+                dismiss(index) {
+                    const t = this.toasts[index];
+                    if (!t) return;
+                    t.show = false;
+                    setTimeout(() => {
+                        this.toasts = this.toasts.filter((x) => x.id !== t.id);
+                    }, 250);
+                },
+            };
+        };
+    </script>
+
     @include('layouts.role-menu-guard')
     @include('layouts.user-jurusan-guard')
     @include('layouts.loan-jurusan-guard')

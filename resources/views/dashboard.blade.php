@@ -71,104 +71,110 @@
 
     {{-- KPI Cards Row 1 --}}
     <div class="mb-4 grid grid-cols-2 gap-3 sm:gap-4 sm:grid-cols-3 xl:grid-cols-6">
-        <div class="flex items-center justify-between rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-            <div class="min-w-0">
-                <p class="text-xs font-medium text-slate-500">Master Barang</p>
-                <p class="mt-1.5 text-xl font-bold text-slate-900 sm:text-2xl">{{ $number($stats['total_items']) }}</p>
-                <p class="mt-0.5 text-xs text-slate-400">{{ $stats['tool_masters'] }} alat · {{ $stats['material_masters'] }} bahan</p>
+        @php
+            $kpiCards = [
+                ['label' => 'Master Barang', 'value' => $number($stats['total_items']), 'sub' => $stats['tool_masters'] . ' alat · ' . $stats['material_masters'] . ' bahan', 'icon' => 'bi-box-seam', 'gradient' => 'from-blue-500 to-indigo-600', 'text' => 'text-blue-600', 'shadow' => 'shadow-blue-500/20'],
+                ['label' => 'Unit Alat', 'value' => $number($stats['tool_units']), 'sub' => $stats['available_units'] . ' tersedia', 'icon' => 'bi-qr-code-scan', 'gradient' => 'from-cyan-500 to-sky-600', 'text' => 'text-cyan-600', 'shadow' => 'shadow-cyan-500/20'],
+                ['label' => 'Dipinjam/Dipesan', 'value' => $number($stats['borrowed_units']), 'sub' => 'unit alat', 'icon' => 'bi-arrow-left-right', 'gradient' => 'from-amber-500 to-orange-600', 'text' => 'text-amber-600', 'shadow' => 'shadow-amber-500/20'],
+                ['label' => 'Unit Bermasalah', 'value' => $number($stats['problem_units']), 'sub' => 'rusak/perbaikan/hilang', 'icon' => 'bi-exclamation-octagon', 'gradient' => 'from-rose-500 to-red-600', 'text' => 'text-rose-600', 'shadow' => 'shadow-rose-500/20'],
+                ['label' => 'Peminjaman Menunggu', 'value' => $number($stats['pending_loans']), 'sub' => 'sesuai hak akses', 'icon' => 'bi-hourglass-split', 'gradient' => 'from-violet-500 to-purple-600', 'text' => 'text-violet-600', 'shadow' => 'shadow-violet-500/20'],
+                ['label' => 'Kerusakan Aktif', 'value' => $number($stats['open_damages']), 'sub' => 'belum selesai', 'icon' => 'bi-wrench-adjustable', 'gradient' => 'from-orange-500 to-amber-600', 'text' => 'text-orange-600', 'shadow' => 'shadow-orange-500/20'],
+            ];
+        @endphp
+        @foreach ($kpiCards as $card)
+            <div class="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg">
+                <div class="flex items-center justify-between">
+                    <div class="min-w-0">
+                        <p class="text-xs font-medium text-slate-500">{{ $card['label'] }}</p>
+                        <p class="mt-1.5 text-xl font-bold text-slate-900 sm:text-2xl">{{ $card['value'] }}</p>
+                        <p class="mt-0.5 text-xs text-slate-400">{{ $card['sub'] }}</p>
+                    </div>
+                    <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br {{ $card['gradient'] }} text-white shadow-lg {{ $card['shadow'] }} transition-transform duration-200 group-hover:scale-110">
+                        <i class="bi {{ $card['icon'] }} text-lg"></i>
+                    </span>
+                </div>
+                <span class="absolute inset-x-0 top-0 h-1 bg-gradient-to-r {{ $card['gradient'] }} opacity-0 transition-opacity duration-200 group-hover:opacity-100" aria-hidden="true"></span>
             </div>
-            <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600"><i class="bi bi-box-seam text-lg"></i></div>
-        </div>
-        <div class="flex items-center justify-between rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-            <div class="min-w-0">
-                <p class="text-xs font-medium text-slate-500">Unit Alat</p>
-                <p class="mt-1.5 text-xl font-bold text-blue-600 sm:text-2xl">{{ $number($stats['tool_units']) }}</p>
-                <p class="mt-0.5 text-xs text-slate-400">{{ $stats['available_units'] }} tersedia</p>
-            </div>
-            <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600"><i class="bi bi-qr-code-scan text-lg"></i></div>
-        </div>
-        <div class="flex items-center justify-between rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-            <div class="min-w-0">
-                <p class="text-xs font-medium text-slate-500">Dipinjam/Dipesan</p>
-                <p class="mt-1.5 text-xl font-bold text-amber-600 sm:text-2xl">{{ $number($stats['borrowed_units']) }}</p>
-                <p class="mt-0.5 text-xs text-slate-400">unit alat</p>
-            </div>
-            <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-50 text-amber-600"><i class="bi bi-arrow-left-right text-lg"></i></div>
-        </div>
-        <div class="flex items-center justify-between rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-            <div class="min-w-0">
-                <p class="text-xs font-medium text-slate-500">Unit Bermasalah</p>
-                <p class="mt-1.5 text-xl font-bold text-red-600 sm:text-2xl">{{ $number($stats['problem_units']) }}</p>
-                <p class="mt-0.5 text-xs text-slate-400">rusak/perbaikan/hilang</p>
-            </div>
-            <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-red-50 text-red-600"><i class="bi bi-exclamation-octagon text-lg"></i></div>
-        </div>
-        <div class="flex items-center justify-between rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-            <div class="min-w-0">
-                <p class="text-xs font-medium text-slate-500">Peminjaman Menunggu</p>
-                <p class="mt-1.5 text-xl font-bold text-amber-600 sm:text-2xl">{{ $number($stats['pending_loans']) }}</p>
-                <p class="mt-0.5 text-xs text-slate-400">sesuai hak akses</p>
-            </div>
-            <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-50 text-amber-600"><i class="bi bi-hourglass-split text-lg"></i></div>
-        </div>
-        <div class="flex items-center justify-between rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-            <div class="min-w-0">
-                <p class="text-xs font-medium text-slate-500">Kerusakan Aktif</p>
-                <p class="mt-1.5 text-xl font-bold text-red-600 sm:text-2xl">{{ $number($stats['open_damages']) }}</p>
-                <p class="mt-0.5 text-xs text-slate-400">belum selesai</p>
-            </div>
-            <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-red-50 text-red-600"><i class="bi bi-wrench text-lg"></i></div>
-        </div>
+        @endforeach
     </div>
 
     {{-- KPI Cards Row 2 --}}
     <div class="mb-5 grid grid-cols-1 gap-3 sm:gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-            <p class="text-xs font-medium text-slate-500">Nilai Inventaris</p>
-            <p class="mt-1.5 text-lg font-bold text-slate-900">{{ $money($stats['inventory_value']) }}</p>
+        <div class="relative overflow-hidden rounded-2xl border border-slate-200 bg-gradient-to-br from-slate-50 to-white p-4 shadow-sm">
+            <div class="absolute -right-3 -top-3 h-20 w-20 rounded-full bg-blue-50/70 blur-xl" aria-hidden="true"></div>
+            <div class="relative flex items-center gap-3">
+                <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-blue-100 text-blue-600"><i class="bi bi-cash-stack text-base"></i></span>
+                <div>
+                    <p class="text-xs font-medium text-slate-500">Nilai Inventaris</p>
+                    <p class="mt-0.5 text-lg font-bold text-slate-900">{{ $money($stats['inventory_value']) }}</p>
+                </div>
+            </div>
         </div>
-        <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-            <p class="text-xs font-medium text-slate-500">Stok Minimum</p>
-            <p class="mt-1.5 text-lg font-bold text-red-600">{{ $number($stats['low_stock_materials']) }} bahan</p>
+        <div class="relative overflow-hidden rounded-2xl border border-slate-200 bg-gradient-to-br from-slate-50 to-white p-4 shadow-sm">
+            <div class="absolute -right-3 -top-3 h-20 w-20 rounded-full bg-red-50/70 blur-xl" aria-hidden="true"></div>
+            <div class="relative flex items-center gap-3">
+                <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-red-100 text-red-600"><i class="bi bi-exclamation-diamond text-base"></i></span>
+                <div>
+                    <p class="text-xs font-medium text-slate-500">Stok Minimum</p>
+                    <p class="mt-0.5 text-lg font-bold text-red-600">{{ $number($stats['low_stock_materials']) }} bahan</p>
+                </div>
+            </div>
         </div>
-        <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-            <p class="text-xs font-medium text-slate-500">Barang Masuk Bulan Ini</p>
-            <p class="mt-1.5 text-lg font-bold text-emerald-600">+{{ $number($stats['incoming_this_month'], 3) }}</p>
+        <div class="relative overflow-hidden rounded-2xl border border-slate-200 bg-gradient-to-br from-slate-50 to-white p-4 shadow-sm">
+            <div class="absolute -right-3 -top-3 h-20 w-20 rounded-full bg-emerald-50/70 blur-xl" aria-hidden="true"></div>
+            <div class="relative flex items-center gap-3">
+                <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-emerald-100 text-emerald-600"><i class="bi bi-box-arrow-in-down text-base"></i></span>
+                <div>
+                    <p class="text-xs font-medium text-slate-500">Barang Masuk Bulan Ini</p>
+                    <p class="mt-0.5 text-lg font-bold text-emerald-600">+{{ $number($stats['incoming_this_month'], 3) }}</p>
+                </div>
+            </div>
         </div>
-        <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-            <p class="text-xs font-medium text-slate-500">Barang Keluar Bulan Ini</p>
-            <p class="mt-1.5 text-lg font-bold text-red-600">-{{ $number($stats['outgoing_this_month'], 3) }}</p>
+        <div class="relative overflow-hidden rounded-2xl border border-slate-200 bg-gradient-to-br from-slate-50 to-white p-4 shadow-sm">
+            <div class="absolute -right-3 -top-3 h-20 w-20 rounded-full bg-rose-50/70 blur-xl" aria-hidden="true"></div>
+            <div class="relative flex items-center gap-3">
+                <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-rose-100 text-rose-600"><i class="bi bi-box-arrow-up text-base"></i></span>
+                <div>
+                    <p class="text-xs font-medium text-slate-500">Barang Keluar Bulan Ini</p>
+                    <p class="mt-0.5 text-lg font-bold text-red-600">-{{ $number($stats['outgoing_this_month'], 3) }}</p>
+                </div>
+            </div>
         </div>
     </div>
 
     {{-- Visual Widget: Pergerakan Bulan Ini --}}
     <div class="mb-5 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-        <div class="border-b border-slate-100 px-5 py-4">
-            <h2 class="text-base font-semibold text-slate-900">Pergerakan Stok Bulan Ini</h2>
-            <p class="mt-0.5 text-sm text-slate-500">Visual cepat untuk barang masuk vs keluar.</p>
+        <div class="flex items-center justify-between border-b border-slate-100 px-5 py-4">
+            <div>
+                <h2 class="text-base font-semibold text-slate-900">Pergerakan Stok Bulan Ini</h2>
+                <p class="mt-0.5 text-sm text-slate-500">Visual cepat untuk barang masuk vs keluar.</p>
+            </div>
+            <span class="hidden h-9 w-9 items-center justify-center rounded-xl bg-slate-50 text-slate-400 sm:flex"><i class="bi bi-graph-up-arrow text-base"></i></span>
         </div>
         @php
             $incoming = (float) $stats['incoming_this_month'];
             $outgoing = (float) $stats['outgoing_this_month'];
             $maxMovement = max($incoming, $outgoing, 1);
+            $incomingPct = min(100, ($incoming / $maxMovement) * 100);
+            $outgoingPct = min(100, ($outgoing / $maxMovement) * 100);
         @endphp
-        <div class="grid gap-4 p-5 md:grid-cols-2">
+        <div class="grid gap-6 p-5 md:grid-cols-2">
             <div>
                 <div class="mb-2 flex items-center justify-between text-sm">
-                    <span class="font-medium text-emerald-700">Barang Masuk</span>
+                    <span class="inline-flex items-center gap-1.5 font-medium text-emerald-700"><i class="bi bi-arrow-down-circle-fill text-xs"></i> Barang Masuk</span>
                     <span class="font-semibold text-slate-800">{{ $number($incoming, 3) }}</span>
                 </div>
-                <div class="h-4 rounded-full bg-slate-100">
-                    <div class="h-4 rounded-full bg-emerald-500" style="width: {{ min(100, ($incoming / $maxMovement) * 100) }}%"></div>
+                <div class="h-3 overflow-hidden rounded-full bg-slate-100">
+                    <div class="h-3 rounded-full bg-gradient-to-r from-emerald-400 to-emerald-600 transition-all duration-500" style="width: {{ $incomingPct }}%"></div>
                 </div>
             </div>
             <div>
                 <div class="mb-2 flex items-center justify-between text-sm">
-                    <span class="font-medium text-red-700">Barang Keluar</span>
+                    <span class="inline-flex items-center gap-1.5 font-medium text-red-700"><i class="bi bi-arrow-up-circle-fill text-xs"></i> Barang Keluar</span>
                     <span class="font-semibold text-slate-800">{{ $number($outgoing, 3) }}</span>
                 </div>
-                <div class="h-4 rounded-full bg-slate-100">
-                    <div class="h-4 rounded-full bg-red-500" style="width: {{ min(100, ($outgoing / $maxMovement) * 100) }}%"></div>
+                <div class="h-3 overflow-hidden rounded-full bg-slate-100">
+                    <div class="h-3 rounded-full bg-gradient-to-r from-rose-400 to-red-600 transition-all duration-500" style="width: {{ $outgoingPct }}%"></div>
                 </div>
             </div>
         </div>
@@ -176,19 +182,36 @@
 
     {{-- Quick Access --}}
     <div class="mb-5 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-        <div class="border-b border-slate-100 px-5 py-4">
-            <h2 class="text-base font-semibold text-slate-900">Akses Cepat</h2>
+        <div class="flex items-center justify-between border-b border-slate-100 px-5 py-4">
+            <div>
+                <h2 class="text-base font-semibold text-slate-900">Akses Cepat</h2>
+                <p class="mt-0.5 text-sm text-slate-500">Menu yang paling sering digunakan.</p>
+            </div>
         </div>
-        <div class="flex flex-wrap gap-2 p-5">
-            @if (\Illuminate\Support\Facades\Route::has('items.index'))<x-button href="{{ route('items.index') }}" variant="soft"><i class="bi bi-tools"></i> Data Inventaris</x-button>@endif
-            @if (\Illuminate\Support\Facades\Route::has('item-assets.index'))<x-button href="{{ route('item-assets.index') }}" variant="soft"><i class="bi bi-qr-code-scan"></i> Unit Alat & QR</x-button>@endif
-            @if (in_array($role, ['admin', 'toolman'], true) && \Illuminate\Support\Facades\Route::has('stock-receipts.create'))<x-button href="{{ route('stock-receipts.create') }}" variant="soft-success"><i class="bi bi-box-arrow-in-down"></i> Barang Masuk</x-button>@endif
-            @if (in_array($role, ['admin', 'toolman'], true) && \Illuminate\Support\Facades\Route::has('stock-issues.create'))<x-button href="{{ route('stock-issues.create') }}" variant="soft-danger"><i class="bi bi-box-arrow-up"></i> Barang Keluar</x-button>@endif
-            @if (\Illuminate\Support\Facades\Route::has('loans.create'))<x-button href="{{ route('loans.create') }}" variant="primary"><i class="bi bi-journal-plus"></i> Ajukan Peminjaman</x-button>@endif
-            @if (\Illuminate\Support\Facades\Route::has('loans.index'))<x-button href="{{ route('loans.index') }}" variant="soft"><i class="bi bi-journal-text"></i> Daftar Peminjaman</x-button>@endif
-            @if (\Illuminate\Support\Facades\Route::has('damage-reports.create'))<x-button href="{{ route('damage-reports.create') }}" variant="soft" class="bg-amber-50 text-amber-700 hover:bg-amber-100"><i class="bi bi-exclamation-triangle"></i> Laporkan Kerusakan</x-button>@endif
-            @if (\Illuminate\Support\Facades\Route::has('reports.inventory'))<x-button href="{{ route('reports.inventory', $dashboardQuery) }}" variant="secondary"><i class="bi bi-bar-chart-line"></i> Laporan Inventaris</x-button>@endif
-            @if ($role === 'admin' && \Illuminate\Support\Facades\Route::has('admin.users.index'))<x-button href="{{ route('admin.users.index') }}" variant="secondary"><i class="bi bi-people"></i> Pengguna</x-button>@endif
+        <div class="grid grid-cols-2 gap-3 p-5 sm:grid-cols-3 lg:grid-cols-5">
+            @php
+                $quickLinks = [
+                    ['route' => 'items.index', 'cond' => \Illuminate\Support\Facades\Route::has('items.index'), 'label' => 'Data Inventaris', 'icon' => 'bi-tools', 'gradient' => 'from-blue-500 to-indigo-600'],
+                    ['route' => 'item-assets.index', 'cond' => \Illuminate\Support\Facades\Route::has('item-assets.index'), 'label' => 'Unit Alat & QR', 'icon' => 'bi-qr-code-scan', 'gradient' => 'from-cyan-500 to-sky-600'],
+                    ['route' => 'stock-receipts.create', 'cond' => in_array($role, ['admin', 'toolman'], true) && \Illuminate\Support\Facades\Route::has('stock-receipts.create'), 'label' => 'Barang Masuk', 'icon' => 'bi-box-arrow-in-down', 'gradient' => 'from-emerald-500 to-teal-600'],
+                    ['route' => 'stock-issues.create', 'cond' => in_array($role, ['admin', 'toolman'], true) && \Illuminate\Support\Facades\Route::has('stock-issues.create'), 'label' => 'Barang Keluar', 'icon' => 'bi-box-arrow-up', 'gradient' => 'from-rose-500 to-red-600'],
+                    ['route' => 'loans.create', 'cond' => \Illuminate\Support\Facades\Route::has('loans.create'), 'label' => 'Ajukan Peminjaman', 'icon' => 'bi-journal-plus', 'gradient' => 'from-violet-500 to-purple-600'],
+                    ['route' => 'loans.index', 'cond' => \Illuminate\Support\Facades\Route::has('loans.index'), 'label' => 'Daftar Peminjaman', 'icon' => 'bi-journal-text', 'gradient' => 'from-indigo-500 to-blue-600'],
+                    ['route' => 'damage-reports.create', 'cond' => \Illuminate\Support\Facades\Route::has('damage-reports.create'), 'label' => 'Laporkan Kerusakan', 'icon' => 'bi-exclamation-triangle', 'gradient' => 'from-amber-500 to-orange-600'],
+                    ['route' => 'reports.inventory', 'cond' => \Illuminate\Support\Facades\Route::has('reports.inventory'), 'label' => 'Laporan Inventaris', 'icon' => 'bi-bar-chart-line', 'gradient' => 'from-teal-500 to-emerald-600'],
+                    ['route' => 'admin.users.index', 'cond' => $role === 'admin' && \Illuminate\Support\Facades\Route::has('admin.users.index'), 'label' => 'Pengguna', 'icon' => 'bi-people', 'gradient' => 'from-slate-600 to-slate-700'],
+                ];
+            @endphp
+            @foreach ($quickLinks as $link)
+                @if ($link['cond'])
+                    <a href="{{ $link['route'] === 'reports.inventory' ? route('reports.inventory', $dashboardQuery) : route($link['route']) }}" class="group flex flex-col items-center gap-2.5 rounded-2xl border border-slate-200 bg-white p-4 text-center no-underline transition-all duration-200 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md" style="text-decoration:none!important">
+                        <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br {{ $link['gradient'] }} text-white shadow-lg transition-transform duration-200 group-hover:scale-110">
+                            <i class="bi {{ $link['icon'] }} text-lg"></i>
+                        </span>
+                        <span class="text-[12px] font-semibold leading-tight text-slate-700 group-hover:text-slate-900">{{ $link['label'] }}</span>
+                    </a>
+                @endif
+            @endforeach
         </div>
     </div>
 
