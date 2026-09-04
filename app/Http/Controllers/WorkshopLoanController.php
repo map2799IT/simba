@@ -991,6 +991,66 @@ class WorkshopLoanController
         );
     }
 
+    /**
+     * Cetak Surat Serah Terima / Surat Peminjaman.
+     *
+     * Hanya boleh dicetak oleh Admin, Kepala Bengkel, atau Toolman
+     * dan hanya setelah alat benar-benar diserahkan (status borrowed).
+     */
+    public function permit(
+        Request $request,
+        Loan $loan
+    ): mixed {
+        $this->authorizeLoan(
+            $request,
+            $loan
+        );
+
+        $user = $request->user();
+
+        if (
+            $user === null
+            || ! in_array(
+                (string) $user->role,
+                [
+                    'admin',
+                    'kepala_bengkel',
+                    'toolman',
+                ],
+                true
+            )
+        ) {
+            abort(403, 'Hanya Admin, Kepala Bengkel, atau Toolman yang dapat mencetak surat.');
+        }
+
+        if ($loan->status !== Loan::STATUS_BORROWED) {
+            abort(422, 'Surat hanya dapat dicetak setelah alat diserahkan.');
+        }
+
+        $loan->load([
+            'borrower',
+            'approver',
+            'workshop',
+            'items.item.unit',
+            'items.item.workshop',
+            'items.itemAsset',
+            'items.returnedBy',
+        ]);
+
+        return \Barryvdh\DomPDF\Facade\Pdf::loadView(
+            'loans.permit',
+            [
+                'loan' => $loan,
+                'generatedAt' => now(),
+            ]
+        )->setPaper('a4', 'portrait')->download(
+            sprintf(
+                'surat-serah-terima-%s.pdf',
+                $loan->code
+            )
+        );
+    }
+
     public function approve(
         Request $request,
         Loan $loan

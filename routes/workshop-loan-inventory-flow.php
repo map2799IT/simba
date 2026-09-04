@@ -33,6 +33,7 @@ $loanRoutes = [
     [['POST'], 'loans/{loan}/items/{loanItem}/return', 'loans.items.return', WorkshopLoanReturnController::class, 'returnItem'],
     [['POST'], 'loans/{loan}/items/{loanItem}/replace', 'loans.items.replace', WorkshopLoanController::class, 'replaceAsset'],
     [['POST'], 'loans/{loan}/extend', 'loans.extend', WorkshopLoanController::class, 'extend'],
+    [['GET', 'HEAD'], 'loans/{loan}/permit', 'loans.permit', WorkshopLoanController::class, 'permit'],
     [['GET', 'HEAD'], 'loans/{loan}', 'loans.show', WorkshopLoanController::class, 'show'],
 ];
 
