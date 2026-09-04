@@ -36,13 +36,27 @@ class EnforceSimbaRoleAccess
                 ->with('error', 'Akun Anda telah dinonaktifkan. Hubungi administrator.');
         }
 
+        $routeName = $request->route()?->getName();
+        $allowed = $this->access->canRoute(
+            $user,
+            $routeName,
+            $request->method(),
+            $request->path()
+        );
+
+        if (! $allowed) {
+            \Illuminate\Support\Facades\Log::warning('SIDDIK-403-RBAC', [
+                'role' => (string) $user->role,
+                'user_id' => $user->id,
+                'route' => (string) $routeName,
+                'method' => $request->method(),
+                'path' => $request->path(),
+                'url' => $request->fullUrl(),
+            ]);
+        }
+
         abort_unless(
-            $this->access->canRoute(
-                $user,
-                $request->route()?->getName(),
-                $request->method(),
-                $request->path()
-            ),
+            $allowed,
             403,
             $this->access->denialMessage(
                 $user
