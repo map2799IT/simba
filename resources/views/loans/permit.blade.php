@@ -146,13 +146,21 @@
             </tr>
         </thead>
         <tbody>
+            @php $totalQty = 0; @endphp
             @forelse ($loan->items as $index => $li)
+                @php
+                    $qtyRaw = (float) ($li->quantity ?? 1);
+                    $totalQty += $qtyRaw;
+                    $qtyText = $qtyRaw === floor($qtyRaw)
+                        ? number_format($qtyRaw, 0, ',', '.')
+                        : rtrim(rtrim(number_format($qtyRaw, 3, ',', '.'), '0'), ',');
+                @endphp
                 <tr>
                     <td class="text-center">{{ $index + 1 }}</td>
                     <td>{{ $li->item?->code ?? '-' }}</td>
                     <td>{{ $li->item?->name ?? '-' }}</td>
                     <td class="text-center">{{ $li->itemAsset?->asset_number ?? '-' }}</td>
-                    <td class="text-center">{{ $li->quantity ?? 1 }}</td>
+                    <td class="text-center">{{ $qtyText }}</td>
                     <td class="text-center">{{ $li->condition_out ?? '-' }}</td>
                 </tr>
             @empty
@@ -161,6 +169,17 @@
                 </tr>
             @endforelse
         </tbody>
+        @if ($loan->items->count() > 1)
+        <tfoot>
+            <tr class="text-bold">
+                <td class="text-right" colspan="4">Total Jumlah</td>
+                <td class="text-center">
+                    {{ number_format($totalQty, 0, ',', '.') }}
+                </td>
+                <td></td>
+            </tr>
+        </tfoot>
+        @endif
     </table>
 
     <p class="statement">
